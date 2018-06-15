@@ -85,7 +85,6 @@ std::string IPv6Route::info() const
         out << " exp:" << getExpiryTime();
 #endif
     return out.str();
-
 }
 
 std::string IPv6Route::detailedInfo() const
