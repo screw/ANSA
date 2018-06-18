@@ -18,6 +18,7 @@ src/Makefile.vc
 /examples/*/*/cache/
 /tutorials/*/cache/
 /tutorials/*/data/
+/tutorials/wireless/html/
 /tests/*/work/
 /tests/*/*/work/
 /tests/*/results*/
@@ -66,4 +67,3 @@ backups
 xxx
 /3rdparty
 /tmp/
-/.cproject
