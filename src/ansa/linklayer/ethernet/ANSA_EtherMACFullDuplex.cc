@@ -84,8 +84,6 @@ void ANSA_EtherMACFullDuplex::handleMessage(cMessage *msg)
     else
         throw cRuntimeError("Message received from unknown gate!");
 
-    if (hasGUI())
-        updateDisplayString();
 }
 
 void ANSA_EtherMACFullDuplex::handleSelfMessage(cMessage *msg)

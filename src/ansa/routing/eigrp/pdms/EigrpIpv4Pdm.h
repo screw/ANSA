@@ -102,7 +102,7 @@ class EigrpIpv4Pdm : public cSimpleModule, public IEigrpModule<IPv4Address>, pub
     /**< Multi-stage initialization. */
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
     //virtual void receiveChangeNotification(int category, const cObject *details);
-    virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj DETAILS_ARG) override;
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details) override;
 
     void printSentMsg(int routeCnt, IPv4Address& destAddress, EigrpMsgReq *msgReq);
     void printRecvMsg(EigrpMessage *msg, IPv4Address& addr, int ifaceId);

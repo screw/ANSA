@@ -92,7 +92,7 @@ class INET_API BabelMain : protected cListener, public cSimpleModule
     virtual void initialize(int stage) override;
     virtual void finish() override;
     virtual void handleMessage(cMessage *msg) override;
-    virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj DETAILS_ARG) override;
+    virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details) override;
 
   public:
     BabelMain() :   seqno(0),

@@ -235,7 +235,7 @@ void BabelMain::receiveChangeNotification(int category, const cObject *details)
 }
 */
 
-void BabelMain::receiveSignal(cComponent* source, simsignal_t signalID, cObject* obj DETAILS_ARG)
+void BabelMain::receiveSignal(cComponent* source, simsignal_t signalID, cObject* obj, cObject *details)
 {
     Enter_Method_Silent("BabelRouting::receiveChangeNotification(%s)", notificationCategoryName(signalID));
 

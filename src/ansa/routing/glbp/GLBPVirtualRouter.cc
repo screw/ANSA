@@ -612,7 +612,7 @@ void GLBPVirtualRouter::receiveSignal(cComponent *source, simsignal_t signalID, 
     }
 }
 
-void GLBPVirtualRouter::receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj DETAILS_ARG)
+void GLBPVirtualRouter::receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details)
 {
     Enter_Method_Silent("GLBPVirtualRouter::receiveChangeNotification(%s)", notificationCategoryName(signalID));
 

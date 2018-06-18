@@ -171,7 +171,7 @@ class HSRPVirtualRouter : public cSimpleModule, public cListener
         /**
          * OMNeT++ signal handler
          */
-        virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj DETAILS_ARG) override;
+        virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details) override;
 
     public:
         /**

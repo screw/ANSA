@@ -153,7 +153,7 @@ class GLBPVirtualRouter: public cSimpleModule, public cListener{
          * OMNeT++ signal handlers
          */
         //@{
-        virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj DETAILS_ARG) override;
+        virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details) override;
         virtual void receiveSignal(cComponent *source, simsignal_t signalID, bool b, cObject *details) override;
         //@}
 

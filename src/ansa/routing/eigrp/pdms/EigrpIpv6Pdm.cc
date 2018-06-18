@@ -142,7 +142,7 @@ void EigrpIpv6Pdm::initialize(int stage)
 
 
 //void EigrpIpv6Pdm::receiveChangeNotification(int category, const cObject *details)
-void EigrpIpv6Pdm::receiveSignal(cComponent* source, simsignal_t signalID, cObject* obj DETAILS_ARG)
+void EigrpIpv6Pdm::receiveSignal(cComponent* source, simsignal_t signalID, cObject* obj, cObject *details)
 {
     // ignore notifications during initialization
     /*

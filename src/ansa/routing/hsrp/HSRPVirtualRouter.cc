@@ -597,7 +597,7 @@ HSRPVirtualRouter::~HSRPVirtualRouter() {
 /**
  * Listen on interface/route changes and update private data structures.
  */
-void HSRPVirtualRouter::receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj DETAILS_ARG)
+void HSRPVirtualRouter::receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details)
 {
     Enter_Method_Silent("HSRPVirtualRouter::receiveChangeNotification(%s)", notificationCategoryName(signalID));
 
