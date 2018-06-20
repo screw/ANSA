@@ -32,7 +32,8 @@ namespace inet{
 
 void ANSA_EtherMACBaseVF::initialize(int stage)
 {
-    connectionColoring = par("connectionColoring");
+    //TODO: if build succeeds, delete coloring
+    //connectionColoring = par("connectionColoring");
 
     MACBase::initialize(stage);
 
