@@ -23,17 +23,17 @@ package inet.visualizer.base;
 // interfaces are not displayed by default, see module parameters for how to
 // enable the visualization.
 //
-// This module subscribes for NF_INTERFACE_CREATED, NF_INTERFACE_DELETED, 
-// NF_INTERFACE_CONFIG_CHANGED, and NF_INTERFACE_IPv4CONFIG_CHANGED on the
+// This module subscribes for interfaceCreated, interfaceDeleted, 
+// interfaceConfigChanged, and interfaceIpv4ConfigChanged on the
 // module determined by the subscriptionModule parameter.
 //
 // The format string can contain the following directives:
 //  - %N interface name
 //  - %m MAC address
-//  - %4 IPv4 address
-//  - %6 IPv6 address
-//  - %a IPv4 or IPv6 address
-//  - %l IPv4 or IPv6 netmask length
+//  - %4 Ipv4 address
+//  - %6 Ipv6 address
+//  - %a Ipv4 or Ipv6 address
+//  - %l Ipv4 or Ipv6 netmask length
 //  - %g generic address
 //  - %n network address
 //  - %i InterfaceEntry::info()

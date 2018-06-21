@@ -21,10 +21,12 @@
  **************************************************************************/
 
 #include "inet/networklayer/flood/Flood.h"
+
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/networklayer/common/HopLimitTag_m.h"
+#include "inet/networklayer/common/L3AddressTag_m.h"
 #include "inet/networklayer/contract/IL3AddressType.h"
-#include "inet/networklayer/contract/INetworkProtocolControlInfo.h"
-#include "inet/linklayer/common/SimpleLinkLayerControlInfo.h"
-#include "inet/networklayer/common/SimpleNetworkProtocolControlInfo.h"
+#include "inet/linklayer/common/MacAddressTag_m.h"
 
 namespace inet {
 
@@ -47,18 +49,16 @@ void Flood::initialize(int stage)
         nbDataPacketsForwarded = 0;
         nbHops = 0;
         headerLength = par("headerLength");
-        hasPar("defaultTtl") ? defaultTtl = par("defaultTtl") : defaultTtl = 5;
-        hasPar("plainFlooding") ? plainFlooding = par("plainFlooding")
-            : plainFlooding = true;
+        defaultTtl = par("defaultTtl");
+        plainFlooding = par("plainFlooding");
 
         EV << "defaultTtl = " << defaultTtl
            << " plainFlooding = " << plainFlooding << endl;
 
         if (plainFlooding) {
             //these parameters are only needed for plain flooding
-            hasPar("bcMaxEntries") ? bcMaxEntries = par("bcMaxEntries") : bcMaxEntries = 30;
-
-            hasPar("bcDelTime") ? bcDelTime = par("bcDelTime").doubleValue() : bcDelTime = 3.0;
+            bcMaxEntries = par("bcMaxEntries");
+            bcDelTime = par("bcDelTime");
             EV << "bcMaxEntries = " << bcMaxEntries
                << " bcDelTime = " << bcDelTime << endl;
         }
@@ -98,13 +98,10 @@ void Flood::finish()
  * If the maximum number of entries is reached the first (oldest) entry
  * is deleted.
  **/
-void Flood::handleUpperPacket(cPacket *m)
+void Flood::handleUpperPacket(Packet *packet)
 {
-    FloodDatagram *msg = encapsMsg(m);
-
-    msg->setSeqNum(seqNum);
-    seqNum++;
-    msg->setTtl(defaultTtl);
+    encapsulate(packet);
+    auto floodHeader = packet->peekAtFront<FloodHeader>();
 
     if (plainFlooding) {
         if (bcMsgs.size() >= bcMaxEntries) {
@@ -121,10 +118,10 @@ void Flood::handleUpperPacket(cPacket *m)
                 bcMsgs.pop_front();
             }
         }
-        bcMsgs.push_back(Bcast(msg->getSeqNum(), msg->getSourceAddress(), simTime() + bcDelTime));
+        bcMsgs.push_back(Bcast(floodHeader->getSeqNum(), floodHeader->getSourceAddress(), simTime() + bcDelTime));
     }
     //there is no routing so all messages are broadcast for the mac layer
-    sendDown(msg);
+    sendDown(packet);
     nbDataPacketsSent++;
 }
 
@@ -138,69 +135,78 @@ void Flood::handleUpperPacket(cPacket *m)
  * account for this hop.
  *
  * In the case of plain flooding the message will only be processed if
- * there is no corresponding entry in the bcMsgs list (@ref
+ * there is no corresponding entry in the bcMsgs
+ * list (@ref
  * notBroadcasted). Otherwise the message will be deleted.
  **/
-void Flood::handleLowerPacket(cPacket *m)
+void Flood::handleLowerPacket(Packet *packet)
 {
-    FloodDatagram *msg = check_and_cast<FloodDatagram *>(m);
-    int protocol = msg->getTransportProtocol();
+    auto floodHeader = packet->peekAtFront<FloodHeader>();
 
     //msg not broadcasted yet
-    if (notBroadcasted(msg)) {
+    if (notBroadcasted(floodHeader.get())) {
         //msg is for me
-        if (interfaceTable->isLocalAddress(msg->getDestinationAddress())) {
+        if (interfaceTable->isLocalAddress(floodHeader->getDestinationAddress())) {
             EV << " data msg for me! send to Upper" << endl;
-            nbHops = nbHops + (defaultTtl + 1 - msg->getTtl());
-            sendUp(decapsMsg(msg), protocol);
+            nbHops = nbHops + (defaultTtl + 1 - floodHeader->getTtl());
+            decapsulate(packet);
+            sendUp(packet);
             nbDataPacketsReceived++;
         }
         //broadcast message
-        else if (msg->getDestinationAddress().isBroadcast()) {
+        else if (floodHeader->getDestinationAddress().isBroadcast()) {
             //check ttl and rebroadcast
-            if (msg->getTtl() > 1) {
-                FloodDatagram *dMsg;
-                EV << " data msg BROADCAST! ttl = " << msg->getTtl()
+            if (floodHeader->getTtl() > 1) {
+                EV << " data msg BROADCAST! ttl = " << floodHeader->getTtl()
                    << " > 1 -> rebroadcast msg & send to upper\n";
-                msg->setTtl(msg->getTtl() - 1);
-                dMsg = msg->dup();
-                setDownControlInfo(dMsg, MACAddress::BROADCAST_ADDRESS);
+                auto dMsg = packet->dup();
+                auto newFloodHeader = dMsg->removeAtFront<FloodHeader>();
+                newFloodHeader->setTtl(newFloodHeader->getTtl() - 1);
+                dMsg->insertAtFront(newFloodHeader);
+                setDownControlInfo(dMsg, MacAddress::BROADCAST_ADDRESS);
                 sendDown(dMsg);
                 nbDataPacketsForwarded++;
             }
             else
-                EV << " max hops reached (ttl = " << msg->getTtl() << ") -> only send to upper\n";
+                EV << " max hops reached (ttl = " << floodHeader->getTtl() << ") -> only send to upper\n";
 
             // message has to be forwarded to upper layer
-            nbHops = nbHops + (defaultTtl + 1 - msg->getTtl());
-            sendUp(decapsMsg(msg), protocol);
+            nbHops = nbHops + (defaultTtl + 1 - floodHeader->getTtl());
+            decapsulate(packet);
+            sendUp(packet);
             nbDataPacketsReceived++;
         }
         //not for me -> rebroadcast
         else {
             //check ttl and rebroadcast
-            if (msg->getTtl() > 1) {
-                EV << " data msg not for me! ttl = " << msg->getTtl()
+            if (floodHeader->getTtl() > 1) {
+                EV << " data msg not for me! ttl = " << floodHeader->getTtl()
                    << " > 1 -> forward\n";
-                msg->setTtl(msg->getTtl() - 1);
+                decapsulate(packet);
+                auto packetCopy = new Packet();
+                packetCopy->insertAtBack(packet->peekDataAt(b(0), packet->getDataLength()));
+                auto floodHeaderCopy = staticPtrCast<FloodHeader>(floodHeader->dupShared());
+                floodHeaderCopy->setTtl(floodHeader->getTtl() - 1);
+                packetCopy->insertAtFront(floodHeaderCopy);
                 // needs to set the next hop address again to broadcast
-                cObject *const pCtrlInfo = msg->removeControlInfo();
+                cObject *const pCtrlInfo = packetCopy->removeControlInfo();
                 if (pCtrlInfo != nullptr)
                     delete pCtrlInfo;
-                setDownControlInfo(msg, MACAddress::BROADCAST_ADDRESS);
-                sendDown(msg);
+                setDownControlInfo(packetCopy, MacAddress::BROADCAST_ADDRESS);
+                sendDown(packetCopy);
                 nbDataPacketsForwarded++;
+                delete packet;
             }
             else {
                 //max hops reached -> delete
-                EV << " max hops reached (ttl = " << msg->getTtl() << ") -> delete msg\n";
-                delete msg;
+                EV << " max hops reached (ttl = " << floodHeader->getTtl() << ") -> delete msg\n";
+                delete packet;
             }
         }
     }
     else {
         EV << " data msg already BROADCASTed! delete msg\n";
-        delete msg;
+        delete packet;
     }
 }
 
@@ -213,7 +219,7 @@ void Flood::handleLowerPacket(cPacket *m)
  * the list is full and a new message has to be entered, the oldest
  * entry is deleted.
  **/
-bool Flood::notBroadcasted(FloodDatagram *msg)
+bool Flood::notBroadcasted(const FloodHeader *msg)
 {
     if (!plainFlooding)
         return true;
@@ -246,39 +252,59 @@ bool Flood::notBroadcasted(FloodDatagram *msg)
 /**
  * Decapsulates the packet from the received Network packet
  **/
-cMessage *Flood::decapsMsg(FloodDatagram *floodDatagram)
+void Flood::decapsulate(Packet *packet)
 {
-    SimpleNetworkProtocolControlInfo *controlInfo = new SimpleNetworkProtocolControlInfo();
-    controlInfo->setSourceAddress(floodDatagram->getSourceAddress());
-    controlInfo->setProtocol(floodDatagram->getTransportProtocol());
-    cPacket *transportPacket = floodDatagram->decapsulate();
-    transportPacket->setControlInfo(controlInfo);
-    delete floodDatagram;
-    return transportPacket;
+    auto floodHeader = packet->popAtFront<FloodHeader>();
+    auto payloadLength = floodHeader->getPayloadLengthField();
+    if (packet->getDataLength() < payloadLength) {
+        throw cRuntimeError("Data error: illegal payload length");     //FIXME packet drop
+    }
+    if (packet->getDataLength() > payloadLength)
+        packet->setBackOffset(packet->getFrontOffset() + payloadLength);
+    auto payloadProtocol = floodHeader->getProtocol();
+    packet->addTagIfAbsent<NetworkProtocolInd>()->setProtocol(&getProtocol());
+    packet->addTagIfAbsent<NetworkProtocolInd>()->setNetworkProtocolHeader(floodHeader);
+    packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(payloadProtocol);
+    packet->addTagIfAbsent<PacketProtocolTag>()->setProtocol(payloadProtocol);
+    auto addressInd = packet->addTagIfAbsent<L3AddressInd>();
+    addressInd->setSrcAddress(floodHeader->getSourceAddress());
+    addressInd->setDestAddress(floodHeader->getDestinationAddress());
+    packet->addTagIfAbsent<HopLimitInd>()->setHopLimit(floodHeader->getTtl());
 }
 
 /**
  * Encapsulates the received ApplPkt into a NetwPkt and set all needed
  * header fields.
  **/
-FloodDatagram *Flood::encapsMsg(cPacket *appPkt)
+void Flood::encapsulate(Packet *appPkt)
 {
     L3Address netwAddr;
 
     EV << "in encaps...\n";
 
-    INetworkProtocolControlInfo *cInfo = check_and_cast_nullable<INetworkProtocolControlInfo *>(appPkt->removeControlInfo());
-    FloodDatagram *pkt = new FloodDatagram(appPkt->getName(), appPkt->getKind());
-    pkt->setBitLength(headerLength);
+    auto cInfo = appPkt->removeControlInfo();
+    auto pkt = makeShared<FloodHeader>(); // TODO: appPkt->getName(), appPkt->getKind());
+    pkt->setChunkLength(b(headerLength));
 
-    if (cInfo == nullptr) {
+    auto hopLimitReq = appPkt->removeTagIfPresent<HopLimitReq>();
+    int ttl = (hopLimitReq != nullptr) ? hopLimitReq->getHopLimit() : -1;
+    delete hopLimitReq;
+    if (ttl == -1)
+        ttl = defaultTtl;
+
+    pkt->setSeqNum(seqNum);
+    seqNum++;
+    pkt->setTtl(ttl);
+
+    auto addressReq = appPkt->findTag<L3AddressReq>();
+    if (addressReq == nullptr) {
         EV << "warning: Application layer did not specifiy a destination L3 address\n"
            << "\tusing broadcast address instead\n";
         netwAddr = netwAddr.getAddressType()->getBroadcastAddress();
     }
     else {
-        pkt->setTransportProtocol(cInfo->getTransportProtocol());
-        netwAddr = cInfo->getDestinationAddress();
+        pkt->setProtocol(appPkt->getTag<PacketProtocolTag>()->getProtocol());
+        netwAddr = addressReq->getDestAddress();
         EV << "CInfo removed, netw addr=" << netwAddr << endl;
         delete cInfo;
     }
@@ -290,23 +316,23 @@ FloodDatagram *Flood::encapsMsg(cPacket *appPkt)
     EV << "sendDown: nHop=L3BROADCAST -> message has to be broadcasted"
        << " -> set destMac=L2BROADCAST" << endl;
 
-    setDownControlInfo(pkt, MACAddress::BROADCAST_ADDRESS);
+    pkt->setPayloadLengthField(appPkt->getDataLength());
 
     //encapsulate the application packet
-    pkt->encapsulate(appPkt);
+    setDownControlInfo(appPkt, MacAddress::BROADCAST_ADDRESS);
+
+    appPkt->insertAtFront(pkt);
     EV << " pkt encapsulated\n";
-    return pkt;
 }
 
 /**
  * Attaches a "control info" structure (object) to the down message pMsg.
  */
-cObject *Flood::setDownControlInfo(cMessage *const pMsg, const MACAddress& pDestAddr)
+void Flood::setDownControlInfo(Packet *const pMsg, const MacAddress& pDestAddr)
 {
-    SimpleLinkLayerControlInfo *const cCtrlInfo = new SimpleLinkLayerControlInfo();
-    cCtrlInfo->setDest(pDestAddr);
-    pMsg->setControlInfo(cCtrlInfo);
-    return cCtrlInfo;
+    pMsg->addTagIfAbsent<MacAddressReq>()->setDestAddress(pDestAddr);
+    pMsg->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&getProtocol());
+    pMsg->addTagIfAbsent<DispatchProtocolInd>()->setProtocol(&getProtocol());
 }
 
 } // namespace inet

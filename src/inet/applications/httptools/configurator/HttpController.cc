@@ -16,6 +16,7 @@
 //
 
 #include "inet/applications/httptools/configurator/HttpController.h"
+#include "inet/applications/httptools/server/HttpServerBase.h"
 
 namespace inet {
 
@@ -47,7 +48,7 @@ void HttpController::initialize(int stage)
     if (stage == INITSTAGE_LOCAL) {
         EV_INFO << "Initializing HTTP controller. First stage" << endl;
 
-        cXMLElement *rootelement = par("config").xmlValue();
+        cXMLElement *rootelement = par("config");
         if (rootelement == nullptr)
             throw cRuntimeError("Configuration file is not defined");
 
@@ -109,8 +110,8 @@ void HttpController::handleMessage(cMessage *msg)
 {
     if (msg->isSelfMessage()) {
         HttpServerStatusUpdateMsg *statusMsg = check_and_cast<HttpServerStatusUpdateMsg *>(msg);
-        EV_DEBUG << "Handling a status change message @T=" << simTime() << " for www " << statusMsg->www() << endl;
-        setSpecialStatus(statusMsg->www(), (ServerStatus)statusMsg->eventKind(), statusMsg->pvalue(), statusMsg->pamortize());
+        EV_DEBUG << "Handling a status change message @T=" << simTime() << " for www " << statusMsg->getWww() << endl;
+        setSpecialStatus(statusMsg->getWww(), (ServerStatus)statusMsg->getEventKind(), statusMsg->getPvalue(), statusMsg->getPamortize());
         delete statusMsg;
     }
     else {
@@ -118,7 +119,7 @@ void HttpController::handleMessage(cMessage *msg)
     }
 }
 
-void HttpController::registerServer(const char *objectName, const char *wwwName, int port, int rank, simtime_t activationTime)
+void HttpController::registerServer(HttpServerBase *serverAppModule, const char *objectName, const char *wwwName, int port, int rank, simtime_t activationTime)
 {
     Enter_Method_Silent();
 
@@ -135,7 +136,7 @@ void HttpController::registerServer(const char *objectName, const char *wwwName,
     en->name = serverName;
     en->host = objectName;
     en->port = port;
-    en->module = getTcpApp(objectName);
+    en->module = serverAppModule;
     en->activationTime = activationTime;
     en->statusSetTime = simTime();
     en->serverStatus = SS_NORMAL;
@@ -268,14 +269,6 @@ int HttpController::getAnyServerInfo(char *wwwName, char *module, int& port)
     port = en->port;
 
     return 0;
-}
-
-cModule *HttpController::getTcpApp(const char *node)
-{
-    cModule *receiverModule = getSimulation()->getModuleByPath(node);
-    ASSERT(receiverModule != nullptr);
-
-    return receiverModule->getSubmodule("tcpApp", 0);    // TODO: CHECK INDEX
 }
 
 void HttpController::setSpecialStatus(const char *www, ServerStatus status, double p, double amortize)

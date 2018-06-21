@@ -24,10 +24,11 @@
 #define __INET_FLOOD_H
 
 #include <list>
-#include "inet/networklayer/contract/INetworkProtocol.h"
-#include "inet/networklayer/base/NetworkProtocolBase.h"
+#include "inet/common/packet/Packet.h"
 #include "inet/networklayer/common/L3Address.h"
-#include "inet/networklayer/flood/FloodDatagram.h"
+#include "inet/networklayer/base/NetworkProtocolBase.h"
+#include "inet/networklayer/contract/INetworkProtocol.h"
+#include "inet/networklayer/flood/FloodHeader_m.h"
 
 namespace inet {
 
@@ -114,20 +115,21 @@ class INET_API Flood : public NetworkProtocolBase, public INetworkProtocol
 
     virtual void finish() override;
 
+    const Protocol& getProtocol() const override { return Protocol::flood; }
+
   protected:
 
     /** @brief Handle messages from upper layer */
-    virtual void handleUpperPacket(cPacket *) override;
+    virtual void handleUpperPacket(Packet *packet) override;
 
     /** @brief Handle messages from lower layer */
-    virtual void handleLowerPacket(cPacket *) override;
+    virtual void handleLowerPacket(Packet *packet) override;
 
     /** @brief Checks whether a message was already broadcasted*/
-    bool notBroadcasted(FloodDatagram *);
+    bool notBroadcasted(const FloodHeader *);
 
-    cMessage *decapsMsg(FloodDatagram *);
-
-    FloodDatagram *encapsMsg(cPacket *);
+    void decapsulate(Packet *packet);
+    void encapsulate(Packet *packet);
 
     /**
      * @brief Attaches a "control info" (NetwToMac) structure (object) to the message pMsg.
@@ -142,7 +144,7 @@ class INET_API Flood : public NetworkProtocolBase, public INetworkProtocol
      * @param pMsg      The message where the "control info" shall be attached.
      * @param pDestAddr The MAC address of the message receiver.
      */
-    virtual cObject *setDownControlInfo(cMessage *const pMsg, const MACAddress& pDestAddr);
+    virtual void setDownControlInfo(Packet *const pMsg, const MacAddress& pDestAddr);
 };
 
 } // namespace inet

@@ -37,14 +37,16 @@
 
 #include "inet/common/Compat.h"
 
+namespace inet {
 using namespace omnetpp;
+}
 
-#if OMNETPP_VERSION < 0x0501 || OMNETPP_BUILDNUM < 1010
-#  error At least OMNeT++/OMNEST version 5.1 required
-#endif // if OMNETPP_VERSION < 0x0501
+#if OMNETPP_VERSION < 0x0503 || OMNETPP_BUILDNUM < 1018
+#  error At least OMNeT++/OMNEST version 5.3 required
+#endif // if OMNETPP_VERSION < 0x0503
 
-#define INET_VERSION  0x0306
-#define INET_PATCH_LEVEL 0x04
+#define INET_VERSION  0x0363
+#define INET_PATCH_LEVEL 0x03
 
 #if defined(INET_EXPORT)
 #  define INET_API    OPP_DLLEXPORT
@@ -81,6 +83,8 @@ T *__checknull(T *p, const char *expr, const char *file, int line)
         throw cRuntimeError("Expression %s returned nullptr at %s:%d", expr, file, line);
     return p;
 }
+
+//@}
 
 #define RNGCONTEXT  (cSimulation::getActiveSimulation()->getContext())->
 

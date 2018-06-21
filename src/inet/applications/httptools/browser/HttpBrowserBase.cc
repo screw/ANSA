@@ -49,7 +49,7 @@ void HttpBrowserBase::initialize(int stage)
     HttpNodeBase::initialize(stage);
 
     if (stage == INITSTAGE_LOCAL) {
-        cXMLElement *rootelement = par("config").xmlValue();
+        cXMLElement *rootelement = par("config");
         if (rootelement == nullptr)
             throw cRuntimeError("Configuration file is not defined");
 
@@ -113,7 +113,7 @@ void HttpBrowserBase::initialize(int stage)
         if (rdProcessingDelay == nullptr)
             throw cRuntimeError("Processing delay random object could not be created");
 
-        controller = getModuleFromPar<HttpController>(par("httpBrowserControllerModule"), this);
+        controller = getModuleFromPar<HttpController>(par("httpControllerModule"), this);
 
         httpProtocol = par("httpProtocol");
 
@@ -268,70 +268,71 @@ void HttpBrowserBase::handleSelfScriptedEvent()
 void HttpBrowserBase::handleSelfDelayedRequestMessage(cMessage *msg)
 {
     EV_DEBUG << "Sending delayed message " << msg->getName() << " @ T=" << simTime() << endl;
-    HttpRequestMessage *reqmsg = check_and_cast<HttpRequestMessage *>(msg);
+    Packet *reqmsg = check_and_cast<Packet *>(msg);
+    //HttpRequestMessage *reqmsg = check_and_cast<HttpRequestMessage *>(msg);
     reqmsg->setKind(HTTPT_REQUEST_MESSAGE);
     sendRequestToServer(reqmsg);
 }
 
-void HttpBrowserBase::handleDataMessage(cMessage *msg)
+void HttpBrowserBase::handleDataMessage(Packet *pk)
 {
-    HttpReplyMessage *appmsg = check_and_cast<HttpReplyMessage *>(msg);
+    const auto& appmsg = pk->peekAtFront<HttpReplyMessage>();
     if (appmsg == nullptr)
-        throw cRuntimeError("Message (%s)%s is not a valid reply message", msg->getClassName(), msg->getName());
+        throw cRuntimeError("Message (%s)%s is not a valid reply message", pk->getClassName(), pk->getName());
 
-    logResponse(appmsg);
+    logResponse(pk);
 
     messagesInCurrentSession++;
 
-    int serial = appmsg->serial();
+    int serial = appmsg->getSerial();
 
-    std::string senderWWW = appmsg->originatorUrl();
-    EV_DEBUG << "Handling received message from " << senderWWW << ": " << msg->getName() << ". Received @T=" << simTime() << endl;
+    std::string senderWWW = appmsg->getOriginatorUrl();
+    EV_DEBUG << "Handling received message from " << senderWWW << ": " << pk->getName() << ". Received @T=" << simTime() << endl;
 
-    if (appmsg->result() != 200 || (HttpContentType)appmsg->contentType() == CT_UNKNOWN) {
-        EV_INFO << "Result for " << appmsg->getName() << " was other than OK. Code: " << appmsg->result() << endl;
+    if (appmsg->getResult() != 200 || (HttpContentType)appmsg->getContentType() == CT_UNKNOWN) {
+        EV_INFO << "Result for " << pk->getName() << " was other than OK. Code: " << appmsg->getResult() << endl;
         htmlErrorsReceived++;
-        delete msg;
+        delete pk;
         return;
     }
     else {
-        switch ((HttpContentType)appmsg->contentType()) {
+        switch ((HttpContentType)appmsg->getContentType()) {
             case CT_HTML:
-                EV_INFO << "HTML Document received: " << appmsg->getName() << "'. Size is " << appmsg->getByteLength() << " bytes and serial " << serial << endl;
-                if (strlen(appmsg->payload()) != 0)
-                    EV_DEBUG << "Payload of " << appmsg->getName() << " is: " << endl << appmsg->payload()
-                             << ", " << strlen(appmsg->payload()) << " bytes" << endl;
+                EV_INFO << "HTML Document received: " << pk->getName() << "'. Size is " << pk->getByteLength() << " bytes and serial " << serial << endl;
+                if (strlen(appmsg->getPayload()) != 0)
+                    EV_DEBUG << "Payload of " << pk->getName() << " is: " << endl << appmsg->getPayload()
+                             << ", " << strlen(appmsg->getPayload()) << " bytes" << endl;
                 else
-                    EV_DEBUG << appmsg->getName() << " has no referenced resources. No GETs will be issued in parsing" << endl;
+                    EV_DEBUG << pk->getName() << " has no referenced resources. No GETs will be issued in parsing" << endl;
                 htmlReceived++;
                 if (hasGUI())
                     bubble("Received a HTML document");
                 break;
 
             case CT_TEXT:
-                EV_INFO << "Text resource received: " << appmsg->getName() << "'. Size is " << appmsg->getByteLength() << " bytes and serial " << serial << endl;
+                EV_INFO << "Text resource received: " << pk->getName() << "'. Size is " << pk->getByteLength() << " bytes and serial " << serial << endl;
                 textResourcesReceived++;
                 if (hasGUI())
                     bubble("Received a text resource");
                 break;
 
             case CT_IMAGE:
-                EV_INFO << "Image resource received: " << appmsg->getName() << "'. Size is " << appmsg->getByteLength() << " bytes and serial " << serial << endl;
+                EV_INFO << "Image resource received: " << pk->getName() << "'. Size is " << pk->getByteLength() << " bytes and serial " << serial << endl;
                 imgResourcesReceived++;
                 if (hasGUI())
                     bubble("Received an image resource");
                 break;
 
             case CT_UNKNOWN:
-                EV_DEBUG << "UNKNOWN RESOURCE TYPE RECEIVED: " << (HttpContentType)appmsg->contentType() << endl;
+                EV_DEBUG << "UNKNOWN RESOURCE TYPE RECEIVED: " << (HttpContentType)appmsg->getContentType() << endl;
                 if (hasGUI())
                     bubble("Received an unknown resource type");
                 break;
         }
         // Parse the html page body
-        if ((HttpContentType)appmsg->contentType() == CT_HTML && strlen(appmsg->payload()) != 0) {
+        if ((HttpContentType)appmsg->getContentType() == CT_HTML && strlen(appmsg->getPayload()) != 0) {
             EV_DEBUG << "Processing HTML document body:\n";
-            cStringTokenizer lineTokenizer((const char *)appmsg->payload(), "\n");
+            cStringTokenizer lineTokenizer((const char *)appmsg->getPayload(), "\n");
             std::vector<std::string> lines = lineTokenizer.asVector();
             std::map<std::string, HttpRequestQueue> requestQueues;
             for (auto resourceLine : lines) {
@@ -364,7 +365,7 @@ void HttpBrowserBase::handleDataMessage(cMessage *msg)
                          << ", delay: " << delay << ", bad: " << bad << ", ref.size: " << refSize << endl;
 
                 // Generate a request message and push on queue for the intended recipient
-                HttpRequestMessage *reqmsg = generateResourceRequest(providerName, resourceName, serial++, bad, refSize);    // TODO: KVJ: CHECK HERE FOR XSITE
+                Packet *reqmsg = generateResourceRequest(providerName, resourceName, serial++, bad, refSize);    // TODO: KVJ: CHECK HERE FOR XSITE
                 if (delay == 0.0) {
                     requestQueues[providerName].push_front(reqmsg);
                 }
@@ -382,10 +383,10 @@ void HttpBrowserBase::handleDataMessage(cMessage *msg)
         }
     }
 
-    delete msg;
+    delete pk;
 }
 
-HttpRequestMessage *HttpBrowserBase::generatePageRequest(std::string www, std::string pageName, bool bad, int size)
+Packet *HttpBrowserBase::generatePageRequest(std::string www, std::string pageName, bool bad, int size)
 {
     EV_DEBUG << "Generating page request for URL " << www << ", page " << pageName << endl;
 
@@ -403,29 +404,31 @@ HttpRequestMessage *HttpBrowserBase::generatePageRequest(std::string www, std::s
 
     char szReq[MAX_URL_LENGTH + 24];
     sprintf(szReq, "GET %s HTTP/1.1", pageName.c_str());
-    HttpRequestMessage *msg = new HttpRequestMessage(szReq);
+    Packet *outPk = new Packet(szReq);
+    const auto& msg = makeShared<HttpRequestMessage>();
     msg->setTargetUrl(www.c_str());
     msg->setProtocol(httpProtocol);
     msg->setHeading(szReq);
     msg->setSerial(0);
-    msg->setByteLength(requestLength + size);    // Add extra request size if specified
+    msg->setChunkLength(B(requestLength + size));    // Add extra request size if specified
     msg->setKeepAlive(httpProtocol == 11);
     msg->setBadRequest(bad);    // Simulates willingly requesting a non-existing resource.
-    msg->setKind(HTTPT_REQUEST_MESSAGE);
+    outPk->insertAtBack(msg);
+    outPk->setKind(HTTPT_REQUEST_MESSAGE);
 
-    logRequest(msg);
+    logRequest(outPk);
     htmlRequested++;
 
-    return msg;
+    return outPk;
 }
 
-HttpRequestMessage *HttpBrowserBase::generateRandomPageRequest(std::string www, bool bad, int size)
+Packet *HttpBrowserBase::generateRandomPageRequest(std::string www, bool bad, int size)
 {
     EV_DEBUG << "Generating random page request, URL: " << www << endl;
     return generatePageRequest(www, "random_page.html", bad, size);
 }
 
-HttpRequestMessage *HttpBrowserBase::generateResourceRequest(std::string www, std::string resource, int serial, bool bad, int size)
+Packet *HttpBrowserBase::generateResourceRequest(std::string www, std::string resource, int serial, bool bad, int size)
 {
     EV_DEBUG << "Generating resource request for URL " << www << ", resource: " << resource << endl;
 
@@ -453,19 +456,21 @@ HttpRequestMessage *HttpBrowserBase::generateResourceRequest(std::string www, st
     char szReq[MAX_URL_LENGTH + 24];
     sprintf(szReq, "GET %s HTTP/1.1", resource.c_str());
 
-    HttpRequestMessage *msg = new HttpRequestMessage(szReq);
+    Packet *outPk = new Packet(szReq);
+    const auto& msg = makeShared<HttpRequestMessage>();
     msg->setTargetUrl(www.c_str());
     msg->setProtocol(httpProtocol);
     msg->setHeading(szReq);
     msg->setSerial(serial);
-    msg->setByteLength(requestLength);    // Add extra request size if specified
+    msg->setChunkLength(B(requestLength));    // Add extra request size if specified
     msg->setKeepAlive(httpProtocol == 11);
     msg->setBadRequest(bad);    // Simulates willingly requesting a non-existing resource.
-    msg->setKind(HTTPT_REQUEST_MESSAGE);
+    outPk->insertAtBack(msg);
+    outPk->setKind(HTTPT_REQUEST_MESSAGE);
 
-    logRequest(msg);
+    logRequest(outPk);
 
-    return msg;
+    return outPk;
 }
 
 void HttpBrowserBase::scheduleNextBrowseEvent()
