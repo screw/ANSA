@@ -4,14 +4,14 @@
         name="ANSAINET"
         description = "ANSA extension of INET framework"
         initiallyEnabled = "true"
-        requires = "IPv6 Generic MultiNet UDP"
+        requires = "IPv6 Generic UDP"
         labels = ""
         nedPackages = ""
         extraSourceFolders = ""
         compileFlags = "-DANSAINET"
         linkerFlags = ""
         />
-    <feature
+	<feature
         id="TCP_common"
         name="TCP Common"
         description = "The common part of TCP implementations"
