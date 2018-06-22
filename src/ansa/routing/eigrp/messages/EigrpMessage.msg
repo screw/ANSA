@@ -28,8 +28,8 @@ cplusplus {{
     using namespace inet;
 }}
 
-class noncobject IPv4Address;
-class noncobject IPv6Address;
+//class noncobject IPv4Address;
+//class noncobject IPv6Address;
 
 // Codes of EIGRP messages
 enum HeaderOpcode

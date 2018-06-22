@@ -8,15 +8,15 @@ cplusplus {{
 
 namespace inet;
 
-class noncobject MACAddress;
+//class noncobject MACAddress;
 
-class noncobject MessageId;
+//class noncobject MessageId;
 
 enum EtherType;
 
 enum SAPCode;
 
-message EthernetIIFrame;
+//message EthernetIIFrame;
 
 
 // ANSA ehter frame with VLAN

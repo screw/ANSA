@@ -24,35 +24,35 @@ cplusplus {{
 #include "ansa/networklayer/isis/ISISCommon.h"
 }}
 namespace inet;
-cplusplus {{
-//using namespace inet;
-//    typedef struct NSAP_t
+//cplusplus {{
+////using namespace inet;
+////    typedef struct NSAP_t
+////    {
+////        unsigned char AreaAddr[3];
+////        unsigned char sysID[6];
+////        unsigned char NSEL;
+////        
+////    } NSAP_t;
+//    
+//    typedef struct TLV_t
 //    {
-//        unsigned char AreaAddr[3];
-//        unsigned char sysID[6];
-//        unsigned char NSEL;
-//        
-//    } NSAP_t;
-    
-    typedef struct TLV_t
-    {
-        unsigned char type;
-        unsigned char length;
-        unsigned char *value;
-    } TLV_t;
-    
-    typedef unsigned char* charP;
-    
-   
-
-}}
-class noncobject charP;
-class noncobject TLV_t;
+//        unsigned char type;
+//        unsigned char length;
+//        unsigned char *value;
+//    } TLV_t;
+//    
+//    typedef unsigned char* charP;
+//    
+//   
+//
+//}}
+//class noncobject charP;
+//class noncobject TLV_t;
 //class noncobject NSAP_t;
 
-class noncobject PseudonodeID;
-class noncobject SystemID;
-class noncobject LspID;
+//class noncobject PseudonodeID;
+//class noncobject SystemID;
+//class noncobject LspID;
 
 
 

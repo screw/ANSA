@@ -21,9 +21,9 @@ cplusplus {{
 }}
 namespace inet;
 
-class noncobject AreaID;
-class noncobject SystemID;
-class noncobject LspID;
+//class noncobject AreaID;
+//class noncobject SystemID;
+//class noncobject LspID;
 
 enum ISISTimerType
 {

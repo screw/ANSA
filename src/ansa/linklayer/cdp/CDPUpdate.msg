@@ -21,13 +21,13 @@
 //
 
 cplusplus {{
-#include "inet/common/TLVOption.h"
+#include "inet/common/TlvOptions_m.h"
 }}
 
 namespace inet;
 
-class noncobject TLVOptionBase;
-class noncobject TLVOptions;
+//class noncobject TLVOptionBase;
+//class noncobject TLVOptions;
 
 enum CDPTLVType
 {

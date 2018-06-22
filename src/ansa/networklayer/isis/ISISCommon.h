@@ -402,6 +402,15 @@ inline std::ostream& operator<<(std::ostream& os, const LspID& lspID)
     return os << lspID.str();
 }
 
+typedef struct TLV_t
+{
+    unsigned char type;
+    unsigned char length;
+    unsigned char *value;
+} TLV_t;
+
+typedef unsigned char* charP;
+
 }//end namespace
 
 
