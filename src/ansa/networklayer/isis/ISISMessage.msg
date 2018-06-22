@@ -53,7 +53,22 @@ namespace inet;
 //class noncobject PseudonodeID;
 //class noncobject SystemID;
 //class noncobject LspID;
-
+class PseudonodeID
+{
+    @existingClass;
+}
+class SystemID
+{
+    @existingClass;
+}
+class LspID
+{
+    @existingClass;
+}
+class TLV_t
+{
+    @existingClass;
+}
 
 
 enum PDU_Type

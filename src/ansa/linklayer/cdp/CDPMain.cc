@@ -21,11 +21,12 @@
 */
 
 #include "ansa/linklayer/cdp/CDPMain.h"
-#include "inet/common/NotifierConsts.h"
+//#include "inet/common/NotifierConsts.h"
+#include "inet/common/Simsignals.h"
 #include "inet/common/lifecycle/NodeOperations.h"
 #include "inet/common/lifecycle/NodeStatus.h"
 #include "inet/common/lifecycle/ILifecycle.h"
-#include "inet/networklayer/ipv4/IPv4InterfaceData.h"
+#include "inet/networklayer/ipv4/Ipv4InterfaceData.h"
 #include "inet/networklayer/contract/IRoutingTable.h"
 
 #include "ansa/linklayer/cdp/CDPDeviceConfigurator.h"

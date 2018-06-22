@@ -232,7 +232,7 @@ void ISISMain::receiveChangeNotification(int category, cObject *details) {
 //        return;
 //    }
     Enter_Method_Silent();
-    if(category == NF_ISIS_ADJ_CHANGED) {
+    if(category == isisAdjChangedSignal) {
         /*TODO B3 Make new timer Type and schedule it when you receive ADJ_CHANGED for short period of time (TBD)
          * and increment some internal counter. When the counter hit certain threshold, stop pushing the timer and wait for
          * timeout.
@@ -277,7 +277,7 @@ void ISISMain::initialize(int stage) {
         //TODO A! Notification board
 //         nb = NotificationBoardAccess().get();
 ////         nb->subscribe(this, NF_INTERFACE_STATE_CHANGED);
-//         nb->subscribe(this, NF_ISIS_ADJ_CHANGED);
+//         nb->subscribe(this, isisAdjChangedSignal);
 
         ift = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
         clnsrt = check_and_cast<CLNSRoutingTable*>(getModuleByPath(par("routingTableModule"))->getSubmodule("clns"));
@@ -2007,7 +2007,7 @@ void ISISMain::handleL1HelloMsg(ISISMessage *inMsg) {
                         //this->sendMyL1LSPs();
                         //TODO generate event adjacencyStateChanged
                         //TODO A! Transform to signals
-//                        nb->fireChangeNotification(NF_ISIS_ADJ_CHANGED, this->genL1LspTimer);
+//                        nb->fireChangeNotification(isisAdjChangedSignal, this->genL1LspTimer);
                     }
                     break;
                 }
@@ -2161,7 +2161,7 @@ void ISISMain::handleL2HelloMsg(ISISMessage *inMsg) {
                         //this->sendMyL1LSPs();
                         //TODO B1 generate event adjacencyStateChanged (i suppose it's done)
                         //TODO A! Signals ...
-//                        nb->fireChangeNotification(NF_ISIS_ADJ_CHANGED, this->genL1LspTimer);
+//                        nb->fireChangeNotification(isisAdjChangedSignal, this->genL1LspTimer);
                         //TODO support multiple area addresses
                         if (areaID != tmpAdj->areaID
                                 && this->isType == L1L2_TYPE) {
@@ -2434,7 +2434,7 @@ void ISISMain::handleTRILLHelloMsg(ISISMessage *inMsg) {
                     if (changed != tmpAdj->state) {
                         //TODO generate event adjacencyStateChanged
                         //TODO A! Signals...
-//                        nb->fireChangeNotification(NF_ISIS_ADJ_CHANGED, this->genL1LspTimer);
+//                        nb->fireChangeNotification(isisAdjChangedSignal, this->genL1LspTimer);
                       Ieee802Ctrl* ctrl = static_cast<Ieee802Ctrl*>(msg->getControlInfo());
                       //  int gateIndex = inMsg->getArrivalGate()->getIndex();
                         int gateIndex = ift->getInterfaceById(ctrl->getInterfaceId())->getNetworkLayerGateIndex();
@@ -2519,7 +2519,7 @@ void ISISMain::handleTRILLHelloMsg(ISISMessage *inMsg) {
         adjL1Table.push_back(neighbour);
         std::sort(this->adjL1Table.begin(), this->adjL1Table.end());
 
-//        nb->fireChangeNotification(NF_ISIS_ADJ_CHANGED, this->genL1LspTimer);
+//        nb->fireChangeNotification(isisAdjChangedSignal, this->genL1LspTimer);
 //        Ieee802Ctrl* ctrl = static_cast<Ieee802Ctrl*>(msg->getControlInfo());
 
           int gateIndex = ift->getInterfaceById(ctrl->getInterfaceId())->getNetworkLayerGateIndex();
@@ -2627,7 +2627,7 @@ void ISISMain::handlePTPHelloMsg(ISISMessage *inMsg)
               //TODO B2
               //schedule adjacencyStateChange(up);
               //TODO A! Signals...
-//                            nb->fireChangeNotification(NF_ISIS_ADJ_CHANGED, this->genL1LspTimer);
+//                            nb->fireChangeNotification(isisAdjChangedSignal, this->genL1LspTimer);
 
             }
             else
@@ -2752,7 +2752,7 @@ void ISISMain::handlePTPHelloMsg(ISISMessage *inMsg)
               //TODO B2
               //schedule adjacencyStateChange(up);
               //TODO A! Signals
-//                            nb->fireChangeNotification(NF_ISIS_ADJ_CHANGED, this->genL2LspTimer);
+//                            nb->fireChangeNotification(isisAdjChangedSignal, this->genL2LspTimer);
               //TODO support multiple area addresses
               if (areaID != tmpAdj->areaID && this->isType == L1L2_TYPE)
               {
@@ -3366,8 +3366,8 @@ void ISISMain::setMode(ISIS_MODE mode) {
 //void ISIS::subscribeNb(void)
 //{
 //    nb->subscribe(this, NF_INTERFACE_STATE_CHANGED);
-//    nb->subscribe(this, NF_CLNS_ROUTE_DELETED);
-//    nb->subscribe(this, NF_ISIS_ADJ_CHANGED);
+//    nb->subscribe(this, clnsRouteDeletedSignal);
+//    nb->subscribe(this, isisAdjChangedSignal);
 //
 //}
 

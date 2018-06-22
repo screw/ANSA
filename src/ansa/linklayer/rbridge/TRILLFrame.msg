@@ -23,7 +23,13 @@ cplusplus {{
 }}
 namespace inet;
 
-class noncobject TRILLNickname;
+//class noncobject TRILLNickname;
+
+//This is retarted, that cannot be the solution
+class TRILLNickname
+{
+    @existingClass;
+}
 
 packet TRILLFrame {
     @customize(true);  // see the generated C++ header for more info

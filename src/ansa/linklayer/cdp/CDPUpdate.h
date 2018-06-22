@@ -49,7 +49,7 @@ class INET_API CDPUpdate : public CDPUpdate_Base
     /**
      * Returns number of TLV in message.
      */
-    unsigned int getOptionArraySize() const { return options.size(); }
+    unsigned int getOptionArraySize() const { return options.getTlvOptionArraySize(); }
 
     /**
      * Get length of the specified option.
@@ -64,7 +64,7 @@ class INET_API CDPUpdate : public CDPUpdate_Base
     /**
      * Returns option
      */
-    virtual TlvOptionBase& getOption(unsigned int k) { return *check_and_cast<TlvOptionBase *>(&(options.at(k))); }
+    virtual TlvOptionBase& getOption(unsigned int k) { return *check_and_cast<TlvOptionBase *>((options.getTlvOptionForUpdate(k))); }
     virtual const TlvOptionBase& getOption(unsigned int k) const { return const_cast<CDPUpdate*>(this)->getOption(k); }
 
     /**

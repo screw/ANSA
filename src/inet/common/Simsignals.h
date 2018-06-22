@@ -85,6 +85,16 @@ extern INET_API simsignal_t    // admin
     ipv6MulticastGroupRegisteredSignal,
     ipv6MulticastGroupUnregisteredSignal,
 
+//layer 3 - ClNS
+
+    interfaceClnsConfigChangedSignal,
+    clnsRouteAddedSignal,
+    clnsRouteDeletedSignal,
+    clnsRouteChangedSignal,
+
+    //TODO move this
+    isisAdjChangedSignal,
+
 // - layer 4 (transport)
 //...
 

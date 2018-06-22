@@ -18,11 +18,16 @@
 // @author Vladimir Vesely (ivesely@fit.vutbr.cz)
 // @copyright Brno University of Technology (www.fit.vutbr.cz) under GPLv3
 
+import inet.common.INETDefs;
+import inet.common.TlvOptions;
+import inet.networklayer.contract.ipv4.Ipv4Address;
+import inet.linklayer.common.MacAddress;
+
 
 cplusplus {{
-#include "inet/common/TLVOption.h"
+#include "inet/common/TlvOptions_m.h"
 #include "inet/networklayer/contract/ipv4/IPv4Address.h"
-#include "inet/linklayer/common/MACAddress.h"
+#include "inet/linklayer/common/MacAddress.h"
 //#include "inet/networklayer/common/IPProtocolId_m.h"
 }}
 
@@ -35,11 +40,11 @@ const short GLBP_HELLO_BYTES = 28;
 }}
 
 
-class noncobject TlvOptionBase;
-class noncobject TlvOptions;
+//class noncobject TlvOptionBase;
+//class noncobject TlvOptions;
 
-class noncobject Ipv4Address;
-class noncobject MacAddress;
+//class noncobject Ipv4Address;
+//class noncobject MacAddress;
 
 ///
 /// GLBP TLV type

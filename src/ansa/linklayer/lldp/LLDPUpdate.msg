@@ -19,7 +19,7 @@
 // @author Tomas Rajca
 // @author Vladimir Vesely (ivesely@fit.vutbr.cz)
 // @copyright Brno University of Technology (www.fit.vutbr.cz) under GPLv3
-
+import inet.common.TlvOptions;
 
 cplusplus {{
 #include "inet/common/TlvOptions_m.h"

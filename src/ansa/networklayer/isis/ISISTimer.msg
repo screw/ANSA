@@ -25,6 +25,19 @@ namespace inet;
 //class noncobject SystemID;
 //class noncobject LspID;
 
+
+class AreaId
+{
+    @existingClass;
+}
+class SystemID
+{
+    @existingClass;
+}
+class LspID
+{
+    @existingClass;
+}
 enum ISISTimerType
 {
    

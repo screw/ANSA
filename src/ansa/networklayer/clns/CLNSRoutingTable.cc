@@ -71,7 +71,7 @@ void CLNSRoutingTable::initialize(int stage)
       host->subscribe(NF_INTERFACE_DELETED, this);
       host->subscribe(NF_INTERFACE_STATE_CHANGED, this);
       host->subscribe(NF_INTERFACE_CONFIG_CHANGED, this);
-      host->subscribe(NF_INTERFACE_CLNSCONFIG_CHANGED, this);
+      host->subscribe(interfaceClnsConfigChangedSignal, this);
 
       ift = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
 
@@ -328,7 +328,7 @@ void CLNSRoutingTable::receiveSignal(cComponent *source, simsignal_t signalID, c
     else if (signalID == NF_INTERFACE_CONFIG_CHANGED) {
         invalidateCache();
     }
-    else if (signalID == NF_INTERFACE_CLNSCONFIG_CHANGED) {
+    else if (signalID == interfaceClnsConfigChangedSignal) {
         // if anything CLNS-related changes in the interfaces, interface netmask
         // based routes have to be re-built.
 //        updateNetmaskRoutes();

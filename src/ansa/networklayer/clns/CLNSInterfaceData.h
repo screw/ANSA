@@ -37,7 +37,7 @@ class INET_API CLNSInterfaceData : public InterfaceProtocolData
     virtual ~CLNSInterfaceData();
 
   protected:
-    void changed1(int fieldId) { changed(NF_INTERFACE_CLNSCONFIG_CHANGED, fieldId); }
+    void changed1(int fieldId) { changed(interfaceClnsConfigChangedSignal, fieldId); }
 
 
   public:

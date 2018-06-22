@@ -19,15 +19,17 @@
 // @author Vladimir Vesely (ivesely@fit.vutbr.cz)
 // @copyright Brno University of Technology (www.fit.vutbr.cz) under GPLv3
 
-
+import inet.common.INETDefs;
+import inet.networklayer.contract.ipv4.Ipv4Address;
+import inet.networklayer.contract.ipv6.Ipv6Address;
 
 cplusplus {{
-    #include "inet/networklayer/contract/ipv4/IPv4Address.h"
-    #include "inet/networklayer/contract/ipv6/IPv6Address.h"   
+    #include "inet/networklayer/contract/ipv4/Ipv4Address.h"
+    #include "inet/networklayer/contract/ipv6/Ipv6Address.h"   
     
-    using namespace inet;
-}}
 
+}}
+namespace inet;
 //class noncobject Ipv4Address;
 //class noncobject Ipv6Address;
 

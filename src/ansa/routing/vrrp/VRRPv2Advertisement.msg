@@ -41,11 +41,13 @@
 // |                     Authentication Data (2)                   |
 // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+import inet.networklayer.contract.ipv4.Ipv4Address;
+
 cplusplus {{
 	#include "inet/networklayer/contract/ipv4/IPv4Address.h"
 }}
 
-class noncobject Ipv4Address;
+//class noncobject Ipv4Address;
 
 namespace inet;
 

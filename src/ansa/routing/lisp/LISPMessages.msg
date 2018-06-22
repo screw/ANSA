@@ -25,12 +25,30 @@ cplusplus {{
 
 namespace inet;
 
-class noncobject TRecord;
-class noncobject TRecords;
-class noncobject TRecs;
-class noncobject TAfiAddr;
-class noncobject TAfiAddrs;
-class noncobject TMapEntries;
+class TRecord
+{
+    @existingClass;
+}
+class TRecords
+{
+    @existingClass;
+}
+class TRecs
+{
+    @existingClass;
+}
+class TAfiAddr
+{
+    @existingClass;
+}
+class TAfiAddrs
+{
+    @existingClass;
+}
+class TMapEntries
+{
+    @existingClass;
+}
 
 enum LISP_MsgType
 {

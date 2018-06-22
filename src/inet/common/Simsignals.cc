@@ -74,6 +74,14 @@ simsignal_t ipv6MulticastGroupLeftSignal = cComponent::registerSignal("ipv6Multi
 simsignal_t ipv6MulticastGroupRegisteredSignal = cComponent::registerSignal("ipv6MulticastGroupRegistered");
 simsignal_t ipv6MulticastGroupUnregisteredSignal = cComponent::registerSignal("ipv6MulticastGroupUnregistered");
 
+// layer 3 - CLNS
+
+simsignal_t interfaceClnsConfigChangedSignal = cComponent::registerSignal("interfaceClnsConfigChangedSignal");
+simsignal_t clnsRouteAddedSignal = cComponent::registerSignal("clnsRouteAddedSignal");
+simsignal_t clnsRouteDeletedSignal = cComponent::registerSignal("clnsRouteDeletedSignal");
+simsignal_t clnsRouteChangedSignal = cComponent::registerSignal("clnsRouteChangedSignal");
+
+simsignal_t isisAdjChangedSignal = cComponent::registerSignal("isisAdjChangedSignal");
 // - layer 4 (transport)
 //...
 

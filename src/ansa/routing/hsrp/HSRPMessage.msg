@@ -32,14 +32,16 @@
 // @copyright Brno University of Technology (www.fit.vutbr.cz) under GPLv3
 
 
+import inet.networklayer.contract.ipv4.Ipv4Address;
+
 cplusplus {{
-#include "inet/networklayer/contract/ipv4/IPv4Address.h"
+#include "inet/networklayer/contract/ipv4/Ipv4Address.h"
 const int HSRP_HEADER_SIZE = 96;
 const std::string HSRP_MULTICAST_ADDRESS = "224.0.0.2";
 const int HSRP_UDP_PORT = 1985;
 }}
 
-class noncobject Ipv4Address;
+//class noncobject Ipv4Address;
 
 namespace inet;
 

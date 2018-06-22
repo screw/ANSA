@@ -18,6 +18,7 @@
 // @author Vladimir Vesely / ivesely@fit.vutbr.cz / http://www.fit.vutbr.cz/~ivesely/
 // @copyright Brno University of Technology (www.fit.vutbr.cz) under GPLv3
 
+import inet.networklayer.common.L3Address;
 cplusplus {{
     #include "inet/common/INETDefs.h"
     #include "inet/networklayer/common/L3Address.h"
@@ -26,9 +27,11 @@ cplusplus {{
 
 namespace inet;  
 
-class noncobject L3Address;
-class noncobject LISPEidPrefix;
-
+//class noncobject L3Address;
+class LISPEidPrefix
+{
+    @existingClass;
+}
 message LISPRegisterTimer {
     L3Address serverAddress;
     unsigned short quickRegCycles;

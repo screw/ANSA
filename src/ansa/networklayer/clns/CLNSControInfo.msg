@@ -12,6 +12,8 @@
 // License along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
+import inet.linklayer.common.MacAddress;
+
 cplusplus {{
 #include "ansa/networklayer/clns/CLNSAddress.h"
 //#include "inet/networklayer/common/IPProtocolId_m.h"
@@ -22,10 +24,15 @@ namespace inet;
 
 //enum IpProtocolId;
 
-class noncobject CLNSAddress;
-class noncobject MacAddress;
+//class noncobject CLNSAddress;
+//class noncobject MacAddress;
 
-//
+class CLNSAddress
+{
+    @existingClass;
+}
+
+
 class CLNSControlInfo
 {
     @customize(true);

@@ -175,8 +175,10 @@ void CDPDeviceConfigurator::loadCDPInterface(cXMLElement *ifaceElem, CDPMain *cM
 
         if (nodeName == "status")
         {
-            if (!Str2Bool(&value, (*ifElemIt)->getNodeValue()))
-                throw cRuntimeError("Invalid CDP status value on interface %s", cIface->getInterface()->getName());
+            if (!Str2Bool(&value, (*ifElemIt)->getNodeValue())){
+                //HOTFIX changed getName() (which is protected method now) to getFullName()
+                throw cRuntimeError("Invalid CDP status value on interface %s", cIface->getInterface()->getFullName());
+            }
             cIface->setCDPEnabled(value);
         }
     }
