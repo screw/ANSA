@@ -28,8 +28,8 @@
 #ifndef EIGRPDUALSTACK_H_
 #define EIGRPDUALSTACK_H_
 
-//#include "IPv4Address.h"
-//#include "IPv6Address.h"
+//#include "Ipv4Address.h"
+//#include "Ipv6Address.h"
 #include "inet/networklayer/common/L3Address.h"
 //#include "ANSAIPv6Address.h"
 
@@ -88,7 +88,7 @@ Ipv6Address getPrefix(const Ipv6Address& addr, const Ipv6Address& netmask);
  * @param   mask length
  * @return  network mask represented as IPv6 address
  *
- * @note    Instead of this function, you can simply use: IPv6Address(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff).getPrefix(prefixLength)
+ * @note    Instead of this function, you can simply use: Ipv6Address(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff).getPrefix(prefixLength)
  */
 Ipv6Address makeNetmask(int length);
 

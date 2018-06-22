@@ -69,7 +69,7 @@ void ANSA_EtherMACBaseVF::initialize(int stage)
         subscribe(POST_MODEL_CHANGE, this);
     }
     else if (stage == INITSTAGE_LINK_LAYER) {
-        registerInterface();    // needs MAC address    //FIXME why not called in MACBase::initialize()?
+        registerInterface();    // needs MAC address    //FIXME why not called in MacBase::initialize()?
         initializeQueueModule();
         readChannelParameters(true);
     }
@@ -82,7 +82,7 @@ void ANSA_EtherMACBaseVF::registerInterface()
     // interface name: NIC module's name without special characters ([])
     interfaceEntry->setName(utils::stripnonalnum(getParentModule()->getFullName()).c_str());
 
-    // generate a link-layer address to be used as interface token for IPv6
+    // generate a link-layer address to be used as interface token for Ipv6
     interfaceEntry->setMACAddress(address);
     interfaceEntry->setInterfaceToken(address.formInterfaceIdentifier());
     //InterfaceToken token(0, simulation.getUniqueNumber(), 64);

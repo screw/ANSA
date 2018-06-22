@@ -29,7 +29,7 @@
 #include "inet/networklayer/ipv4/IPv4InterfaceData.h"
 #include "inet/networklayer/contract/ipv4/IPv4ControlInfo.h"
 #include "inet/common/ModuleAccess.h"
-//#include "inet/transportlayer/contract/udp/UDPSocket.h"
+//#include "inet/transportlayer/contract/udp/UdpSocket.h"
 
 namespace inet {
 /**

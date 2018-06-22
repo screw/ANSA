@@ -25,7 +25,7 @@
 #include "ansa/routing/eigrp/tables/EigrpNeighborTable.h"
 namespace inet {
 
-Define_Module(EigrpIpv4NeighborTable);      //TODO - PROB-01 - How to register template class? Define_Module(EigrpNeighborTable<IPv4Address>)
+Define_Module(EigrpIpv4NeighborTable);      //TODO - PROB-01 - How to register template class? Define_Module(EigrpNeighborTable<Ipv4Address>)
 
 #ifndef DISABLE_EIGRP_IPV6
 Define_Module(EigrpIpv6NeighborTable);

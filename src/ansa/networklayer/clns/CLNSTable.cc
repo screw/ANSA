@@ -215,7 +215,7 @@ namespace inet {
 //    }
 //    else if (category==NF_INTERFACE_IPv4CONFIG_CHANGED)
 //    {
-//        // if anything IPv4-related changes in the interfaces, interface netmask
+//        // if anything Ipv4-related changes in the interfaces, interface netmask
 //        // based routes have to be re-built.
 //        updateNetmaskRoutes();
 //    }

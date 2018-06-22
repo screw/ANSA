@@ -154,12 +154,12 @@ void MultiNetworkNodeConfigurator::parseInterfaces(cXMLElement* config) {
                 Ipv6Address ipv6;
                 int prefixLen;
 
-                // Check IPv6 address validity and initialize prefixLen variable
+                // Check Ipv6 address validity and initialize prefixLen variable
                 if (!ipv6.tryParseAddrWithPrefix(addrFull.c_str(), prefixLen)){
                     EV_ERROR << "Unable to set IPv6 address." << endl;
                 }
 
-                //Initialize IPv6 address and add it to interface
+                //Initialize Ipv6 address and add it to interface
                 ipv6 = Ipv6Address(addrFull.substr(0, addrFull.find_last_of('/')).c_str());
                 ie->ipv6Data()->assignAddress(ipv6, false, 0, 0);
 
@@ -207,15 +207,15 @@ void MultiNetworkNodeConfigurator::parseInterfaces(cXMLElement* config) {
 }
 
 void MultiNetworkNodeConfigurator::parseDefaultRoutes(cXMLElement* config) {
-    //Add default route for IPv4
+    //Add default route for Ipv4
     parseDefaultRoute4(config);
 
-    //Add default route for IPv6
+    //Add default route for Ipv6
     parseDefaultRoute6(config);
 }
 
 void MultiNetworkNodeConfigurator::parseDefaultRoute4(cXMLElement* config) {
-    //Add default route for IPv4
+    //Add default route for Ipv4
     cXMLElement* defrou = config->getFirstChildWithTag(XML_DEFROUTER);
     if (defrou) {
         //Parse XML
@@ -244,7 +244,7 @@ void MultiNetworkNodeConfigurator::parseDefaultRoute4(cXMLElement* config) {
 }
 
 void MultiNetworkNodeConfigurator::parseDefaultRoute6(cXMLElement* config) {
-    //Add default route for IPv6
+    //Add default route for Ipv6
     cXMLElement* defrou6 = config->getFirstChildWithTag(XML_DEFROUTER6);
     if (defrou6) {
         //Parse XML
@@ -273,14 +273,14 @@ void MultiNetworkNodeConfigurator::parseDefaultRoute6(cXMLElement* config) {
 }
 
 void MultiNetworkNodeConfigurator::parseStaticRoutes(cXMLElement* config) {
-    //Parse IPv4 static routes
+    //Parse Ipv4 static routes
     parseStaticRoutes4(config);
-    //Parse IPv6 static routes
+    //Parse Ipv6 static routes
     parseStaticRoutes6(config);
 }
 
 void MultiNetworkNodeConfigurator::parseStaticRoutes4(cXMLElement* config) {
-    //Parse IPv4 static routes
+    //Parse Ipv4 static routes
     std::stringstream exp;
     exp << XML_ROUTING << "/" << XML_STATIC;
     cXMLElement* stat = config->getElementByPath(exp.str().c_str());
@@ -327,7 +327,7 @@ void MultiNetworkNodeConfigurator::parseStaticRoutes4(cXMLElement* config) {
 }
 
 void MultiNetworkNodeConfigurator::parseStaticRoutes6(cXMLElement* config) {
-    //Parse IPv4 static routes
+    //Parse Ipv4 static routes
     std::stringstream exp;
     exp << XML_ROUTING6 << "/" << XML_STATIC;
     cXMLElement* stat = config->getElementByPath(exp.str().c_str());
@@ -429,7 +429,7 @@ Ipv6Route* MultiNetworkNodeConfigurator::prepareIPv6Route(Ipv6Address address,
     ipv6rou->setAdminDist(admindist);
     return ipv6rou;
 }
-//TODO: Vesely - I am not sure that ANSA configs has this syntax for IPv6
+//TODO: Vesely - I am not sure that ANSA configs has this syntax for Ipv6
 bool MultiNetworkNodeConfigurator::Str2Int(int* retValue, const char* str) {
     if (retValue == NULL || str == NULL){
        return false;

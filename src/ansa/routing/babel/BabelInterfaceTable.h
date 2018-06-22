@@ -29,7 +29,7 @@
 #include "inet/common/INETDefs.h"
 
 #include "ansa/routing/babel/BabelDef.h"
-//#include "UDPSocket.h"
+//#include "UdpSocket.h"
 #include "inet/transportlayer/contract/udp/UDPSocket.h"
 //#include "InterfaceEntry.h"
 #include "inet/networklayer/common/InterfaceEntry.h"
@@ -48,8 +48,8 @@ class BabelInterface : public cObject
     uint16_t updateInterval;    ///< Update interval (centiseconds)
     Babel::BabelTimer* helloTimer;     ///< Hello timer
     Babel::BabelTimer* updateTimer;    ///< Update timer
-    UdpSocket* socket4;         ///< UDP socket for unicast IPv4
-    UdpSocket* socket6;         ///< UDP socket for unicast IPv6
+    UdpSocket* socket4;         ///< Udp socket for unicast Ipv4
+    UdpSocket* socket6;         ///< Udp socket for unicast Ipv6
     bool enabled;               ///< Interface status
     uint16_t nominalrxcost;
     std::vector<Babel::netPrefix<L3Address> > directlyconn;

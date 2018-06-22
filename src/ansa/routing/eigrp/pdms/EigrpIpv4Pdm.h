@@ -32,7 +32,7 @@ topology table.
 
 //#include "InterfaceTable.h"
 //#include "InterfaceEntry.h"
-//#include "IPv4Address.h"
+//#include "Ipv4Address.h"
 //#include "AnsaRoutingTable.h"
 //#include "NotificationBoard.h"
 

@@ -131,7 +131,7 @@ class GLBPVirtualRouter: public cSimpleModule, public cListener{
          * GLBP group number.
          * @param n an integer argument which is typically
          * in range <1,4>.
-         * @return pointer to MACAddress object.
+         * @return pointer to MacAddress object.
          */
         MacAddress *setVirtualMAC(int n);
 
@@ -219,7 +219,7 @@ class GLBPVirtualRouter: public cSimpleModule, public cListener{
         /**
          * Helper for AVG to getting another MAC Address
          * of VF which is working.
-         * @return MACAddress pointer
+         * @return MacAddress pointer
          * @see receiveSignal(cComponent *source, simsignal_t signalID, bool b)
          */
         MacAddress *getNextActiveMac();

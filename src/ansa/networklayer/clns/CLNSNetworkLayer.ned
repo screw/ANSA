@@ -15,7 +15,7 @@
 
 package ansa.networklayer.clns;
 
-//import inet.networklayer.configurator.ipv4.IPv4NodeConfigurator;
+//import inet.networklayer.configurator.ipv4.Ipv4NodeConfigurator;
 import inet.networklayer.contract.INetworkLayer;
 
 
@@ -49,7 +49,7 @@ module CLNSNetworkLayer like INetworkLayer
 //        output igmpOut;
 
     submodules:
-//        configurator: IPv4NodeConfigurator {
+//        configurator: Ipv4NodeConfigurator {
 //            @display("p=39,158");
 //        }
         clns: CLNS {

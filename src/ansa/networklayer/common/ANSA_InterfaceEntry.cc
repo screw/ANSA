@@ -146,7 +146,7 @@ std::string ANSA_InterfaceEntry::info() const {
         out << "n/a";
     else
         out << getMacAddress();
-    //IPv4
+    //Ipv4
     if (ipv4data != nullptr) {
         out << "\nIPv4 ucast:\t" << ipv4data->getIPAddress() << "/" << ipv4data->getNetmask().getNetmaskLength();
         out << "\nIPv4 mcast:\t";
@@ -156,7 +156,7 @@ std::string ANSA_InterfaceEntry::info() const {
     }
 
     if (ipv6data != nullptr) {
-        //IPv6
+        //Ipv6
         out << "\nIPv6 ucast:\t";
         for (int i = 0; i < ipv6data->getNumAddresses(); i++) {
             out << (i > 0 ? ", " : "") << ipv6data->getAddress(i);

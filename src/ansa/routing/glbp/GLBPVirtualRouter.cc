@@ -32,8 +32,8 @@
 #include "inet/networklayer/ipv4/IPv4InterfaceData.h"
 #include "inet/networklayer/arp/ipv4/ARPPacket_m.h"
 
-//#include "inet/networklayer/contract/ipv4/IPv4ControlInfo.h"
-//#include "inet/transportlayer/udp/UDP.h"
+//#include "inet/networklayer/contract/ipv4/Ipv4ControlInfo.h"
+//#include "inet/transportlayer/udp/Udp.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
 
 namespace inet {
@@ -1301,7 +1301,7 @@ GLBPVirtualRouter::~GLBPVirtualRouter() {
         cancelAndDelete(timeouttimer[i]);
     }
     containingModule->unsubscribe(NF_INTERFACE_STATE_CHANGED, this);
-    //arp->unsubscribe(ARP::recvReqSignal,this);
+    //arp->unsubscribe(Arp::recvReqSignal,this);
 //    This is the end
 //    My only friend, the end ...
 }

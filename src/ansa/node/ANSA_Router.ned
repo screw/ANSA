@@ -52,7 +52,7 @@ module ANSA_Router extends ANSA_NodeBase
         bool hasLLDP = default(false);
         bool hasISIS = default(false);
 
-        string tcpType = default(firstAvailableOrEmpty("TCP", "TCP_lwIP", "TCP_NSC"));  // tcp implementation (e.g. ~TCP, ~TCP_lwIP, ~TCP_NSC) or ~TCPSpoof
+        string tcpType = default(firstAvailableOrEmpty("TCP", "TCP_lwIP", "TCP_NSC"));  // tcp implementation (e.g. ~Tcp, ~TcpLwip, ~TcpNsc) or ~TcpSpoof
         string udpType = default("UDP");
         forwarding = true;
         ethernetType = default("ANSA_EthernetInterface");

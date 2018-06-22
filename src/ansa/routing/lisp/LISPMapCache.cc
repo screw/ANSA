@@ -84,7 +84,7 @@ void LISPMapCache::initialize(int stage)
         //parseConfig( par("configData").xmlValue() );
 
         //Create default record
-        //LISPMapEntry m1 = LISPMapEntry(LISPEidPrefix(IPv4Address::UNSPECIFIED_ADDRESS, 0));
+        //LISPMapEntry m1 = LISPMapEntry(LISPEidPrefix(Ipv4Address::UNSPECIFIED_ADDRESS, 0));
         //m1.setAction(LISPCommon::SEND_MAP_REQUEST);
         //this->addMapEntry(m1);
 

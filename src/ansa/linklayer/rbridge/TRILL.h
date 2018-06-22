@@ -40,7 +40,7 @@
 #include <string>
 
 //#include "NotificationBoard.h"
-//#include "MACAddress.h"
+//#include "MacAddress.h"
 #include "inet/linklayer/common/MACAddress.h"
 #include "inet/linklayer/ethernet/Ethernet.h"
 #include "inet/linklayer/ethernet/EtherFrame.h"

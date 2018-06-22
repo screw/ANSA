@@ -39,7 +39,7 @@
 //#include "deviceConfigurator.h"
 
 //TODO A! Add TRILL source files
-//#include "TRILLInterfaceData.h"
+//#include "TrillInterfaceData.h"
 
 namespace inet {
 
@@ -1391,7 +1391,7 @@ void ISISMain::sendPTPHelloMsg(int interfaceIndex, int gateIndex,
 /*   TRILL Hellos */
 /******************/
 /**
- * Generates TRILL hellos and places them in TRILLInterfaceData
+ * Generates TRILL hellos and places them in TrillInterfaceData
  * @param interfaceId is interface id in interfacetable
  * @param circuitType is circuit type of interface with @param interfaceId
  */
@@ -1507,7 +1507,7 @@ void ISISMain::genTRILLHello(int interfaceId, ISISCircuitType circuitType) {
 //    ctrl->setDsap(SAP_CLNS);
 //    ctrl->setSsap(SAP_CLNS);
 //
-//    ctrl->setDest(MACAddress(ALL_IS_IS_RBRIDGES));
+//    ctrl->setDest(MacAddress(ALL_IS_IS_RBRIDGES));
 //    hello.setControlInfo(ctrl);
 
 }
@@ -1915,9 +1915,9 @@ void ISISMain::schedule(ISISTimer *timer, double timee) {
 //    //49.0001.1921.6801.2003.00
 //
 //    areaId = area;
-////    std::cout << "ISIS: AreaID: " << areaId[0] << endl;
-////    std::cout << "ISIS: AreaID: " << areaId[1] << endl;
-////    std::cout << "ISIS: AreaID: " << areaId[2] << endl;
+////    std::cout << "ISIS: AreaId: " << areaId[0] << endl;
+////    std::cout << "ISIS: AreaId: " << areaId[1] << endl;
+////    std::cout << "ISIS: AreaId: " << areaId[2] << endl;
 //    sysId = systemId;
 ////    std::cout << "ISIS: SystemID: " << sysId << endl;
 //    NSEL = nsel;
@@ -3866,7 +3866,7 @@ void ISISMain::electDIS(ISISLANHelloPacket *msg) {
 
         if (mode == L2_ISIS_MODE) {
             //TODO B1 SEVERE call trillDIS() -> such method would appoint forwarder and handled other TRILL-DIS related duties
-//            TRILLInterfaceData *trillD = ift->getInterfaceByNetworkLayerGateIndex(gateIndex)->trillData();
+//            TrillInterfaceData *trillD = ift->getInterfaceByNetworkLayerGateIndex(gateIndex)->trillData();
 //            trillD->clearAppointedFWDs();
             //when appointed forwarder observes that DRB on link has changet, it NO LONGER considers itselft as app fwd
 
@@ -8961,7 +8961,7 @@ void ISISMain::generateNetAddr() {
 
 ////    unsigned char *a = new unsigned char[6];
 //    char *tmp = new char[25];
-//    MACAddress address;
+//    MacAddress address;
 //
 //    for (int i = 0; i < ift->getNumInterfaces(); i++)
 //    {

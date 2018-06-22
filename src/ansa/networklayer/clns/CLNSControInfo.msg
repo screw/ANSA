@@ -20,7 +20,7 @@ cplusplus {{
 
 namespace inet;
 
-//enum IPProtocolId;
+//enum IpProtocolId;
 
 class noncobject CLNSAddress;
 class noncobject MacAddress;
@@ -30,14 +30,14 @@ class CLNSControlInfo
 {
     @customize(true);
     
-    CLNSAddress destAddr;   // destination IPv4 address
-    CLNSAddress srcAddr;    // source IPv4 address
+    CLNSAddress destAddr;   // destination Ipv4 address
+    CLNSAddress srcAddr;    // source Ipv4 address
     MacAddress src;
     MacAddress dest;
     int interfaceId = -1; // interface on which the datagram was received, or
                           // should be sent (see ~InterfaceTable)
 //    bool multicastLoop;   // if true, sent multicast datagrams will be looped back
-//    short protocol @enum(IPProtocolId);  // encapsulated protocol
+//    short protocol @enum(IpProtocolId);  // encapsulated protocol
     
     
     

@@ -26,8 +26,8 @@ cplusplus {{
 
 namespace inet;
 
-//class noncobject TLVOptionBase;
-//class noncobject TLVOptions;
+//class noncobject TlvOptionBase;
+//class noncobject TlvOptions;
 
 enum CDPTLVType
 {

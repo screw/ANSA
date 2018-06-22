@@ -54,14 +54,14 @@ class GLBPMessage : public GLBPMessage_Base
       virtual const TlvOptionBase& getTlvOption(unsigned int k) const { return const_cast<GLBPMessage*>(this)->getTlvOption(k); }
 
       /**
-       * Returns the TLVOptionBase of the specified type,
+       * Returns the TlvOptionBase of the specified type,
        * or nullptr. If index is 0, then the first, if 1 then the
        * second option is returned.
        */
       virtual TlvOptionBase *findOptionByType(short int optionType, int index = 0);
 
       /**
-       * Adds an TLVOptionBase to the datagram.
+       * Adds an TlvOptionBase to the datagram.
        * default atPos means add to the end.
        */
       virtual void addOption(TlvOptionBase *opt, int atPos = -1);

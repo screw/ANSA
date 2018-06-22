@@ -15,7 +15,7 @@
 //
 
 /**
- * @file ISISInterfaceData.cc
+ * @file IsisInterfaceData.cc
  * @author Marcel Marek (mailto:xscrew02@gmail.com), Vladimir Vesely (mailto:ivesely@fit.vutbr.cz)
  * @date 1.4.2013
  * @brief Stores IS-IS interface related data.

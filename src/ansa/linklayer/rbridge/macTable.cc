@@ -351,11 +351,11 @@ void MACTable::initialize() {
 	tmp1.push_back(4);
 	tmp1.push_back(5);
 
-	addStatic(MACAddress("01:00:00:00:00:01"), tmp0);
-	addStatic(MACAddress("01:00:00:00:00:02"), tmp1);
-	removePort(MACAddress("01:00:00:00:00:01"), 2);
-	remove(MACAddress("01:00:00:00:00:02"));
-	add(MACAddress("01:00:00:00:00:03"), 16, GROUP, NONE);
+	addStatic(MacAddress("01:00:00:00:00:01"), tmp0);
+	addStatic(MacAddress("01:00:00:00:00:02"), tmp1);
+	removePort(MacAddress("01:00:00:00:00:01"), 2);
+	remove(MacAddress("01:00:00:00:00:02"));
+	add(MacAddress("01:00:00:00:00:03"), 16, GROUP, NONE);
 */
 	/* END TEST */
 

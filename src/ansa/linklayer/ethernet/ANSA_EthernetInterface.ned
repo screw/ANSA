@@ -28,7 +28,7 @@ import inet.linklayer.contract.ITrafficConditioner;
 import inet.linklayer.contract.IWiredNic;
 import inet.linklayer.ethernet.*;
 //
-// Ethernet network interface. Complements ~EtherMAC and ~EtherEncap
+// Ethernet network interface. Complements ~EtherMac and ~EtherEncap
 // with an output queue for QoS and RED support.
 //
 module ANSA_EthernetInterface like IWiredNic

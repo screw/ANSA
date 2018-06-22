@@ -27,7 +27,7 @@ topology table.
 
 #include <algorithm>
 
-//#include "inet/networklayer/contract/ipv4/IPv4ControlInfo.h"
+//#include "inet/networklayer/contract/ipv4/Ipv4ControlInfo.h"
 //#include "AnsaIPv4Route.h"
 #include "ansa/routing/eigrp/EigrpDeviceConfigurator.h"
 #include "ansa/routing/eigrp/pdms/EigrpPrint.h"
@@ -68,7 +68,7 @@ EigrpIpv4Pdm::~EigrpIpv4Pdm()
 /*
     EigrpTimer *timer;
     int cnt = eigrpNt->getNumNeighbors();
-    EigrpNeighbor<IPv4Address> *neigh;
+    EigrpNeighbor<Ipv4Address> *neigh;
     for (int i = 0; i < cnt; i++) {
         neigh = eigrpNt->getNeighbor(i);
         if ((timer = neigh->getHoldTimer()) != NULL) {
@@ -1255,7 +1255,7 @@ Ipv4Route *EigrpIpv4Pdm::createRTRoute(EigrpRouteSource<Ipv4Address> *successor)
     if (successor->isInternal())
     {
         // Set any source except IFACENETMASK and MANUAL
-        //rtEntry->setSource(IPv4Route::ZEBRA);
+        //rtEntry->setSource(Ipv4Route::ZEBRA);
         // Set right protocol source
         //rtEntry->setRoutingProtocolSource(ANSAIPv4Route::pEIGRP);
         //rtEntry->setAdminDist(ANSAIPv4Route::dEIGRPInternal);
@@ -1762,7 +1762,7 @@ bool EigrpIpv4Pdm::removeRouteFromRT(EigrpRouteSource<Ipv4Address> *source, IRou
     return rtEntry != nullptr;
 }
 
-/*void EigrpIpv4Pdm::removeSourceFromTT(EigrpRouteSource<IPv4Address> *source)
+/*void EigrpIpv4Pdm::removeSourceFromTT(EigrpRouteSource<Ipv4Address> *source)
 {
     EV << "EIGRP remove route " << source->getRouteInfo()->getRouteAddress();
     EV << " via " << source->getNextHop() << " from TT" << endl;
@@ -1792,9 +1792,9 @@ bool EigrpIpv4Pdm::isRTSafeForAdd(EigrpRoute<Ipv4Address> *route, unsigned int e
         return true;
     }
     if (ansaRoute == NULL && routeInTable->getAdminDist() == Ipv4Route::dUnknown)
-        return false;   // Connected route has AD = 255 (dUnknown) in IPv4Route
+        return false;   // Connected route has AD = 255 (dUnknown) in Ipv4Route
     if (routeInTable != NULL && routeInTable->getAdminDist() < eigrpAd)
-        return false;   // Other IPv4Route with right AD
+        return false;   // Other Ipv4Route with right AD
     return true;
 }
 

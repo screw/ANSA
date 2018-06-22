@@ -32,7 +32,7 @@ topology table.
 
 //#include "InterfaceTable.h"
 //#include "InterfaceEntry.h"
-//#include "IPv6Address.h"
+//#include "Ipv6Address.h"
 //#include "AnsaRoutingTable.h"
 //#include "NotificationBoard.h"
 
@@ -59,7 +59,7 @@ topology table.
 
 //#include "EigrpDualStack.h"
 //#include "ANSARoutingTable6.h"
-//#include "IPv6InterfaceData.h"
+//#include "Ipv6InterfaceData.h"
 namespace inet {
 /**
  * Class represents EIGRP Protocol Dependent Module for IPv6. It contains IPv6 specific things.
@@ -215,12 +215,12 @@ class EigrpIpv6Pdm : public cSimpleModule, public IEigrpModule<Ipv6Address>, pub
     /**
      * Remove interface from EIGRP interface table. Removes all neighbors on the interface.
      */
-    //void disableInterface(InterfaceEntry *iface, EigrpInterface *eigrpIface, IPv6Address& ifAddress, IPv6Address& ifMask);
+    //void disableInterface(InterfaceEntry *iface, EigrpInterface *eigrpIface, Ipv6Address& ifAddress, Ipv6Address& ifMask);
     void disableInterface(ANSA_InterfaceEntry*iface, EigrpInterface *eigrpIface);
     /**
      * Add interface to the EIGRP interface table and notifies DUAL.
      */
-    //void enableInterface(EigrpInterface *eigrpIface, IPv6Address& ifAddress, IPv6Address& ifMask, int networkId);
+    //void enableInterface(EigrpInterface *eigrpIface, Ipv6Address& ifAddress, Ipv6Address& ifMask, int networkId);
     void enableInterface(EigrpInterface *eigrpIface);
     /**
      * Returns EIGRP interface (enabled or disabled) or NULL.

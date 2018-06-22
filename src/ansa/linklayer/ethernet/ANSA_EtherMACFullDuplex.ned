@@ -27,7 +27,7 @@ import inet.linklayer.contract.IEtherMac;
 
 //
 // Ethernet MAC which supports full-duplex operation ONLY.
-// See the ~IEtherMAC for general informations.
+// See the ~IEtherMac for general informations.
 //
 // Most of today's Ethernet networks are switched, and operate
 // in full-duplex mode. Full-duplex transmission can be used for
@@ -42,8 +42,8 @@ import inet.linklayer.contract.IEtherMac;
 // (If you need half-duplex operation, see ~EtherMAC which is for a full-blown
 // and therefore more complicated Ethernet MAC model.)
 //
-// ~EtherMACFullDuplex performs transmission and reception of frames.
-// It does not do encapsulation/decapsulation; see ~EtherLLC and ~EtherEncap
+// ~EtherMacFullDuplex performs transmission and reception of frames.
+// It does not do encapsulation/decapsulation; see ~EtherLlc and ~EtherEncap
 // for that.
 //
 // Supported variations:
@@ -76,7 +76,7 @@ import inet.linklayer.contract.IEtherMac;
 //   broadcast frames are passed up.
 //
 // The module does not perform encapsulation or decapsulation of frames --
-// this is done by higher layers (~EtherLLC or ~EtherEncap).
+// this is done by higher layers (~EtherLlc or ~EtherEncap).
 //
 // When a frame is received from the higher layers, it must be an ~EtherFrame,
 // and with all protocol fields filled out
@@ -116,8 +116,8 @@ import inet.linklayer.contract.IEtherMac;
 //
 // Please see <a href="physical.html">Messaging on the physical layer</a>.
 //
-// @see ~EtherMAC, ~EthernetInterface, ~IOutputQueue, ~EtherEncap, ~EtherLLC
-// @see ~EtherFrame, ~EthernetIIFrame, ~EtherFrameWithLLC, ~Ieee802Ctrl
+// @see ~EtherMac, ~EthernetInterface, ~IOutputQueue, ~EtherEncap, ~EtherLlc
+// @see ~EtherFrame, ~EthernetIIFrame, ~EtherFrameWithLlc, ~Ieee802Ctrl
 //
 simple ANSA_EtherMACFullDuplex like IEtherMac
 {
@@ -128,7 +128,7 @@ simple ANSA_EtherMACFullDuplex like IEtherMac
         string address = default("auto");   // MAC address as hex string (12 hex digits), or
                                             // "auto". "auto" values will be replaced by
                                             // a generated MAC address in init stage 0.
-        bool duplexMode = default(true);    // must be set to "true", as EtherMACFullDuplex does not support half-duplex operation
+        bool duplexMode = default(true);    // must be set to "true", as EtherMacFullDuplex does not support half-duplex operation
                                             // (parameter is present to reduce the risk of accidental misconfiguration)
         int txQueueLimit = default(1000);   // maximum number of frames queued up for transmission in the internal queue
                                             // (only used if queueModule==""); additional frames cause a runtime error
@@ -150,8 +150,8 @@ simple ANSA_EtherMACFullDuplex like IEtherMac
         @signal[packetReceivedFromLower](type=EtherFrame);
         @signal[packetSentToUpper](type=EtherFrame);
         @signal[packetReceivedFromUpper](type=EtherFrame);
-		@signal[transmitState](type=long); // enum=MACTransmitState
-        @signal[receiveState](type=long); // enum=MACReceiveState
+		@signal[transmitState](type=long); // enum=MacTransmitState
+        @signal[receiveState](type=long); // enum=MacReceiveState
 
         @statistic[txPk](title="packets transmitted"; source=txPk; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[rxPkOk](title="packets received OK"; source=rxPkOk; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
@@ -164,8 +164,8 @@ simple ANSA_EtherMACFullDuplex like IEtherMac
         @statistic[droppedPkNotForUs](title="packets dropped/not for us"; source=dropPkNotForUs; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
 
     gates:
-        input upperLayerIn @labels(EtherFrame);    // to ~EtherLLC or ~EtherEncap or ~MACRelayUnitPP
-        output upperLayerOut @labels(EtherFrame);  // to ~EtherLLC or ~EtherEncap or ~MACRelayUnitPP
+        input upperLayerIn @labels(EtherFrame);    // to ~EtherLlc or ~EtherEncap or ~MACRelayUnitPP
+        output upperLayerOut @labels(EtherFrame);  // to ~EtherLlc or ~EtherEncap or ~MACRelayUnitPP
         inout phys @labels(EtherFrame);            // to physical layer or the network
 }
 

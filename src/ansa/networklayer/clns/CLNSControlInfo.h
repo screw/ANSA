@@ -34,7 +34,7 @@ class INET_API CLNSControlInfo : public CLNSControlInfo_Base, public INetworkPro
       CLNSControlInfo(const CLNSControlInfo& other) : CLNSControlInfo_Base(other) {copy(other);}
       CLNSControlInfo& operator=(const CLNSControlInfo& other) {if (this==&other) return *this; CLNSControlInfo_Base::operator=(other); copy(other); return *this;}
       virtual CLNSControlInfo *dup() const override { return new CLNSControlInfo(*this);}
-//      virtual IPv4ControlInfo *dup() const override { return new IPv4ControlInfo(*this); }
+//      virtual Ipv4ControlInfo *dup() const override { return new Ipv4ControlInfo(*this); }
       // ADD CODE HERE to redefine and implement pure virtual functions from CLNSControlInfo_Base
 
 

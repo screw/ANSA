@@ -57,10 +57,10 @@ module ANSA_EtherSwitch
         bool hasCDP = default(false);
         bool hasLLDP = default(false);
         bool hasSTP= default(false);
-        string macType = default(csmacdSupport ? "EtherMAC" : "EtherMACFullDuplex"); // ~EtherMAC or ~EtherMACFullDuplex
+        string macType = default(csmacdSupport ? "EtherMAC" : "EtherMACFullDuplex"); // ~EtherMac or ~EtherMacFullDuplex
 
-        string relayUnitType = default("relayUnit"); // type of the ~IMACRelayUnit;
-        string macTableType = default("MACAddressTable"); // type of the ~IMACAddressTable
+        string relayUnitType = default("relayUnit"); // type of the ~IMacRelayUnit;
+        string macTableType = default("MACAddressTable"); // type of the ~IMacAddressTable
         eth[*].encapType = "EtherEncapDummy";
         eth[*].csmacdSupport = csmacdSupport;
         eth[*].macType = macType;

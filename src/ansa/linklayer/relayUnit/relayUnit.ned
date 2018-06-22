@@ -29,7 +29,7 @@ import ansa.linklayer.contract.ANSA_IMACRelayUnit;
 //     Handles BPDU frames.
 //     If relaying a message also checks the port's status in the InterfaceTable.
 //
-// @see EtherFrame, MACAddressTable, STP, RSTP
+// @see EtherFrame, MacAddressTable, STP, RSTP
 //
 
 //from Ieee8021dRelay
@@ -38,7 +38,7 @@ simple relayUnit like ANSA_IMACRelayUnit
     parameters:
         @display("i=block/broadcast;bgb=425,114");
         string interfaceTablePath = default("^.interfaceTable"); // The path to the InterfaceTable module
-        string macTablePath = default("^.macTable");             // The path to the MACAddressTable module
+        string macTablePath = default("^.macTable");             // The path to the MacAddressTable module
     gates:
         input ifIn[];
         output ifOut[];

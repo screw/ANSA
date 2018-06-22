@@ -30,7 +30,7 @@
 #include "InterfaceTableAccess.h"
 #include "RoutingTableAccess.h"
 #include "PimInterfaceTable.h"*/
-//#include "IPv4InterfaceData.h"
+//#include "Ipv4InterfaceData.h"
 #include "inet/networklayer/ipv4/IPv4InterfaceData.h"
 #include "inet/networklayer/ipv6/IPv6InterfaceData.h"
 //#include "AnsaRoutingTableAccess.h"

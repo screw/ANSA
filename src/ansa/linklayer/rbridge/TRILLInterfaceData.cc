@@ -15,7 +15,7 @@
 //
 
 /**
- * @file TRILLInterfaceData.cc
+ * @file TrillInterfaceData.cc
  * @author Marcel Marek (mailto:xscrew02@gmail.com), Vladimir Vesely (mailto:ivesely@fit.vutbr.cz)
  * @date 24.3.2013
  * @brief Represents TRILL related data on interface.

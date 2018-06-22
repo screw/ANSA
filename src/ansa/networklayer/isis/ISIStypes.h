@@ -56,7 +56,7 @@ namespace inet {
 #define ISIS_SPF_FULL_INTERVAL 50 //TODO A! change back to 50
 #define ISIS_TRILL_MAX_HELLO_SIZE 1470
 //class InterfaceEntr;
-//class MACAddress;
+//class MacAddress;
 
 
 

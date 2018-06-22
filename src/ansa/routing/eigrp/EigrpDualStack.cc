@@ -27,7 +27,7 @@
 #include "ansa/routing/eigrp/EigrpDualStack.h"
 namespace inet {
 /**
- * Uses IPv4Address.getNetmaskLength() method
+ * Uses Ipv4Address.getNetmaskLength() method
  */
 int getNetmaskLength(const Ipv4Address &netmask)
 {
@@ -36,7 +36,7 @@ int getNetmaskLength(const Ipv4Address &netmask)
 
 
 /**
- * Uses four times IPv4Address.getNetmaskLength() method on four parts of IPv6 address
+ * Uses four times Ipv4Address.getNetmaskLength() method on four parts of Ipv6 address
  */
 int getNetmaskLength(const Ipv6Address &netmask)
 {
@@ -44,7 +44,7 @@ int getNetmaskLength(const Ipv6Address &netmask)
 
     for(int i = 0; i <= 3; ++i)
     {
-        //length += IPv4Address(netmask.words()[i]).getNetmaskLength();
+        //length += Ipv4Address(netmask.words()[i]).getNetmaskLength();
 
         length += (static_cast<Ipv4Address> (netmask.words()[i])).getNetmaskLength();      //TODO - verify!
     }

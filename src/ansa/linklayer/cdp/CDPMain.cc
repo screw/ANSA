@@ -1038,7 +1038,7 @@ void CDPMain::setTlvIpPrefix(CDPUpdate *msg, int pos, int interfaceId)
 
         for(int i=0, count = 1; i < ift->getNumInterfaces(); ++i)
         {
-            // add to prefixes only interfaces with specified IPv4 address, that are
+            // add to prefixes only interfaces with specified Ipv4 address, that are
             // not loopback and are not outgoing interface for this message
             if(ift->getInterface(i)->ipv4Data() != nullptr &&
                     !ift->getInterface(i)->ipv4Data()->getIPAddress().isUnspecified() &&

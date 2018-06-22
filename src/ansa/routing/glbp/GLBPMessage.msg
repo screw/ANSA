@@ -55,7 +55,7 @@ enum GLBPType{
 ///
 enum GLBPAddressType{
 	Ipv4 = 1;
-//	IPv6 = 2;
+//	Ipv6 = 2;
 }
 
 ///

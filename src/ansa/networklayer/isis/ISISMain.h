@@ -201,7 +201,7 @@ class ISISMain : public cSimpleModule
         void electDIS(ISISLANHelloPacket *msg);
         std::vector<ISISadj> *getAdjTab(short circuitType);
 
-        void genTRILLHello(int interfaceId, ISISCircuitType circuitType); //generates Hello(s) for specified interface and places them into ISISInterfaceData
+        void genTRILLHello(int interfaceId, ISISCircuitType circuitType); //generates Hello(s) for specified interface and places them into IsisInterfaceData
 
         /* LSP */
         unsigned char *getLanID(ISISLANHelloPacket *msg);

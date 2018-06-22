@@ -28,8 +28,8 @@ cplusplus {{
     using namespace inet;
 }}
 
-//class noncobject IPv4Address;
-//class noncobject IPv6Address;
+//class noncobject Ipv4Address;
+//class noncobject Ipv6Address;
 
 // Codes of EIGRP messages
 enum HeaderOpcode
@@ -112,7 +112,7 @@ struct EigrpTlvParameter
     uint16_t holdTimer;
 };
 
-// IPv4 TLV Internal route
+// Ipv4 TLV Internal route
 //struct EigrpIpv4Internal
 //{
 //    // type
@@ -121,12 +121,12 @@ struct EigrpTlvParameter
 //    // length
 //    uint16_t length = 28;
 //    // value
-//    IPv4Address routerID;		// IP of originating router (also in exterior TLV)
-// 	IPv4Address nextHop;   
+//    Ipv4Address routerID;		// IP of originating router (also in exterior TLV)
+// 	Ipv4Address nextHop;   
 // 	EigrpMetricPar metric;
 // 	EigrpRouteFlags flags;
-// 	IPv4Address destMask;	 	// Destination
-// 	IPv4Address destAddress;
+// 	Ipv4Address destMask;	 	// Destination
+// 	Ipv4Address destAddress;
 //};
 
 // Multiprotocol Ipv4 (IPv4Address used) Internal TLV route
@@ -149,7 +149,7 @@ struct EigrpMpIpv4Internal
 };
 
 
-// Multiprotocol Ipv6 (IPv6Address used) Internal TLV route
+// Multiprotocol Ipv6 (Ipv6Address used) Internal TLV route
 struct EigrpMpIpv6Internal
 {
     // type

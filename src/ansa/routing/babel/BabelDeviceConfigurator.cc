@@ -21,9 +21,9 @@
 */
 
 #include "BabelDeviceConfigurator.h"
-//#include "IPv6Address.h"
-//#include "IPv6InterfaceData.h"
-//#include "IPv4Address.h"
+//#include "Ipv6Address.h"
+//#include "Ipv6InterfaceData.h"
+//#include "Ipv4Address.h"
 #include <errno.h>
 
 namespace inet {
@@ -158,7 +158,7 @@ void BabelDeviceConfigurator::loadBabelInterfacesConfig(cXMLElement *device, Bab
             }
 
 
-            // for each IPv6 address - save info about network prefix
+            // for each Ipv6 address - save info about network prefix
             cXMLElement *ipv6AddrElem = GetIPv6Address(nullptr, ifaceElem);
             while (ipv6AddrElem != nullptr)
             {
@@ -167,7 +167,7 @@ void BabelDeviceConfigurator::loadBabelInterfacesConfig(cXMLElement *device, Bab
                 Ipv6Address ipv6;
                 int prefixLen;
 
-                // check if it's a valid IPv6 address string with prefix and get prefix
+                // check if it's a valid Ipv6 address string with prefix and get prefix
                 if (!ipv6.tryParseAddrWithPrefix(addrFull.c_str(), prefixLen))
                 {
                     throw cRuntimeError("Unable to set IPv6 address %s on interface %s", addrFull.c_str(), ifaceName);
@@ -175,13 +175,13 @@ void BabelDeviceConfigurator::loadBabelInterfacesConfig(cXMLElement *device, Bab
 
                 ipv6 = Ipv6Address(addrFull.substr(0, addrFull.find_last_of('/')).c_str());
 
-                //EV << "IPv6 address: " << ipv6 << "/" << prefixLen << " on iface " << ifaceName << endl;
+                //EV << "Ipv6 address: " << ipv6 << "/" << prefixLen << " on iface " << ifaceName << endl;
 
                 if(ipv6.getScope() != Ipv6Address::LINK)
                 {// is not link-local -> add
                     bIface->addDirectlyConn(Babel::netPrefix<L3Address>(ipv6, prefixLen));
                 }
-                // get next IPv6 address
+                // get next Ipv6 address
                 ipv6AddrElem = GetIPv6Address(ipv6AddrElem, nullptr);
             }
 
@@ -287,15 +287,15 @@ void BabelDeviceConfigurator::loadBabelInterface(cXMLElement *ifaceElem, BabelMa
             std::transform(afstr.begin(), afstr.end(), afstr.begin(), ::tolower);
 
             if(afstr.compare("ipv6") == 0)
-            {// IPv6 only
+            {// Ipv6 only
                  bIface->setAfSend(Babel::AF::Ipv6);
             }
             else if(afstr.compare("ipv4") == 0)
-            {// IPv4 only
+            {// Ipv4 only
                 bIface->setAfSend(Babel::AF::Ipv4);
             }
             else if(afstr.compare("ipvx") == 0 || afstr.compare("ipv46") == 0 || afstr.compare("ipv4andipv6") == 0 || afstr.compare("both") == 0)
-            {// IPv4 and IPv6
+            {// Ipv4 and Ipv6
                 bIface->setAfSend(Babel::AF::IPvX);
             }
             else if(afstr.compare("none") == 0 || afstr.compare("passive") == 0)
@@ -317,15 +317,15 @@ void BabelDeviceConfigurator::loadBabelInterface(cXMLElement *ifaceElem, BabelMa
             std::transform(afstr.begin(), afstr.end(), afstr.begin(), ::tolower);
 
             if(afstr.compare("ipv6") == 0)
-            {// IPv6 only
+            {// Ipv6 only
                  bIface->setAfDist(Babel::AF::Ipv6);
             }
             else if(afstr.compare("ipv4") == 0)
-            {// IPv4 only
+            {// Ipv4 only
                 bIface->setAfDist(Babel::AF::Ipv4);
             }
             else if(afstr.compare("ipvx") == 0 || afstr.compare("ipv46") == 0 || afstr.compare("ipv4andipv6") == 0 || afstr.compare("both") == 0)
-            {// IPv4 and IPv6
+            {// Ipv4 and Ipv6
                 bIface->setAfDist(Babel::AF::IPvX);
             }
             else if(afstr.compare("none") == 0)
@@ -459,11 +459,11 @@ cXMLElement * BabelDeviceConfigurator::GetInterface(cXMLElement *iface, cXMLElem
 
 cXMLElement * BabelDeviceConfigurator::GetIPv6Address(cXMLElement *addr, cXMLElement *iface){
 
-   // initial call of the method - get first "IPv6Address" child node
+   // initial call of the method - get first "Ipv6Address" child node
    if (iface != nullptr){
       addr = iface->getFirstChildWithTag("IPv6Address");
 
-   // repeated call - get another "IPv6Address" sibling node
+   // repeated call - get another "Ipv6Address" sibling node
    }else if (addr != nullptr){
       addr = addr->getNextSiblingWithTag("IPv6Address");
    }else{

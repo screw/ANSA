@@ -21,7 +21,7 @@ cplusplus {{
 }}
 namespace inet;
 
-//class noncobject AreaID;
+//class noncobject AreaId;
 //class noncobject SystemID;
 //class noncobject LspID;
 

@@ -28,8 +28,8 @@
 
 #include <omnetpp.h>
 
-//#include "IPv4Address.h"
-//#include "IPv6Address.h"    //IPv6 - ADDED for IPv6 support ... or Should I use IPvX ???
+//#include "Ipv4Address.h"
+//#include "Ipv6Address.h"    //Ipv6 - ADDED for Ipv6 support ... or Should I use IPvX ???
 //#include "ModuleAccess.h"
 
 #include "ansa/routing/eigrp/tables/EigrpNeighbor.h"

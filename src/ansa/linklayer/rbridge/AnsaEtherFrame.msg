@@ -8,7 +8,7 @@ cplusplus {{
 
 namespace inet;
 
-//class noncobject MACAddress;
+//class noncobject MacAddress;
 
 //class noncobject MessageId;
 

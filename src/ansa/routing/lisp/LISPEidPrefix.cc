@@ -63,9 +63,9 @@ std::string LISPEidPrefix::info() const {
     std::stringstream os;
 
     /*
-    if (eid.getType() == L3Address::IPv6 && eid == IPv6Address::UNSPECIFIED_ADDRESS)
+    if (eid.getType() == L3Address::Ipv6 && eid == Ipv6Address::UNSPECIFIED_ADDRESS)
         os << "::0";
-    else if (!eid.getType() == L3Address::IPv6 && eid == IPv4Address::UNSPECIFIED_ADDRESS)
+    else if (!eid.getType() == L3Address::Ipv6 && eid == Ipv4Address::UNSPECIFIED_ADDRESS)
         os << "0.0.0.0";
     else
     */

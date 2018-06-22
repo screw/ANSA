@@ -20,15 +20,15 @@
 * @author Vladimir Vesely (ivesely@fit.vutbr.cz)
 * @copyright Brno University of Technology (www.fit.vutbr.cz) under GPLv3
 * @date 6. 11. 2014
-* @brief EIGRP IPv6 Protocol Dependent Module
+* @brief EIGRP Ipv6 Protocol Dependent Module
 * @detail Main module, it mediates control exchange between DUAL, routing table and
 topology table.
 */
 
 #include <algorithm>
 
-//#include "IPv6ControlInfo.h"
-//#include "IPv6Address.h"
+//#include "Ipv6ControlInfo.h"
+//#include "Ipv6Address.h"
 #include "ansa/routing/eigrp/EigrpDeviceConfigurator.h"
 #include "ansa/routing/eigrp/pdms/EigrpPrint.h"
 #include "ansa/routing/eigrp/pdms/EigrpIpv6Pdm.h"
@@ -1218,7 +1218,7 @@ void EigrpIpv6Pdm::removeNeighbor(EigrpNeighbor<Ipv6Address> *neigh)
 Ipv6Route *EigrpIpv6Pdm::createRTRoute(EigrpRouteSource<Ipv6Address> *successor)
 {
     EigrpRoute<Ipv6Address> *route = successor->getRouteInfo();
-    //ANSAIPv6Route *rtEntry = new ANSAIPv6Route(route->getRouteAddress(), getNetmaskLength(route->getRouteMask()), IPv6Route::ROUTING_PROT);
+    //ANSAIPv6Route *rtEntry = new ANSAIPv6Route(route->getRouteAddress(), getNetmaskLength(route->getRouteMask()), Ipv6Route::ROUTING_PROT);
     Ipv6Route* rtEntry = new Ipv6Route(route->getRouteAddress(), getNetmaskLength(route->getRouteMask()), IRoute::EIGRP);
     rtEntry->setInterface(ift->getInterfaceById(successor->getIfaceId()));
     rtEntry->setNextHop(successor->getNextHop());
@@ -1227,7 +1227,7 @@ Ipv6Route *EigrpIpv6Pdm::createRTRoute(EigrpRouteSource<Ipv6Address> *successor)
     // Set protocol source and AD
     if (successor->isInternal())
     {
-        //rtEntry->setSourceType(IPv6Route::EIGRP);
+        //rtEntry->setSourceType(Ipv6Route::EIGRP);
         rtEntry->setAdminDist(Ipv6Route::dEIGRPInternal);
     }
     else

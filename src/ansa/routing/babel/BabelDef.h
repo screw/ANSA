@@ -263,9 +263,9 @@ struct AE
     enum
     {
         WILDCARD = 0,   ///< Wildcard
-        Ipv4 = 1,       ///< IPv4
-        Ipv6 = 2,       ///< IPv6
-        LLIPv6 = 3      ///< link-local IPv6
+        Ipv4 = 1,       ///< Ipv4
+        Ipv6 = 2,       ///< Ipv6
+        LLIPv6 = 3      ///< link-local Ipv6
     };
 
     static int maxLen(int ae);

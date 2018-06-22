@@ -36,7 +36,7 @@
 //#include "InterfaceTableAccess.h"
 //#include "inet/networklayer/ipv4/IPv4Datagram.h"
 //#include "inet/transportlayer/udp/UDPPacket.h"
-//#include "TCPSegment.h"
+//#include "TcpHeader.h"
 //#include "UDPPacket.h"
 //#include "NotificationBoard.h"
 #include "inet/linklayer/common/MACAddress.h"

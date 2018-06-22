@@ -23,9 +23,9 @@
 
 
 #include "ansa/routing/eigrp/EigrpDeviceConfigurator.h"
-//#include "IPv6Address.h"
-//#include "IPv6InterfaceData.h"
-//#include "IPv4Address.h"
+//#include "Ipv6Address.h"
+//#include "Ipv6InterfaceData.h"
+//#include "Ipv4Address.h"
 #include <errno.h>
 namespace inet {
 
@@ -74,11 +74,11 @@ cXMLElement * EigrpDeviceConfigurator::GetInterface(cXMLElement *iface, cXMLElem
 
 cXMLElement * EigrpDeviceConfigurator::GetIPv6Address(cXMLElement *addr, cXMLElement *iface){
 
-   // initial call of the method - get first "IPv6Address" child node
+   // initial call of the method - get first "Ipv6Address" child node
    if (iface != NULL){
       addr = iface->getFirstChildWithTag("IPv6Address");
 
-   // repeated call - get another "IPv6Address" sibling node
+   // repeated call - get another "Ipv6Address" sibling node
    }else if (addr != NULL){
       addr = addr->getNextSiblingWithTag("IPv6Address");
    }else{

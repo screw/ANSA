@@ -35,12 +35,12 @@ package ansa.linklayer.contract;
 // of the simulation; this controlled by the addressTableFile module parameter.
 //
 // This module is not a concrete implementation, it just defines gates and
-// parameters a ~IMACRelayUnit should have. Concrete inplementations add
+// parameters a ~IMacRelayUnit should have. Concrete inplementations add
 // capacity and performance aspects to the model (number of frames processed
 // per second, amount of memory available in the switch, etc.)
 // C++ implementations can subclass from the class <tt>MACRelayUnitBase</tt>.
 //
-// Known implementations are ~MACRelayUnit and ~Ieee8021dRelay.
+// Known implementations are ~MacRelayUnit and ~Ieee8021dRelay.
 //
 moduleinterface ANSA_IMACRelayUnit
 {

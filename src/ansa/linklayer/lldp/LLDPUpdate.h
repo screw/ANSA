@@ -69,14 +69,14 @@ class INET_API LLDPUpdate : public LLDPUpdate_Base
     virtual const TlvOptionBase& getOption(unsigned int k) const { return const_cast<LLDPUpdate*>(this)->getOption(k); }
 
     /**
-     * Returns the TLVOptionBase of the specified type,
+     * Returns the TlvOptionBase of the specified type,
      * or nullptr. If index is 0, then the first, if 1 then the
      * second option is returned.
      */
     virtual TlvOptionBase *findOptionByType(short int optionType, int index = 0);
 
     /**
-     * Adds an TLVOptionBase to the update.
+     * Adds an TlvOptionBase to the update.
      * default atPos means add to the end.
      */
     virtual void addOption(TlvOptionBase *opt, int atPos = -1);
