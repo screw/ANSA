@@ -56,7 +56,7 @@ message ISISTimer
       SystemID sysID;
       unsigned short isType;	//L1 / L2
 //      unsigned char areaID[3];	//areaID; relevant for L2 dead timer
-      AreaID areaID;
+      AreaId areaID;
 //      unsigned char LSPid[8];	//for use as LSP dead timer
       LspID LSPid;
       

@@ -39,8 +39,8 @@ module BabelRouting like IUDPApp
         string routingTableModule;
         
     gates:
-        input udpIn @labels(UDPControlInfo/up);
-        output udpOut @labels(UDPControlInfo/down);        
+        input udpIn @labels(UdpControlInfo/up);
+        output udpOut @labels(UdpControlInfo/down);        
 
     submodules:
         babelMain: BabelMain {

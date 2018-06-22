@@ -56,7 +56,7 @@ void GLBPVirtualRouter::initialize(int stage)
         glbpUdpPort = (int)par("glbpUdpPort");
         glbpMulticast = new L3Address(par("glbpMulticastAddress"));
         glbpGroup = (int)par("group");
-        virtualIP = new IPv4Address(par("virtualIP").stringValue());
+        virtualIP = new Ipv4Address(par("virtualIP").stringValue());
         priority = (int)par("priority");
         weight = (int)par("weight");
         preempt = (bool)par("preempt");
@@ -92,7 +92,7 @@ void GLBPVirtualRouter::initialize(int stage)
 
         //get neccessary OMNET parameters
         ift = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
-        arp = getModuleFromPar<ARP>(par("arp"), this);
+        arp = getModuleFromPar<Arp>(par("arp"), this);
         ie = dynamic_cast<ANSA_InterfaceEntry *>(ift->getInterfaceById((int) par("interface")));
 
         //max nuber of vf is 4
@@ -114,13 +114,13 @@ void GLBPVirtualRouter::initialize(int stage)
         ie->addVirtualForwarder(vf);
 
         //get socket ready
-        socket = new UDPSocket();
+        socket = new UdpSocket();
         socket->setOutputGate(gate("udpOut"));
         socket->setReuseAddress(true);
         socket->bind(glbpUdpPort);
 
         //needs ARP signal for special ARP responses from AVG
-        arp->subscribe(ARP::recvReqSignal,this);
+        arp->subscribe(Arp::recvReqSignal,this);
 
         //TODO another signals for device down and so on...
         //signal for interface down
@@ -345,7 +345,7 @@ void GLBPVirtualRouter::handleMessageListen(GLBPMessage *msg){
     if (dynamic_cast<GLBPHello *>(msg->findOptionByType(HELLO,0))){
         GLBPHello *hello = check_and_cast<GLBPHello *>(msg->findOptionByType(HELLO,0));
         UDPDataIndication *udpControll = check_and_cast<UDPDataIndication *>(msg->getControlInfo());
-        IPv4Address IP = udpControll->getSrcAddr().toIPv4();
+        Ipv4Address IP = udpControll->getSrcAddr().toIPv4();
 
         switch(hello->getVgState()){
         case SPEAK:
@@ -403,7 +403,7 @@ void GLBPVirtualRouter::handleMessageSpeak(GLBPMessage *msg){
         GLBPHello *hello = check_and_cast<GLBPHello *>(msg->findOptionByType(HELLO,0));
 
         UDPDataIndication *udpControll = check_and_cast<UDPDataIndication *>(msg->getControlInfo());
-        IPv4Address IP = udpControll->getSrcAddr().toIPv4();
+        Ipv4Address IP = udpControll->getSrcAddr().toIPv4();
 
         switch(hello->getVgState()){
             case SPEAK:
@@ -476,7 +476,7 @@ void GLBPVirtualRouter::handleMessageStandby(GLBPMessage *msg){
         GLBPHello *hello = check_and_cast<GLBPHello *>(msg->findOptionByType(HELLO,0));
 
         UDPDataIndication *udpControll = check_and_cast<UDPDataIndication *>(msg->getControlInfo());
-        IPv4Address IP = udpControll->getSrcAddr().toIPv4();
+        Ipv4Address IP = udpControll->getSrcAddr().toIPv4();
 
         switch(hello->getVgState()){// TODOmsg->getVgState()){
             case SPEAK:
@@ -552,7 +552,7 @@ void GLBPVirtualRouter::handleMessageActive(GLBPMessage *msg)
         if (req->getForwarder() == UNKNOWN){
             //get IP requester IP
             UDPDataIndication *udpControll = check_and_cast<UDPDataIndication *>(msg->getControlInfo());
-            IPv4Address IP = udpControll->getSrcAddr().toIPv4();
+            Ipv4Address IP = udpControll->getSrcAddr().toIPv4();
 
             //send Response
             sendMessageRequestResponse(RESPONSEm, &IP);
@@ -596,14 +596,14 @@ void GLBPVirtualRouter::addOrStartVf(GLBPMessage *msg){
 
 void GLBPVirtualRouter::receiveSignal(cComponent *source, simsignal_t signalID, bool b, cObject *details){
     Enter_Method_Silent("GLBPVirtualRouter::receiveChangeNotification(%s)", notificationCategoryName(signalID));
-    if (signalID == ARP::recvReqSignal){
+    if (signalID == Arp::recvReqSignal){
         //iff Iam active
         if (!vf->isDisable()){
 //            std::cout<<hostname<<" # "<<" Grp "<<glbpGroup<<" got SIGNAL.."<<endl;
 //            fflush(stdout);
-            MACAddress *mac = loadBalancingNext(loadBalancing);
+            MacAddress *mac = loadBalancingNext(loadBalancing);
             if (mac == nullptr){
-                mac = new MACAddress("00-00-00-00-00-00");
+                mac = new MacAddress("00-00-00-00-00-00");
                 vf->setMACAddress(*mac);
             }else{
                 vf->setMACAddress(*mac);
@@ -683,7 +683,7 @@ void GLBPVirtualRouter::startVf(int n)
     vfVector[n-1]->setState(LISTEN);
     vfVector[n-1]->setWeight(weight);
     vfVector[n-1]->setForwarder(n);
-    MACAddress *myMac = new MACAddress(ie->getMacAddress());
+    MacAddress *myMac = new MacAddress(ie->getMacAddress());
     vfVector[n-1]->setPrimary(myMac);
 
     //add vf to interface
@@ -697,7 +697,7 @@ void GLBPVirtualRouter::startVf(int n)
 //    fflush(stdout);
 }
 
-void GLBPVirtualRouter::addVf(int n, MACAddress *macOfPrimary)
+void GLBPVirtualRouter::addVf(int n, MacAddress *macOfPrimary)
 {
     //If it is not already added
     if (vfVector[n-1]->getState() == INIT || vfVector[n-1]->getState() == DISABLED){
@@ -741,7 +741,7 @@ void GLBPVirtualRouter::sendMessage(GLBPMessageType type, int forwarder){
     packet->setGroup(glbpGroup);
     packet->setOwnerId(ie->getMacAddress());
 
-    UDPSocket::SendOptions options;
+    UdpSocket::SendOptions options;
     options.outInterfaceId = ie->getInterfaceId();
     options.srcAddr = ie->ipv4Data()->getIPAddress();
 
@@ -749,7 +749,7 @@ void GLBPVirtualRouter::sendMessage(GLBPMessageType type, int forwarder){
     socket->sendTo(packet, *glbpMulticast, glbpUdpPort, &options);
 }
 
-void GLBPVirtualRouter::sendMessageRequestResponse(GLBPMessageType type, IPv4Address *IP)
+void GLBPVirtualRouter::sendMessageRequestResponse(GLBPMessageType type, Ipv4Address *IP)
 {
     DebugSendMessage(type);
     GLBPMessage *packet = new GLBPMessage();
@@ -792,7 +792,7 @@ void GLBPVirtualRouter::sendMessageRequestResponse(GLBPMessageType type, IPv4Add
     packet->setGroup(glbpGroup);
     packet->setOwnerId(ie->getMacAddress());
 
-    UDPSocket::SendOptions options;
+    UdpSocket::SendOptions options;
     options.outInterfaceId = ie->getInterfaceId();
     options.srcAddr = ie->ipv4Data()->getIPAddress();
 
@@ -875,7 +875,7 @@ void GLBPVirtualRouter::sendMessage(GLBPMessageType type)
     packet->setGroup(glbpGroup);
     packet->setOwnerId(ie->getMacAddress());
 
-    UDPSocket::SendOptions options;
+    UdpSocket::SendOptions options;
     options.outInterfaceId = ie->getInterfaceId();
     options.srcAddr = ie->ipv4Data()->getIPAddress();
 
@@ -883,14 +883,14 @@ void GLBPVirtualRouter::sendMessage(GLBPMessageType type)
     socket->sendTo(packet, *glbpMulticast, glbpUdpPort, &options);
 }
 
-MACAddress *GLBPVirtualRouter::getNextActiveMac(){
+MacAddress *GLBPVirtualRouter::getNextActiveMac(){
     static int actual=0;
     bool deadlock = false;
-    MACAddress *mac = nullptr;
+    MacAddress *mac = nullptr;
 
     while (actual < (int)vfVector.size()){
         if (vfVector[actual]->getState() == ACTIVE){
-            mac = new MACAddress(vfVector[actual]->getMacAddress());
+            mac = new MacAddress(vfVector[actual]->getMacAddress());
             return mac;
         }
         actual++;
@@ -915,7 +915,7 @@ GLBPHello *GLBPVirtualRouter::generateHelloTLV(){
     packet->setRedirect(redirect);
     packet->setTimeout(timeout);
     //TODO: IPv6
-    packet->setAddressType(IPv4);
+    packet->setAddressType(Ipv4);
     packet->setAddress(*virtualIP);
 
     return packet;
@@ -934,7 +934,7 @@ GLBPRequestResponse *GLBPVirtualRouter::generateReqRespTLV(int forwarder)
         packet->setMacAddress(vfVector[forwarder-1]->getMacAddress());
     }else{
         //VF request
-        MACAddress *unknownMAC = new MACAddress("00-00-00-00-00-00");
+        MacAddress *unknownMAC = new MacAddress("00-00-00-00-00-00");
 
         packet->setForwarder(forwarder);
         packet->setVfState(0);
@@ -968,30 +968,30 @@ void GLBPVirtualRouter::scheduleTimer(cMessage *msg)
     }
 }
 
-MACAddress *GLBPVirtualRouter::setVirtualMAC(int n)
+MacAddress *GLBPVirtualRouter::setVirtualMAC(int n)
 {
-    MACAddress * mac;
+    MacAddress * mac;
     //"00-07-b4-xx-xx-yy"
     //x's are 6bits of 0 followed by 10bits of group ID
     //y's reprezent number of virtual forwarder
 
     if (n > (vfMax+1)){
-        mac = new MACAddress("00-00-00-00-00-00");
+        mac = new MacAddress("00-00-00-00-00-00");
         return mac;
     }
     //set first two bits of group ID
     int minus = 0;
     if (glbpGroup < 256){
-        mac = new MACAddress("00-07-b4-00-00-00");
+        mac = new MacAddress("00-07-b4-00-00-00");
     }
     else if ( glbpGroup < 512 ){ // glbpGroup >= 256 &&
-        mac = new MACAddress("00-07-b4-01-00-00");
+        mac = new MacAddress("00-07-b4-01-00-00");
         minus = 256;
     }else if ( glbpGroup < 768 ){ // glbpGroup >= 512 &&
-        mac = new MACAddress("00-07-b4-02-00-00");
+        mac = new MacAddress("00-07-b4-02-00-00");
         minus = 512;
     }else{ //horni bity oba 11
-        mac = new MACAddress("00-07-b4-03-00-00");
+        mac = new MacAddress("00-07-b4-03-00-00");
         minus = 768;
     }
 
@@ -1004,9 +1004,9 @@ MACAddress *GLBPVirtualRouter::setVirtualMAC(int n)
     return mac;
 }
 
-MACAddress *GLBPVirtualRouter::loadBalancingNext(GLBPLoadBalancingType type){
+MacAddress *GLBPVirtualRouter::loadBalancingNext(GLBPLoadBalancingType type){
     static int forwarder = 1;
-    MACAddress *retval = nullptr;
+    MacAddress *retval = nullptr;
     bool deadlock = false;
 
 

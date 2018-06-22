@@ -129,8 +129,8 @@ class LISPCore : public LISPCoreBase
     ServerAddresses     MapResolvers;
     ServerCItem         MapResolverQueue;
 
-    UDPSocket controlTraf;
-    UDPSocket dataTraf;
+    UdpSocket controlTraf;
+    UdpSocket dataTraf;
 
     bool mapServerV4;
     bool mapServerV6;

@@ -114,9 +114,9 @@ struct ISISadj
     SystemID sysID;
 
 //    unsigned char areaID[3];            /*!<neighbour areaID*/
-    AreaID areaID;
+    AreaId areaID;
 
-    MACAddress mac;                     /*!<mac address of neighbour*/
+    MacAddress mac;                     /*!<mac address of neighbour*/
     ISISAdjState state;                         /*!<adjacency state has to be 2-way; 0 = only 1 way, 1 = 2-way (hello received from adj router)*/
     ISISTimer *timer;                   /*!<timer set to hold time and reseted every time hello from neighbour is received. For L2_MODE works as designated VLAN holding timer*/
     ISISTimer *nonDesTimer;              /*!< nonDesignated VLAN holding timer */
@@ -385,7 +385,7 @@ typedef std::vector<ISISPath*> ISISPaths_t;
 struct ISISAPath
 {
     //        unsigned char *to;
-    AreaID to;
+    AreaId to;
     uint32_t metric;
     ISISNeighbours_t from; // works as next hop
     //bool operator for sorting
@@ -410,7 +410,7 @@ struct ISISAPath
 
     }
 
-    ISISAPath(AreaID to, uint32_t metric, ISISNeighbours_t from)
+    ISISAPath(AreaId to, uint32_t metric, ISISNeighbours_t from)
     {
       this->to = to;
       this->metric = metric;
@@ -423,7 +423,7 @@ struct ISISAPath
 
     ISISAPath* copy()
     {
-      return new ISISAPath(AreaID(to), this->metric, this->from);
+      return new ISISAPath(AreaId(to), this->metric, this->from);
     }
 
 };

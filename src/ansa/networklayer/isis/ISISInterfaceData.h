@@ -32,7 +32,7 @@
 
 namespace inet {
 
-class ISISInterfaceData : public InterfaceProtocolData
+class IsisInterfaceData : public InterfaceProtocolData
 {
 
 
@@ -68,8 +68,8 @@ class ISISInterfaceData : public InterfaceProtocolData
 
 
     public:
-        ISISInterfaceData();
-        virtual ~ISISInterfaceData();
+        IsisInterfaceData();
+        virtual ~IsisInterfaceData();
         void init(void);
         ISISMessage* getHello();
         std::vector<ISISMessage *> getHellos();

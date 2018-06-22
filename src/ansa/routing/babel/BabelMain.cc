@@ -86,8 +86,8 @@ void BabelMain::initialize(int stage)
         //rt4 = AnsaRoutingTableAccess().get();
         //rt6 = ANSARoutingTable6Access().get();
         //rt = getModuleFromPar<IRoutingTable>(par("routingTableModule"), this);
-        rt4 = check_and_cast<IPv4RoutingTable*>(getModuleByPath(par("routingTableModule"))->getSubmodule("ipv4"));
-        rt6 = check_and_cast<IPv6RoutingTable*>(getModuleByPath(par("routingTableModule"))->getSubmodule("ipv6"));
+        rt4 = check_and_cast<Ipv4RoutingTable*>(getModuleByPath(par("routingTableModule"))->getSubmodule("ipv4"));
+        rt6 = check_and_cast<Ipv6RoutingTable*>(getModuleByPath(par("routingTableModule"))->getSubmodule("ipv6"));
 
         //bit = BabelInterfaceTableAccess().get();
         //bsend = BabelSenderAccess().get();
@@ -180,7 +180,7 @@ void BabelMain::handleMessage(cMessage *msg)
         }
 
         // process incoming packet
-        EV << "Received packet: " << UDPSocket::getReceivedPacketInfo(pk) << endl;
+        EV << "Received packet: " << UdpSocket::getReceivedPacketInfo(pk) << endl;
 
         BabelMessage *bm = check_and_cast<BabelMessage *>(pk);
 
@@ -348,7 +348,7 @@ void BabelMain::sendHelloTLV(BabelInterface *iface, double mt)
         {// through all neighbours
             if((*it)->getInterface() == iface)
             {// neighbour on same interface -> send IHU TLV
-                sendTLV((((*it)->getAddress().getType()==L3Address::IPv6) ? defval::MCASTG6 : defval::MCASTG4),
+                sendTLV((((*it)->getAddress().getType()==L3Address::Ipv6) ? defval::MCASTG6 : defval::MCASTG4),
                         iface,
                         new BabelIhuFtlv((*it)->computeRxcost(),
                             defval::IHU_INTERVAL_MULT * iface->getHInterval(),
@@ -363,7 +363,7 @@ void BabelMain::sendHelloTLV(BabelInterface *iface, double mt)
             if((*it)->getInterface() == iface
                     && ((((*it)->getHistory() & 0xF000) != 0xF000) || (*it)->getTxcost() >= 384))
             {// neighbour on same interface with loss in last 4 hellos or with txcost >= 384 -> send IHU TLV
-                sendTLV((((*it)->getAddress().getType()==L3Address::IPv6) ? defval::MCASTG6 : defval::MCASTG4),
+                sendTLV((((*it)->getAddress().getType()==L3Address::Ipv6) ? defval::MCASTG6 : defval::MCASTG4),
                         iface,
                         new BabelIhuFtlv((*it)->computeRxcost(),
                             defval::IHU_INTERVAL_MULT * iface->getHInterval(),
@@ -461,11 +461,11 @@ void BabelMain::sendUpdateTLV(BabelInterface *iface, BabelUpdateFtlv *update, do
 
     int ifaceaf = iface->getAfSend();
 
-    if(ifaceaf == AF::IPv4)
+    if(ifaceaf == AF::Ipv4)
     {// send IPv4
         sendUpdateTLV(defval::MCASTG4, iface, update, mt, reliably);
     }
-    else if(ifaceaf == AF::IPv6)
+    else if(ifaceaf == AF::Ipv6)
     {// send IPv6
         sendUpdateTLV(defval::MCASTG6, iface, update, mt, reliably);
     }
@@ -547,11 +547,11 @@ void BabelMain::sendSeqnoReqTLV(BabelInterface *iface, BabelSeqnoReqFtlv *reques
 
     int ifaceaf = iface->getAfSend();
 
-    if(ifaceaf == AF::IPv4)
+    if(ifaceaf == AF::Ipv4)
     {// send IPv4
         sendSeqnoReqTLV(defval::MCASTG4, iface, request, recfrom, mt);
     }
-    else if(ifaceaf == AF::IPv6)
+    else if(ifaceaf == AF::Ipv6)
     {// send IPv6
         sendSeqnoReqTLV(defval::MCASTG6, iface, request, recfrom, mt);
     }
@@ -596,7 +596,7 @@ void BabelMain::sendUpdate(L3Address da, BabelInterface *iface, BabelRoute *rout
     {// local route or disabled split-horizon or learned on another interface -> send
         L3Address nh;
 
-        if(route->getPrefix().getAddr().getType()==L3Address::IPv6)
+        if(route->getPrefix().getAddr().getType()==L3Address::Ipv6)
         {// IPv6
           nh = iface->getInterface()->ipv6Data()->getLinkLocalAddress();
         }
@@ -643,11 +643,11 @@ void BabelMain::sendUpdate(BabelInterface *iface, BabelRoute *route, double mt, 
 
     int ifaceaf = iface->getAfSend();
 
-    if(ifaceaf == AF::IPv4)
+    if(ifaceaf == AF::Ipv4)
     {// send IPv4
         sendUpdate(defval::MCASTG4, iface, route, mt, reliably);
     }
-    else if(ifaceaf == AF::IPv6)
+    else if(ifaceaf == AF::Ipv6)
     {// send IPv6
         sendUpdate(defval::MCASTG6, iface, route, mt, reliably);
     }
@@ -974,9 +974,9 @@ void BabelMain::deleteTimers()
     timers.clear();
 }
 
-UDPSocket *BabelMain::createSocket()
+UdpSocket *BabelMain::createSocket()
 {
-    UDPSocket *socket = new UDPSocket();
+    UdpSocket *socket = new UdpSocket();
     socket->setOutputGate(gate("udpOut"));
     socket->setTimeToLive(1);
 
@@ -1015,14 +1015,14 @@ void BabelMain::activateInterface(BabelInterface *iface)
         }
         iface->getSocket6()->bind(iface->getInterface()->ipv6Data()->getLinkLocalAddress(), port);
        break;
-    case AF::IPv4:
+    case AF::Ipv4:
         if(iface->getSocket4() == NULL)
         {
             iface->setSocket4(createSocket());
         }
         iface->getSocket4()->bind(iface->getInterface()->ipv4Data()->getIPAddress(), port);
        break;
-    case AF::IPv6:
+    case AF::Ipv6:
         if(iface->getSocket6() == NULL)
         {
             iface->setSocket6(createSocket());
@@ -1059,8 +1059,8 @@ void BabelMain::activateInterface(BabelInterface *iface)
     for (std::vector<netPrefix<L3Address> >::const_iterator it = iface->getDirectlyConn().begin(); it != iface->getDirectlyConn().end(); ++it)
     {// add all prefixes to tt
         if(iface->getAfDist() == AF::IPvX
-                || (iface->getAfDist() == AF::IPv4 && !((*it).getAddr().getType()==L3Address::IPv6) )
-                || (iface->getAfDist() == AF::IPv6 &&   (*it).getAddr().getType()==L3Address::IPv6  )
+                || (iface->getAfDist() == AF::Ipv4 && !((*it).getAddr().getType()==L3Address::Ipv6) )
+                || (iface->getAfDist() == AF::Ipv6 &&   (*it).getAddr().getType()==L3Address::Ipv6  )
           )
         {
             BabelRoute *newroute = new BabelRoute((*it), NULL, routerId, routeDistance(seqno, 0), L3Address(), 0, NULL, NULL);
@@ -1167,8 +1167,8 @@ void BabelMain::sendMessage(L3Address dst, BabelInterface *outIface, BabelMessag
     }
 
     // Check AddressFamily of destination -> choose corresponding socket
-    UDPSocket *socket = NULL;
-    if(dst.getType()==L3Address::IPv6)
+    UdpSocket *socket = NULL;
+    if(dst.getType()==L3Address::Ipv6)
     {
         socket = outIface->getSocket6();
     }
@@ -1181,13 +1181,13 @@ void BabelMain::sendMessage(L3Address dst, BabelInterface *outIface, BabelMessag
     {// socket is ready
         msg->countStats(&(outIface->txStat));
         //socket->sendTo(msg, dst, port, outIface->getInterfaceId());
-        UDPSocket::SendOptions options;
+        UdpSocket::SendOptions options;
         options.outInterfaceId = outIface->getInterfaceId();
         socket->sendTo(msg, dst, port, &options);
     }
     else
     {
-        EV << "Packet not send - UDP socket (" << ((dst.getType()==L3Address::IPv6) ? "IPv6" : "IPv4") << ") on interface " << outIface->getIfaceName() << " is not ready" << endl;
+        EV << "Packet not send - UDP socket (" << ((dst.getType()==L3Address::Ipv6) ? "IPv6" : "IPv4") << ") on interface " << outIface->getIfaceName() << " is not ready" << endl;
     }
 }
 
@@ -1223,10 +1223,10 @@ void BabelMain::processMessage(BabelMessage *msg)
 
     bool changed = false;
     rid prevrid;
-    L3Address prevnh4 =  !(src.getType()==L3Address::IPv6) ? src : L3Address(IPv4Address());
-    L3Address prevnh6 =    src.getType()==L3Address::IPv6  ? src : L3Address(IPv6Address());
-    netPrefix<L3Address> prevprefix4 = netPrefix<L3Address>(IPv4Address(), 0);
-    netPrefix<L3Address> prevprefix6 = netPrefix<L3Address>(IPv6Address(), 0);
+    L3Address prevnh4 =  !(src.getType()==L3Address::Ipv6) ? src : L3Address(Ipv4Address());
+    L3Address prevnh6 =    src.getType()==L3Address::Ipv6  ? src : L3Address(Ipv6Address());
+    netPrefix<L3Address> prevprefix4 = netPrefix<L3Address>(Ipv4Address(), 0);
+    netPrefix<L3Address> prevprefix6 = netPrefix<L3Address>(Ipv6Address(), 0);
 
 
     char *msgbody = msg->getBody();
@@ -1266,11 +1266,11 @@ void BabelMain::processMessage(BabelMessage *msg)
         case tlvT::NEXTHOP:
             tmpae = *reinterpret_cast<uint8_t *>(msgbody + tlvoffset + 2);
 
-            if(tmpae == AE::IPv4)
+            if(tmpae == AE::Ipv4)
             {// encoded IPv4 address -> read
                 prevnh4 = readRawAddr(tmpae, msgbody + tlvoffset + 4);
             }
-            else if(tmpae == AE::IPv6 || tmpae == AE::LLIPv6)
+            else if(tmpae == AE::Ipv6 || tmpae == AE::LLIPv6)
             {// encoded IPv6 address -> read
                 prevnh6 = readRawAddr(tmpae, msgbody + tlvoffset + 4);
             }
@@ -1291,11 +1291,11 @@ void BabelMain::processMessage(BabelMessage *msg)
 
             if(tmpflags & 0x80)
             {// update contains full prefix -> remember as previous for next Update TLVs
-                if(tmpae == AE::IPv4)
+                if(tmpae == AE::Ipv4)
                 {// encoded IPv4 prefix -> read
                     prevprefix4.set(tmpae, msgbody + tlvoffset + 12, tmpplen);
                 }
-                else if(tmpae == AE::IPv6)
+                else if(tmpae == AE::Ipv6)
                 {// encoded IPv6 prefix -> read
                     prevprefix6.set(tmpae, msgbody + tlvoffset + 12, tmpplen);
                 }
@@ -1317,11 +1317,11 @@ void BabelMain::processMessage(BabelMessage *msg)
             }
 
 
-            if(tmpae == AE::IPv4)
+            if(tmpae == AE::Ipv4)
             {// encoded IPv4 prefix -> process
                 changed = processUpdateTlv(msgbody + tlvoffset, iniface, src, prevrid, prevnh4, &prevprefix4) || changed;
             }
-            else if(tmpae == AE::IPv6)
+            else if(tmpae == AE::Ipv6)
             {// encoded IPv6 prefix -> process
                 changed = processUpdateTlv(msgbody + tlvoffset, iniface, src, prevrid, prevnh6, &prevprefix6) || changed;
             }
@@ -1501,7 +1501,7 @@ bool BabelMain::processIhuTlv(char *tlv, BabelInterface *iniface, const L3Addres
 
         address = dst;
     }
-    else if(ae == AE::IPv4 || ae == AE::IPv6 || ae == AE::LLIPv6)
+    else if(ae == AE::Ipv4 || ae == AE::Ipv6 || ae == AE::LLIPv6)
     {// encoded address -> read
         address = readRawAddr(ae, tlv + 8);
     }
@@ -1514,8 +1514,8 @@ bool BabelMain::processIhuTlv(char *tlv, BabelInterface *iniface, const L3Addres
     }
 
 
-    if(!(      (!(address.getType()==L3Address::IPv6) && address.toIPv4() == iniface->getInterface()->ipv4Data()->getIPAddress())
-            || (  address.getType()==L3Address::IPv6  && iniface->getInterface()->ipv6Data()->hasAddress(address.toIPv6()))
+    if(!(      (!(address.getType()==L3Address::Ipv6) && address.toIPv4() == iniface->getInterface()->ipv4Data()->getIPAddress())
+            || (  address.getType()==L3Address::Ipv6  && iniface->getInterface()->ipv6Data()->hasAddress(address.toIPv6()))
         )
       )
     {// address is not my address on ingress interface -> ignore
@@ -1563,7 +1563,7 @@ bool BabelMain::processUpdateTlv(char *tlv, BabelInterface *iniface, const L3Add
 
     bool changed = false;
     routeDistance dist = routeDistance(seqno, metric);
-    netPrefix<L3Address> prefix = ((ae == AE::IPv4 || ae == AE::IPv6) ? netPrefix<L3Address>(ae, tlv + 12, plen, omitted, prevprefix) : netPrefix<L3Address>());
+    netPrefix<L3Address> prefix = ((ae == AE::Ipv4 || ae == AE::Ipv6) ? netPrefix<L3Address>(ae, tlv + 12, plen, omitted, prevprefix) : netPrefix<L3Address>());
     BabelNeighbour *neigh = bnt.findNeighbour(iniface, src);
 
     if(!neigh)
@@ -1577,7 +1577,7 @@ bool BabelMain::processUpdateTlv(char *tlv, BabelInterface *iniface, const L3Add
     {// forwarded seqnoRequest for this prefix exists - this update is reply -> forward
         L3Address measnh;
 
-        if(req->getRequest().getPrefix().getAddr().getType()==L3Address::IPv6)
+        if(req->getRequest().getPrefix().getAddr().getType()==L3Address::Ipv6)
         {// IPv6
             measnh = req->getReceivedFrom()->getInterface()->getInterface()->ipv6Data()->getLinkLocalAddress();
         }
@@ -1690,7 +1690,7 @@ void BabelMain::processRouteReqTlv(char *tlv, BabelInterface *iniface, const L3A
     {// request for full table dump
         sendFullDump(iniface);
     }
-    else if(ae == AE::IPv4 || ae == AE::IPv6)
+    else if(ae == AE::Ipv4 || ae == AE::Ipv6)
     {
         netPrefix<L3Address> prefix = netPrefix<L3Address>(ae, tlv + 4, plen);
         BabelRoute *intable = btt.findSelectedRoute(prefix);
@@ -1748,7 +1748,7 @@ void BabelMain::processSeqnoReqTlv(char *tlv, BabelInterface *iniface, const L3A
                        ntohl(*reinterpret_cast<uint32_t *>(tlv + 12)));
     netPrefix<L3Address> prefix;
 
-    if(ae == AE::IPv4 || ae == AE::IPv6)
+    if(ae == AE::Ipv4 || ae == AE::Ipv6)
     {
         prefix = netPrefix<L3Address>(ae, tlv + 16, plen);
     }
@@ -1916,11 +1916,11 @@ void BabelMain::sendTLV(BabelInterface *oi, BabelFtlv *ftlv, double mt)
 
     int ifaceaf = oi->getAfSend();
 
-    if(ifaceaf == AF::IPv4)
+    if(ifaceaf == AF::Ipv4)
     {// send IPv4
         sendTLV(defval::MCASTG4, oi, ftlv, mt);
     }
-    else if(ifaceaf == AF::IPv6)
+    else if(ifaceaf == AF::Ipv6)
     {// send IPv6
         sendTLV(defval::MCASTG6, oi, ftlv, mt);
     }
@@ -2013,7 +2013,7 @@ void BabelMain::flushBuffer(BabelBuffer *buff)
     {// while buffer is not empty
         // compute maximum size of body = MTU - IP_HEADER - UDP_HEADER - BABEL_HEADER
         int maxbodysize = buff->getOutIface()->getInterface()->getMTU()
-                - ((buff->getDst().getType()==L3Address::IPv6) ? IPV6_HEADER_SIZE : IPV4_HEADER_SIZE)
+                - ((buff->getDst().getType()==L3Address::Ipv6) ? IPV6_HEADER_SIZE : IPV4_HEADER_SIZE)
                 - UDP_HEADER_SIZE - BABEL_HEADER_SIZE;
 
         if(maxbodysize < (512 - BABEL_HEADER_SIZE))
@@ -2035,10 +2035,10 @@ void BabelMain::flushBuffer(BabelBuffer *buff)
         bool containhello = false;              ///< is HELLO TLV in MSG?
         uint16_t acknonce;                      ///< nonce field of ACKREQ TLV
         rid prevrid;
-        L3Address prevnh4 = !(buff->getDst().getType()==L3Address::IPv6) ? buff->getOutIface()->getInterface()->ipv4Data()->getIPAddress() : L3Address(IPv4Address());
-        L3Address prevnh6 =   buff->getDst().getType()==L3Address::IPv6  ? buff->getOutIface()->getInterface()->ipv6Data()->getLinkLocalAddress() : L3Address(IPv6Address());
-        netPrefix<L3Address> prevprefix4 = netPrefix<L3Address>(IPv4Address(), 0);
-        netPrefix<L3Address> prevprefix6 = netPrefix<L3Address>(IPv6Address(), 0);
+        L3Address prevnh4 = !(buff->getDst().getType()==L3Address::Ipv6) ? buff->getOutIface()->getInterface()->ipv4Data()->getIPAddress() : L3Address(Ipv4Address());
+        L3Address prevnh6 =   buff->getDst().getType()==L3Address::Ipv6  ? buff->getOutIface()->getInterface()->ipv6Data()->getLinkLocalAddress() : L3Address(Ipv6Address());
+        netPrefix<L3Address> prevprefix4 = netPrefix<L3Address>(Ipv4Address(), 0);
+        netPrefix<L3Address> prevprefix6 = netPrefix<L3Address>(Ipv6Address(), 0);
 
         for (it = buff->tlvsBegin(); it != buff->tlvsEnd();)
         {
@@ -2099,8 +2099,8 @@ void BabelMain::flushBuffer(BabelBuffer *buff)
             else
             {// UPDATE TLV -> optimize
                 BabelUpdateFtlv *updatetlv = dynamic_cast<BabelUpdateFtlv *>(*it);
-                L3Address *prevnhsameaf = (updatetlv->getNextHop().getType()==L3Address::IPv6) ? &prevnh6 : &prevnh4;
-                netPrefix<L3Address> *prevprefixsameaf = (updatetlv->getPrefix().getAddr().getType()==L3Address::IPv6) ? &prevprefix6 : &prevprefix4;
+                L3Address *prevnhsameaf = (updatetlv->getNextHop().getType()==L3Address::Ipv6) ? &prevnh6 : &prevnh4;
+                netPrefix<L3Address> *prevprefixsameaf = (updatetlv->getPrefix().getAddr().getType()==L3Address::Ipv6) ? &prevprefix6 : &prevprefix4;
 
                 ASSERT(updatetlv != NULL);
 
@@ -2122,8 +2122,8 @@ void BabelMain::flushBuffer(BabelBuffer *buff)
                 }
 
                 if(updatetlv->getDistance().getMetric() != 0xFFFF
-                        && (   (  updatetlv->getNextHop().getType()==L3Address::IPv6  && updatetlv->getNextHop() != prevnh6)
-                            || (!(updatetlv->getNextHop().getType()==L3Address::IPv6) && updatetlv->getNextHop() != prevnh4)
+                        && (   (  updatetlv->getNextHop().getType()==L3Address::Ipv6  && updatetlv->getNextHop() != prevnh6)
+                            || (!(updatetlv->getNextHop().getType()==L3Address::Ipv6) && updatetlv->getNextHop() != prevnh4)
                            )
                   )
                 {// update is not retraction and previous NextHop is different -> add NextHop TLV
@@ -2545,7 +2545,7 @@ void BabelMain::addToRT(BabelRoute *route)
         return;
     }
 
-    IRoutingTable* rt = route->getPrefix().getAddr().getType() == L3Address::IPv4 ? check_and_cast<IRoutingTable*>(rt4) : check_and_cast<IRoutingTable*>(rt6);
+    IRoutingTable* rt = route->getPrefix().getAddr().getType() == L3Address::Ipv4 ? check_and_cast<IRoutingTable*>(rt4) : check_and_cast<IRoutingTable*>(rt6);
     IRoute* ro = rt->createRoute();
     ro->setSourceType(IRoute::BABEL);
     ro->setSource(this);
@@ -2556,10 +2556,10 @@ void BabelMain::addToRT(BabelRoute *route)
     ro->setMetric(route->metric());
 
     if (rt == rt4) {
-        ((IPv4Route*)ro)->setAdminDist(IPv4Route::dBABEL);
+        ((Ipv4Route*)ro)->setAdminDist(Ipv4Route::dBABEL);
     }
     else {
-        ((IPv6Route*)ro)->setAdminDist(IPv6Route::dBABEL);
+        ((Ipv6Route*)ro)->setAdminDist(Ipv6Route::dBABEL);
         //EV << "!!!!!!!!!!!" << ((IPv6Route*)ro)->info() << endl;
     }
 
@@ -2567,10 +2567,10 @@ void BabelMain::addToRT(BabelRoute *route)
     if (prepareToAdd(rt, ro)) {
         rt->addRoute(ro);
         if (rt == rt4) {
-            route->setRTEntry(dynamic_cast<IPv4Route*>(ro));
+            route->setRTEntry(dynamic_cast<Ipv4Route*>(ro));
         }
         else {
-            route->setRTEntry(dynamic_cast<IPv6Route*>(ro));
+            route->setRTEntry(dynamic_cast<Ipv6Route*>(ro));
         }
     }
     else {
@@ -2602,13 +2602,13 @@ void BabelMain::removeFromRT(BabelRoute *route)
         return;
     }
 
-    if(route->getPrefix().getAddr().getType()==L3Address::IPv6)
+    if(route->getPrefix().getAddr().getType()==L3Address::Ipv6)
     {// IPv6
-        rt6->removeRoute(reinterpret_cast<IPv6Route *>(route->getRTEntry()));
+        rt6->removeRoute(reinterpret_cast<Ipv6Route *>(route->getRTEntry()));
     }
     else
     {// IPv4
-        rt4->removeRoute(reinterpret_cast<IPv4Route *>(route->getRTEntry()));
+        rt4->removeRoute(reinterpret_cast<Ipv4Route *>(route->getRTEntry()));
     }
 
     route->setRTEntry(NULL);
@@ -2638,16 +2638,16 @@ void BabelMain::updateRT(BabelRoute *route)
         return;
     }
 
-    if(route->getPrefix().getAddr().getType()==L3Address::IPv6)
+    if(route->getPrefix().getAddr().getType()==L3Address::Ipv6)
     {// IPv6
-        IPv6Route *entry = reinterpret_cast<IPv6Route *>(route->getRTEntry());
+        Ipv6Route *entry = reinterpret_cast<Ipv6Route *>(route->getRTEntry());
 
         entry->setMetric(route->metric());
         entry->setNextHop(route->getNextHop().toIPv6());
     }
     else
     {// IPv4
-        IPv4Route *entry = reinterpret_cast<IPv4Route *>(route->getRTEntry());
+        Ipv4Route *entry = reinterpret_cast<Ipv4Route *>(route->getRTEntry());
 
         entry->setMetric(route->metric());
         entry->setGateway(route->getNextHop().toIPv4());
@@ -2806,8 +2806,8 @@ bool BabelMain::prepareToAdd(IRoutingTable* rt, IRoute* ro) {
     }
 
     if (old) {
-        unsigned int newad = (rt == rt4 ? ((IPv4Route*)ro)->getAdminDist() : ((IPv6Route*)ro)->getAdminDist());
-        unsigned int oldad = (rt == rt4 ? ((IPv4Route*)old)->getAdminDist() : ((IPv6Route*)old)->getAdminDist());
+        unsigned int newad = (rt == rt4 ? ((Ipv4Route*)ro)->getAdminDist() : ((Ipv6Route*)ro)->getAdminDist());
+        unsigned int oldad = (rt == rt4 ? ((Ipv4Route*)old)->getAdminDist() : ((Ipv6Route*)old)->getAdminDist());
 
         if (oldad < newad) return false;
         if (oldad == newad && old->getMetric() < ro->getMetric()) return false;

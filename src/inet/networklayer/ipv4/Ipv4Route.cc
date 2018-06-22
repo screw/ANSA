@@ -122,8 +122,8 @@ std::string Ipv4Route::str() const
     out << (gateway.isUnspecified() ? "DIRECT" : "REMOTE");
     out << " " << IRoute::sourceTypeName(sourceType);
 #ifdef WITH_AODV
-    if (dynamic_cast<AODVRouteData *>(protocolData)) {
-        AODVRouteData *data = (AODVRouteData *)protocolData;
+    if (dynamic_cast<AodvRouteData *>(protocolData)) {
+        AodvRouteData *data = (AodvRouteData *)protocolData;
         out << data;
     }
 #endif // ifdef WITH_AODV

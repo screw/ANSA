@@ -147,7 +147,7 @@ bool EigrpDeviceConfigurator::Str2Bool(bool *ret, const char *str){
    return false;
 }
 
-bool EigrpDeviceConfigurator::wildcardToMask(const char *wildcard, IPv4Address& result)
+bool EigrpDeviceConfigurator::wildcardToMask(const char *wildcard, Ipv4Address& result)
 {
     result.set(wildcard);
     uint32 wcNum = result.getInt();
@@ -162,14 +162,14 @@ bool EigrpDeviceConfigurator::wildcardToMask(const char *wildcard, IPv4Address& 
     return true;
 }
 
-EigrpNetwork<IPv4Address> *EigrpDeviceConfigurator::isEigrpInterface(std::vector<EigrpNetwork<IPv4Address> *>& networks, ANSA_InterfaceEntry *interface)
+EigrpNetwork<Ipv4Address> *EigrpDeviceConfigurator::isEigrpInterface(std::vector<EigrpNetwork<Ipv4Address> *>& networks, ANSA_InterfaceEntry *interface)
 {
-    IPv4Address prefix, mask;
-    IPv4Address ifAddress = interface->ipv4Data()->getIPAddress();
-    IPv4Address ifmask = interface->ipv4Data()->getNetmask();
+    Ipv4Address prefix, mask;
+    Ipv4Address ifAddress = interface->ipv4Data()->getIPAddress();
+    Ipv4Address ifmask = interface->ipv4Data()->getNetmask();
     vector<int> resultIfs;
     int maskLength, ifMaskLength;
-    std::vector<EigrpNetwork<IPv4Address> *>::iterator it;
+    std::vector<EigrpNetwork<Ipv4Address> *>::iterator it;
 
     if (ifAddress.isUnspecified())
                 return NULL;
@@ -196,12 +196,12 @@ EigrpNetwork<IPv4Address> *EigrpDeviceConfigurator::isEigrpInterface(std::vector
     return NULL;
 }
 
-void EigrpDeviceConfigurator::loadEigrpIPv4Networks(cXMLElement *processElem, IEigrpModule<IPv4Address> *eigrpModule)
+void EigrpDeviceConfigurator::loadEigrpIPv4Networks(cXMLElement *processElem, IEigrpModule<Ipv4Address> *eigrpModule)
 {
     const char *addressStr, *wildcardStr;
-    IPv4Address address, mask;
-    std::vector<EigrpNetwork<IPv4Address> *> networks;
-    EigrpNetwork<IPv4Address> *net;
+    Ipv4Address address, mask;
+    std::vector<EigrpNetwork<Ipv4Address> *> networks;
+    EigrpNetwork<Ipv4Address> *net;
     ANSA_InterfaceEntry* iface;
 
     cXMLElement *netoworkParentElem = processElem->getFirstChildWithTag("Networks");
@@ -224,14 +224,14 @@ void EigrpDeviceConfigurator::loadEigrpIPv4Networks(cXMLElement *processElem, IE
         address.set(addressStr);
         if (wildcardStr == NULL)
         {// wildcard is optional
-            mask = IPv4Address::UNSPECIFIED_ADDRESS;
+            mask = Ipv4Address::UNSPECIFIED_ADDRESS;
             // classful network
             address = address.getNetwork();
         }
         else
         {
             // Accepts incorrectly specified wildcard as normal mask (Cisco)
-            mask = IPv4Address(wildcardStr);
+            mask = Ipv4Address(wildcardStr);
             if (mask.isUnspecified() || !mask.isValidNetmask()) {
                 if (!wildcardToMask(wildcardStr, mask))
                     throw cRuntimeError("Invalid wildcard in EIGRP network configuration");
@@ -254,7 +254,7 @@ void EigrpDeviceConfigurator::loadEigrpIPv4Networks(cXMLElement *processElem, IE
     }
 }
 
-void EigrpDeviceConfigurator::loadEigrpIPv4Config(IEigrpModule<IPv4Address> *eigrpModule)
+void EigrpDeviceConfigurator::loadEigrpIPv4Config(IEigrpModule<Ipv4Address> *eigrpModule)
 {
     ASSERT(eigrpModule != NULL);
 
@@ -275,7 +275,7 @@ void EigrpDeviceConfigurator::loadEigrpIPv4Config(IEigrpModule<IPv4Address> *eig
     loadEigrpInterfacesConfig(device, eigrpModule);
 }
 
-void EigrpDeviceConfigurator::loadEigrpProcessesConfig(cXMLElement *device, IEigrpModule<IPv4Address> *eigrpModule)
+void EigrpDeviceConfigurator::loadEigrpProcessesConfig(cXMLElement *device, IEigrpModule<Ipv4Address> *eigrpModule)
 {
     // XML nodes for EIGRP
     cXMLElement *processElem = NULL;
@@ -392,7 +392,7 @@ bool EigrpDeviceConfigurator::loadEigrpStubConf(cXMLElement *node, const char *a
     return result;
 }
 
-void EigrpDeviceConfigurator::loadEigrpInterfacesConfig(cXMLElement *device, IEigrpModule<IPv4Address> *eigrpModule)
+void EigrpDeviceConfigurator::loadEigrpInterfacesConfig(cXMLElement *device, IEigrpModule<Ipv4Address> *eigrpModule)
 {
     // XML nodes for EIGRP
     cXMLElement *eigrpIfaceElem = NULL;
@@ -434,7 +434,7 @@ void EigrpDeviceConfigurator::loadEigrpInterfacesConfig(cXMLElement *device, IEi
     }
 }
 
-void EigrpDeviceConfigurator::loadEigrpInterface(cXMLElement *eigrpIface, IEigrpModule<IPv4Address> *eigrpModule, int ifaceId, const char *ifaceName)
+void EigrpDeviceConfigurator::loadEigrpInterface(cXMLElement *eigrpIface, IEigrpModule<Ipv4Address> *eigrpModule, int ifaceId, const char *ifaceName)
 {
     int tempNumber;
     bool tempBool, success;
@@ -467,7 +467,7 @@ void EigrpDeviceConfigurator::loadEigrpInterface(cXMLElement *eigrpIface, IEigrp
     }
 }
 
-void EigrpDeviceConfigurator::loadEigrpIPv6Config(IEigrpModule<IPv6Address> *eigrpModule)
+void EigrpDeviceConfigurator::loadEigrpIPv6Config(IEigrpModule<Ipv6Address> *eigrpModule)
 {//TODO
     ASSERT(eigrpModule != NULL);
 
@@ -489,7 +489,7 @@ void EigrpDeviceConfigurator::loadEigrpIPv6Config(IEigrpModule<IPv6Address> *eig
     loadEigrpInterfaces6Config(device, eigrpModule);
 }
 
-void EigrpDeviceConfigurator::loadEigrpProcesses6Config(cXMLElement *device, IEigrpModule<IPv6Address> *eigrpModule)
+void EigrpDeviceConfigurator::loadEigrpProcesses6Config(cXMLElement *device, IEigrpModule<Ipv6Address> *eigrpModule)
 {
     // XML nodes for EIGRP
     cXMLElement *processElem = NULL;
@@ -519,7 +519,7 @@ void EigrpDeviceConfigurator::loadEigrpProcesses6Config(cXMLElement *device, IEi
     // routerID for process
     if ((rIdStr = processElem->getAttribute("routerId")) == NULL)
         throw cRuntimeError("No EIGRP routerID specified"); // routerID must be specified
-    eigrpModule->setRouterId(IPv4Address(rIdStr));
+    eigrpModule->setRouterId(Ipv4Address(rIdStr));
 
     procDetails = processElem->getChildren();
     for (cXMLElementList::iterator procElem = procDetails.begin(); procElem != procDetails.end(); procElem++)
@@ -580,7 +580,7 @@ void EigrpDeviceConfigurator::loadEigrpProcesses6Config(cXMLElement *device, IEi
     return;
 }
 
-void EigrpDeviceConfigurator::loadEigrpInterfaces6Config(cXMLElement *device, IEigrpModule<IPv6Address> *eigrpModule)
+void EigrpDeviceConfigurator::loadEigrpInterfaces6Config(cXMLElement *device, IEigrpModule<Ipv6Address> *eigrpModule)
 {
     // XML nodes for EIGRP
     cXMLElement *eigrpIfaceElem = NULL;
@@ -609,7 +609,7 @@ void EigrpDeviceConfigurator::loadEigrpInterfaces6Config(cXMLElement *device, IE
 
             // get address string
             string addrFull = ipv6AddrElem->getNodeValue();
-            IPv6Address ipv6;
+            Ipv6Address ipv6;
             int prefixLen;
 
             // check if it's a valid IPv6 address string with prefix and get prefix
@@ -617,11 +617,11 @@ void EigrpDeviceConfigurator::loadEigrpInterfaces6Config(cXMLElement *device, IE
             throw cRuntimeError("Unable to set IPv6 address %s on interface %s", addrFull.c_str(), ifaceName);
             }
 
-            ipv6 = IPv6Address(addrFull.substr(0, addrFull.find_last_of('/')).c_str());
+            ipv6 = Ipv6Address(addrFull.substr(0, addrFull.find_last_of('/')).c_str());
 
             //EV << "IPv6 address: " << ipv6 << "/" << prefixLen << " on iface " << ifaceName << endl;
 
-            if(ipv6.getScope() != IPv6Address::LINK)
+            if(ipv6.getScope() != Ipv6Address::LINK)
             {// is not link-local -> add
                 if(!eigrpModule->addNetPrefix(ipv6.getPrefix(prefixLen), prefixLen, iface->getInterfaceId())) //only saves information about prefix - does not enable in EIGRP
                 {// failure - same prefix on different interfaces
@@ -663,7 +663,7 @@ void EigrpDeviceConfigurator::loadEigrpInterfaces6Config(cXMLElement *device, IE
     }
 }
 
-void EigrpDeviceConfigurator::loadEigrpInterface6(cXMLElement *eigrpIface, IEigrpModule<IPv6Address> *eigrpModule, int ifaceId, const char *ifaceName)
+void EigrpDeviceConfigurator::loadEigrpInterface6(cXMLElement *eigrpIface, IEigrpModule<Ipv6Address> *eigrpModule, int ifaceId, const char *ifaceName)
 {
     int tempNumber;
     bool tempBool, success;

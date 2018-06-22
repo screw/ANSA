@@ -138,14 +138,14 @@ struct EigrpMpIpv4Internal
     // value
     uint16_t afi;				// Address Family ID, IPv4 = 1, Ipv6 = 2
     uint16_t tid;				// Topology ID
-    IPv4Address routerID;		// Router ID
+    Ipv4Address routerID;		// Router ID
 
  	EigrpWideMetricPar metric;
  	EigrpRouteFlags flags;
  	
- 	IPv4Address nextHop;
- 	IPv4Address destMask;
- 	IPv4Address destAddress;
+ 	Ipv4Address nextHop;
+ 	Ipv4Address destMask;
+ 	Ipv4Address destAddress;
 };
 
 
@@ -158,14 +158,14 @@ struct EigrpMpIpv6Internal
     // value
     uint16_t afi = 2;				// Address Family ID, IPv4 = 1, Ipv6 = 2
     uint16_t tid;				// Topology ID
-    IPv4Address routerID;		// Router ID
+    Ipv4Address routerID;		// Router ID
 
  	EigrpWideMetricPar metric;
  	EigrpRouteFlags flags;
  	
- 	IPv6Address nextHop;
- 	IPv6Address destMask;
- 	IPv6Address destAddress;
+ 	Ipv6Address nextHop;
+ 	Ipv6Address destMask;
+ 	Ipv6Address destAddress;
 };
 
 
@@ -259,7 +259,7 @@ struct EigrpMsgRoute
     int routeId;           	// ID of route 
     bool unreachable;       // Route with maximal metric 
     bool invalid;
-    IPv4Address originator;
+    Ipv4Address originator;
 };
 
 // Message request

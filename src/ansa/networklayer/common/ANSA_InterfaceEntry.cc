@@ -49,7 +49,7 @@ void ANSA_InterfaceEntry::removeVirtualForwarder(VirtualForwarder* vforw)
     delete vforw;
 }
 
-int ANSA_InterfaceEntry::getVirtualForwarderId(const IPv4Address& addr)
+int ANSA_InterfaceEntry::getVirtualForwarderId(const Ipv4Address& addr)
 {
     if (vforwarder.empty())
         return -1;
@@ -61,7 +61,7 @@ int ANSA_InterfaceEntry::getVirtualForwarderId(const IPv4Address& addr)
     return -1;
 }
 
-int ANSA_InterfaceEntry::getVirtualForwarderId(const MACAddress& addr)
+int ANSA_InterfaceEntry::getVirtualForwarderId(const MacAddress& addr)
 {
     if (vforwarder.empty())
         return -1;
@@ -73,7 +73,7 @@ int ANSA_InterfaceEntry::getVirtualForwarderId(const MACAddress& addr)
     return -1;
 }
 
-const MACAddress& ANSA_InterfaceEntry::getMacAddressByIP(const IPv4Address& addr) const
+const MacAddress& ANSA_InterfaceEntry::getMacAddressByIP(const Ipv4Address& addr) const
 {
     if (vforwarder.empty())
         return getMacAddress();
@@ -85,15 +85,15 @@ const MACAddress& ANSA_InterfaceEntry::getMacAddressByIP(const IPv4Address& addr
     return getMacAddress();
 }
 
-const MACAddress& ANSA_InterfaceEntry::getMacVirtualForwarderById(int vforwarderId) const
+const MacAddress& ANSA_InterfaceEntry::getMacVirtualForwarderById(int vforwarderId) const
 {
     if (vforwarder.empty())
-        return MACAddress::UNSPECIFIED_ADDRESS;
+        return MacAddress::UNSPECIFIED_ADDRESS;
 
     return vforwarder.at(vforwarderId)->getMacAddress();
 }
 
-bool ANSA_InterfaceEntry::hasIPAddress(const IPv4Address& addr) const
+bool ANSA_InterfaceEntry::hasIPAddress(const Ipv4Address& addr) const
 {
     if (vforwarder.empty())
         return false;
@@ -105,7 +105,7 @@ bool ANSA_InterfaceEntry::hasIPAddress(const IPv4Address& addr) const
     return false;
 }
 
-bool ANSA_InterfaceEntry::hasMacAddress(const MACAddress& addr) const
+bool ANSA_InterfaceEntry::hasMacAddress(const MacAddress& addr) const
 {
     if (vforwarder.empty())
         return false;

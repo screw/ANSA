@@ -36,12 +36,12 @@ class HSRPVirtualRouter : public cSimpleModule, public cListener
         std::string hostname;                   //!< Hostname of the router device
 
         /* Variable needed for UDP */
-        UDPSocket *socket;                      //!< UDP socket used for sending messages
+        UdpSocket *socket;                      //!< UDP socket used for sending messages
         int hsrpUdpPort;                        //!< hsrp udp port (usually 1985)
 
         /* Variables needed for  OMNET */
         IInterfaceTable *ift = nullptr;         //!< Usable interfaces of this router
-        ARP *arp = nullptr;                     //!< Arp table for sending arp gratuious.
+        Arp *arp = nullptr;                     //!< Arp table for sending arp gratuious.
         ANSA_InterfaceEntry *ie = nullptr;       //!< Interface which is running HSRP group
         VirtualForwarder *vf = nullptr;         //!< Particular HSRP group is represented by VF on each interface
         cModule *containingModule = nullptr;    //!< helper for looking for particular module
@@ -50,8 +50,8 @@ class HSRPVirtualRouter : public cSimpleModule, public cListener
         int hsrpState;                          //!< State of hsrp virtual router
         int hsrpGroup;                          //!< Group of hsrp virtual router
         L3Address *hsrpMulticast = nullptr;     //!< Multicast address of HSRP (224.0.0.2)
-        IPv4Address *virtualIP = nullptr;       //!< Primary IP of the HSRP group
-        MACAddress *virtualMAC = nullptr;       //!< MAC of the HSRP group
+        Ipv4Address *virtualIP = nullptr;       //!< Primary IP of the HSRP group
+        MacAddress *virtualMAC = nullptr;       //!< MAC of the HSRP group
         bool preempt;                           //!< Preemption flag
         int priority;                           //!< Priority value of hsrp group
         int helloTime;                          //!< Hello time value

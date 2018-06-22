@@ -154,7 +154,7 @@ void BabelDeviceConfigurator::loadBabelInterfacesConfig(cXMLElement *device, Bab
             cXMLElement *ipv4MaskElem = ifaceElem->getFirstChildWithTag("Mask");
             if(ipv4AddrElem != nullptr && ipv4MaskElem != nullptr)
             {
-                bIface->addDirectlyConn(Babel::netPrefix<L3Address>(IPv4Address(ipv4AddrElem->getNodeValue()), IPv4Address(ipv4MaskElem->getNodeValue()).getNetmaskLength()));
+                bIface->addDirectlyConn(Babel::netPrefix<L3Address>(Ipv4Address(ipv4AddrElem->getNodeValue()), Ipv4Address(ipv4MaskElem->getNodeValue()).getNetmaskLength()));
             }
 
 
@@ -164,7 +164,7 @@ void BabelDeviceConfigurator::loadBabelInterfacesConfig(cXMLElement *device, Bab
             {
                 // get address string
                 string addrFull = ipv6AddrElem->getNodeValue();
-                IPv6Address ipv6;
+                Ipv6Address ipv6;
                 int prefixLen;
 
                 // check if it's a valid IPv6 address string with prefix and get prefix
@@ -173,11 +173,11 @@ void BabelDeviceConfigurator::loadBabelInterfacesConfig(cXMLElement *device, Bab
                     throw cRuntimeError("Unable to set IPv6 address %s on interface %s", addrFull.c_str(), ifaceName);
                 }
 
-                ipv6 = IPv6Address(addrFull.substr(0, addrFull.find_last_of('/')).c_str());
+                ipv6 = Ipv6Address(addrFull.substr(0, addrFull.find_last_of('/')).c_str());
 
                 //EV << "IPv6 address: " << ipv6 << "/" << prefixLen << " on iface " << ifaceName << endl;
 
-                if(ipv6.getScope() != IPv6Address::LINK)
+                if(ipv6.getScope() != Ipv6Address::LINK)
                 {// is not link-local -> add
                     bIface->addDirectlyConn(Babel::netPrefix<L3Address>(ipv6, prefixLen));
                 }
@@ -288,11 +288,11 @@ void BabelDeviceConfigurator::loadBabelInterface(cXMLElement *ifaceElem, BabelMa
 
             if(afstr.compare("ipv6") == 0)
             {// IPv6 only
-                 bIface->setAfSend(Babel::AF::IPv6);
+                 bIface->setAfSend(Babel::AF::Ipv6);
             }
             else if(afstr.compare("ipv4") == 0)
             {// IPv4 only
-                bIface->setAfSend(Babel::AF::IPv4);
+                bIface->setAfSend(Babel::AF::Ipv4);
             }
             else if(afstr.compare("ipvx") == 0 || afstr.compare("ipv46") == 0 || afstr.compare("ipv4andipv6") == 0 || afstr.compare("both") == 0)
             {// IPv4 and IPv6
@@ -318,11 +318,11 @@ void BabelDeviceConfigurator::loadBabelInterface(cXMLElement *ifaceElem, BabelMa
 
             if(afstr.compare("ipv6") == 0)
             {// IPv6 only
-                 bIface->setAfDist(Babel::AF::IPv6);
+                 bIface->setAfDist(Babel::AF::Ipv6);
             }
             else if(afstr.compare("ipv4") == 0)
             {// IPv4 only
-                bIface->setAfDist(Babel::AF::IPv4);
+                bIface->setAfDist(Babel::AF::Ipv4);
             }
             else if(afstr.compare("ipvx") == 0 || afstr.compare("ipv46") == 0 || afstr.compare("ipv4andipv6") == 0 || afstr.compare("both") == 0)
             {// IPv4 and IPv6

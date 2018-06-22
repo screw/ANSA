@@ -169,7 +169,7 @@ void LISPCommon::parseIpAddress(const char* str, std::string& address, std::stri
     length = len;
 }
 
-int LISPCommon::getNumMatchingPrefixBits4(IPv4Address addr1, IPv4Address addr2)
+int LISPCommon::getNumMatchingPrefixBits4(Ipv4Address addr1, Ipv4Address addr2)
 {
     const uint32 w1 = addr1.getInt();
     const uint32 w2 = addr2.getInt();
@@ -188,7 +188,7 @@ int LISPCommon::getNumMatchingPrefixBits4(IPv4Address addr1, IPv4Address addr2)
 }
 
 
-int LISPCommon::getNumMatchingPrefixBits6(IPv6Address addr1, IPv6Address addr2)
+int LISPCommon::getNumMatchingPrefixBits6(Ipv6Address addr1, Ipv6Address addr2)
 {
     //EV << "addr1 " << addr1 << "    addr2 " << addr2 << endl;
     uint32 *w1 = addr1.words();
@@ -230,11 +230,11 @@ int LISPCommon::getNumMatchingPrefixBits6(IPv6Address addr1, IPv6Address addr2)
  */
 int LISPCommon::doPrefixMatch(L3Address addr1, L3Address addr2)
 {
-    if ( (addr1.getType() == L3Address::IPv6) xor (addr2.getType() == L3Address::IPv6) )
+    if ( (addr1.getType() == L3Address::Ipv6) xor (addr2.getType() == L3Address::Ipv6) )
         return -2;
     int res;
     //IPv4
-    if (! (addr1.getType() == L3Address::IPv6) )
+    if (! (addr1.getType() == L3Address::Ipv6) )
         res = LISPCommon::getNumMatchingPrefixBits4(addr1.toIPv4(), addr2.toIPv4());
     //IPv6
     else
@@ -245,15 +245,15 @@ int LISPCommon::doPrefixMatch(L3Address addr1, L3Address addr2)
 
 L3Address LISPCommon::getNetworkAddress(L3Address address, int length) {
     //IPv6
-    if ( (address.getType() == L3Address::IPv6) && length <= 128 && length >= 0) {
-        IPv6Address mask = IPv6Address::constructMask(length);
+    if ( (address.getType() == L3Address::Ipv6) && length <= 128 && length >= 0) {
+        Ipv6Address mask = Ipv6Address::constructMask(length);
         uint32 *w1 = address.toIPv6().words();
         uint32 *w2 = mask.words();
-        return IPv6Address(w1[0] & w2[0], w1[1] & w2[1], w1[2] & w2[2], w1[3] & w2[3]);
+        return Ipv6Address(w1[0] & w2[0], w1[1] & w2[1], w1[2] & w2[2], w1[3] & w2[3]);
     }
     //IPv4
-    else if (!(address.getType() == L3Address::IPv6) && length <= 32 && length >= 0) {
-        IPv4Address mask = IPv4Address::makeNetmask(length);
+    else if (!(address.getType() == L3Address::Ipv6) && length <= 32 && length >= 0) {
+        Ipv4Address mask = Ipv4Address::makeNetmask(length);
         return address.toIPv4().doAnd(mask);
     }
     return L3Address();

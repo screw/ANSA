@@ -43,7 +43,7 @@ class GLBP : public cSimpleModule {
         std::vector<GLBPVirtualRouter *> virtualRouterTable;    //!< GLBP groups on this router
         std::vector<int> multicastInterfaces;                   //!< Joined multicast interfaces for GLBP listening
         L3Address *glbpMulticastAddress = nullptr;              //!< GLBP multicast address
-        UDPSocket *socket;                                      //!< udp socket at port 3222
+        UdpSocket *socket;                                      //!< udp socket at port 3222
         std::string hostname;                                   //!< hostname of the device
         cModule *containingModule;                              //!< Pointer to router which contain GLBP module
 

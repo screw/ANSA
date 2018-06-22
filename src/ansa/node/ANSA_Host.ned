@@ -59,9 +59,9 @@ import inet.applications.contract.IPingApp;
 import inet.applications.contract.ISCTPApp;
 import inet.applications.contract.ITCPApp;
 import inet.applications.contract.IUDPApp;
-import inet.transportlayer.contract.ISCTP;
-import inet.transportlayer.contract.ITCP;
-import inet.transportlayer.contract.IUDP;
+import inet.transportlayer.contract.ISctp;
+import inet.transportlayer.contract.ITcp;
+import inet.transportlayer.contract.IUdp;
 import inet.applications.contract.ITunApp;
 
 import ansa.node.ANSA_NodeBase;
@@ -104,7 +104,7 @@ module ANSA_Host extends ANSA_NodeBase
             parameters:
                 @display("p=201,50,row,60");
         }
-        tcp: <tcpType> like ITCP if hasTcp {
+        tcp: <tcpType> like ITcp if hasTcp {
             parameters:
                 @display("p=201,138");
         }
@@ -112,7 +112,7 @@ module ANSA_Host extends ANSA_NodeBase
             parameters:
                 @display("p=345,54,row,60");
         }
-        udp: <udpType> like IUDP if hasUdp {
+        udp: <udpType> like IUdp if hasUdp {
             parameters:
                 @display("p=345,142");
         }
@@ -120,7 +120,7 @@ module ANSA_Host extends ANSA_NodeBase
             parameters:
                 @display("p=500,54,row,60");
         }
-        sctp: <sctpType> like ISCTP if hasSctp {
+        sctp: <sctpType> like ISctp if hasSctp {
             @display("p=500,142");
         }
         pingApp[numPingApps]: <default("PingApp")> like IPingApp {

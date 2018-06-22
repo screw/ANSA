@@ -54,31 +54,31 @@ class INET_API CDPUpdate : public CDPUpdate_Base
     /**
      * Get length of the specified option.
      */
-    short getOptionLength(TLVOptionBase *opt);
+    short getOptionLength(TlvOptionBase *opt);
 
     /**
      * Set length of the specified option.
      */
-    void setOptionLength(TLVOptionBase *opt);
+    void setOptionLength(TlvOptionBase *opt);
 
     /**
      * Returns option
      */
-    virtual TLVOptionBase& getOption(unsigned int k) { return *check_and_cast<TLVOptionBase *>(&(options.at(k))); }
-    virtual const TLVOptionBase& getOption(unsigned int k) const { return const_cast<CDPUpdate*>(this)->getOption(k); }
+    virtual TlvOptionBase& getOption(unsigned int k) { return *check_and_cast<TlvOptionBase *>(&(options.at(k))); }
+    virtual const TlvOptionBase& getOption(unsigned int k) const { return const_cast<CDPUpdate*>(this)->getOption(k); }
 
     /**
      * Returns the TLVOptionBase of the specified type,
      * or nullptr. If index is 0, then the first, if 1 then the
      * second option is returned.
      */
-    virtual TLVOptionBase *findOptionByType(short int optionType, int index = 0);
+    virtual TlvOptionBase *findOptionByType(short int optionType, int index = 0);
 
     /**
      * Adds an TLVOptionBase to the update.
      * default atPos means add to the end.
      */
-    virtual void addOption(TLVOptionBase *opt, int atPos = -1);
+    virtual void addOption(TlvOptionBase *opt, int atPos = -1);
 
 };
 } /* namespace inet */

@@ -45,12 +45,12 @@ class INET_API ANSA_InterfaceEntry : public InterfaceEntry
 
         virtual std::string info() const override;
 
-        virtual bool hasMacAddress(const MACAddress& addr) const;
-        virtual bool hasIPAddress(const IPv4Address& addr) const;
-        virtual const MACAddress& getMacVirtualForwarderById(int vforwarderId) const;
-        virtual const MACAddress& getMacAddressByIP(const IPv4Address& addr) const;
-        virtual int getVirtualForwarderId(const IPv4Address& addr);
-        virtual int getVirtualForwarderId(const MACAddress& addr);
+        virtual bool hasMacAddress(const MacAddress& addr) const;
+        virtual bool hasIPAddress(const Ipv4Address& addr) const;
+        virtual const MacAddress& getMacVirtualForwarderById(int vforwarderId) const;
+        virtual const MacAddress& getMacAddressByIP(const Ipv4Address& addr) const;
+        virtual int getVirtualForwarderId(const Ipv4Address& addr);
+        virtual int getVirtualForwarderId(const MacAddress& addr);
         virtual VirtualForwarder *getVirtualForwarderById(int id) { return vforwarder[id]; };
 
         /**

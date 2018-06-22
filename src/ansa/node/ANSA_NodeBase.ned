@@ -83,7 +83,7 @@ module ANSA_NodeBase
         networkLayer.configurator.configData = configData;
     gates:
         input radioIn[numRadios] @directIn;
-        inout pppg[] @labels(PPPFrame-conn);
+        inout pppg[] @labels(PppFrame-conn);
         inout ethg[] @labels(EtherFrame-conn);
 
     submodules:

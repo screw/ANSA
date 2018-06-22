@@ -20,9 +20,9 @@
 
 package ansa.routing.vrrp;
 
-import inet.routing.contract.IIPRouting;
+import inet.routing.contract.IIpRouting;
 
-simple VRRPv2 like IIPRouting
+simple VRRPv2 like IIpRouting
 {
     parameters:
         @display("i=block/network2");
@@ -32,6 +32,6 @@ simple VRRPv2 like IIPRouting
     gates:
         input vrIn[] @labels(IPv4Datagram);
         output vrOut[] @labels(IPv4Datagram);       
-        input ipIn @labels(IPv4ControlInfo/up);
-        output ipOut @labels(IPv4ControlInfo/down);
+        input ipIn @labels(Ipv4ControlInfo/up);
+        output ipOut @labels(Ipv4ControlInfo/down);
 }

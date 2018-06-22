@@ -14,7 +14,7 @@ namespace inet;
 
 enum EtherType;
 
-enum SAPCode;
+enum SapCode;
 
 //message EthernetIIFrame;
 

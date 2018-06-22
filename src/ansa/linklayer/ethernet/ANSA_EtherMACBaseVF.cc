@@ -35,7 +35,7 @@ void ANSA_EtherMACBaseVF::initialize(int stage)
     //TODO: if build succeeds, delete coloring
     //connectionColoring = par("connectionColoring");
 
-    MACBase::initialize(stage);
+    MacBase::initialize(stage);
 
     if (stage == INITSTAGE_LOCAL) {
         physInGate = gate("phys$i");
@@ -109,7 +109,7 @@ bool ANSA_EtherMACBaseVF::dropFrameNotForUs(EtherFrame* frame) {
     if (aie && aie->hasMacAddress(frame->getDest())) {
        return false;
     }
-    return EtherMACBase::dropFrameNotForUs(frame);
+    return EtherMacBase::dropFrameNotForUs(frame);
 }
 
 }    //namespace inet

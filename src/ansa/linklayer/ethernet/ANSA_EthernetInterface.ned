@@ -23,7 +23,7 @@
 package ansa.linklayer.ethernet;
 
 import inet.common.IHook;
-import inet.linklayer.contract.IEtherMAC;
+import inet.linklayer.contract.IEtherMac;
 import inet.linklayer.contract.ITrafficConditioner;
 import inet.linklayer.contract.IWiredNic;
 import inet.linklayer.ethernet.*;
@@ -62,12 +62,12 @@ module ANSA_EthernetInterface like IWiredNic
         egressTC: <egressTCType> like ITrafficConditioner if egressTCType != "" {
             @display("p=53,158");
         }
-        queue: EtherQoSQueue if queueType != "" {
+        queue: EtherQosQueue if queueType != "" {
             parameters:
                 dataQueueType = queueType;
                 @display("p=107,263;q=l2queue");
         }
-        mac: <macType> like IEtherMAC {
+        mac: <macType> like IEtherMac {
             parameters:
                 queueModule = (queueType == "" ? "" : "^.queue");
                 txQueueLimit = (queueType == "" ? 10000 : 1); // queue sends one packet at a time

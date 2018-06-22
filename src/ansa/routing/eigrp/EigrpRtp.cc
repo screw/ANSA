@@ -249,7 +249,7 @@ EigrpRtpT<IPAddress>::~EigrpRtpT()
 }
 
 template <>
-void EigrpRtpT<IPv4Address>::initialize(int stage)
+void EigrpRtpT<Ipv4Address>::initialize(int stage)
 {
     cSimpleModule::initialize(stage);
     if (stage == INITSTAGE_ROUTING_PROTOCOLS)
@@ -269,7 +269,7 @@ void EigrpRtpT<IPv4Address>::initialize(int stage)
 
 #ifndef DISABLE_EIGRP_IPV6
 template <>
-void EigrpRtpT<IPv6Address>::initialize(int stage)
+void EigrpRtpT<Ipv6Address>::initialize(int stage)
 {
     cSimpleModule::initialize(stage);
     if (stage == INITSTAGE_ROUTING_PROTOCOLS)
@@ -392,20 +392,20 @@ void EigrpRtpT<IPAddress>::acknowledgeMsg(int neighId, int ifaceId, uint32_t ack
 }
 
 template <>
-EigrpNeighbor<IPv4Address> *EigrpRtpT<IPv4Address>::getNeighborId(EigrpMessage *msg)
+EigrpNeighbor<Ipv4Address> *EigrpRtpT<Ipv4Address>::getNeighborId(EigrpMessage *msg)
 {
-    IPv4ControlInfo *ctrlInfo =check_and_cast<IPv4ControlInfo *>(msg->getControlInfo());
-    IPv4Address srcAddr = ctrlInfo->getSrcAddr();
+    Ipv4ControlInfo *ctrlInfo =check_and_cast<Ipv4ControlInfo *>(msg->getControlInfo());
+    Ipv4Address srcAddr = ctrlInfo->getSrcAddr();
 
     return eigrpNt->findNeighbor(srcAddr);
 }
 
 #ifndef DISABLE_EIGRP_IPV6
 template <>
-EigrpNeighbor<IPv6Address> *EigrpRtpT<IPv6Address>::getNeighborId(EigrpMessage *msg)
+EigrpNeighbor<Ipv6Address> *EigrpRtpT<Ipv6Address>::getNeighborId(EigrpMessage *msg)
 {
-    IPv6ControlInfo *ctrlInfo =check_and_cast<IPv6ControlInfo *>(msg->getControlInfo());
-    IPv6Address srcAddr = ctrlInfo->getSrcAddr();
+    Ipv6ControlInfo *ctrlInfo =check_and_cast<Ipv6ControlInfo *>(msg->getControlInfo());
+    Ipv6Address srcAddr = ctrlInfo->getSrcAddr();
 
     return eigrpNt->findNeighbor(srcAddr);
 }
@@ -537,9 +537,9 @@ void EigrpRtpT<IPAddress>::sendRelMsg(EigrpMsgReq *msgReq)
     scheduleNextMsg(info.neighborIfaceId);
 }
 
-template class EigrpRtpT<IPv4Address>;
+template class EigrpRtpT<Ipv4Address>;
 
 #ifndef DISABLE_EIGRP_IPV6
-template class EigrpRtpT<IPv6Address>;
+template class EigrpRtpT<Ipv6Address>;
 #endif /* DISABLE_EIGRP_IPV6 */
 }

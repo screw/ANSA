@@ -42,7 +42,7 @@ void HSRPVirtualRouter::initialize(int stage)
         hsrpUdpPort = HSRP_UDP_PORT;
         hsrpMulticast = new L3Address(HSRP_MULTICAST_ADDRESS.c_str());
         hsrpGroup = (int)par("group");
-        virtualIP = new IPv4Address(par("virtualIP").stringValue());
+        virtualIP = new Ipv4Address(par("virtualIP").stringValue());
         priority = (int)par("priority");
         preempt = (bool)par("preempt");
         hsrpState = DISABLED;
@@ -60,7 +60,7 @@ void HSRPVirtualRouter::initialize(int stage)
 
         //get neccessary OMNET parameters
         ift = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
-        arp = getModuleFromPar<ARP>(par("arp"), this);
+        arp = getModuleFromPar<Arp>(par("arp"), this);
         ie = dynamic_cast<ANSA_InterfaceEntry *>(ift->getInterfaceById((int) par("interface")));
 
         //add another VF to the interface
@@ -70,7 +70,7 @@ void HSRPVirtualRouter::initialize(int stage)
         ie->addVirtualForwarder(vf);
 
         //get socket ready
-        socket = new UDPSocket();
+        socket = new UdpSocket();
         socket->setOutputGate(gate("udpOut"));
 
         //TODO another reactions to different signals (router down and so on..)
@@ -485,7 +485,7 @@ void HSRPVirtualRouter::handleMessageListen(HSRPMessage *msg)
 
 void HSRPVirtualRouter::setVirtualMAC()
 {
-    virtualMAC = new MACAddress("00-00-0C-07-AC-00");
+    virtualMAC = new MacAddress("00-00-0C-07-AC-00");
     virtualMAC->setAddressByte(5, hsrpGroup);
 //    EV_DEBUG<<"routerID:"<<par("deviceId").str()<<"vMAC:"<<virtualMAC->str()<<"\n";
 }
@@ -537,7 +537,7 @@ void HSRPVirtualRouter::sendMessage(OP_CODE opCode)
     HSRPMessage *packet = generateMessage(opCode);
     packet->setBitLength(HSRP_HEADER_SIZE);
 
-    UDPSocket::SendOptions options;
+    UdpSocket::SendOptions options;
     options.outInterfaceId = ie->getInterfaceId();
     options.srcAddr = ie->ipv4Data()->getIPAddress();
 

@@ -51,7 +51,7 @@ void ANSA_EtherMACFullDuplex::initialize(int stage)
 
 void ANSA_EtherMACFullDuplex::initializeStatistics()
 {
-    EtherMACBase::initializeStatistics();
+    EtherMacBase::initializeStatistics();
 
     // initialize statistics
     totalSuccessfulRxTime = 0.0;
@@ -59,7 +59,7 @@ void ANSA_EtherMACFullDuplex::initializeStatistics()
 
 void ANSA_EtherMACFullDuplex::initializeFlags()
 {
-    EtherMACBase::initializeFlags();
+    EtherMacBase::initializeFlags();
 
     duplexMode = true;
     physInGate->setDeliverOnReceptionStart(false);
@@ -265,7 +265,7 @@ void ANSA_EtherMACFullDuplex::processMsgFromNetwork(cPacket *pk)
 
     EtherPhyFrame *phyFrame = dynamic_cast<EtherPhyFrame *>(msg);
     if (!phyFrame) {
-        if (dynamic_cast<EtherFilledIFG *>(msg))
+        if (dynamic_cast<EtherFilledIfg *>(msg))
             throw cRuntimeError("There is no burst mode in full-duplex operation: EtherFilledIFG is unexpected");
         else
             throw cRuntimeError("Unexpected ethernet traffic: %s", msg->getClassName());
@@ -357,7 +357,7 @@ void ANSA_EtherMACFullDuplex::handleEndTxPeriod()
 
 void ANSA_EtherMACFullDuplex::finish()
 {
-    EtherMACBase::finish();
+    EtherMacBase::finish();
 
     simtime_t t = simTime();
     simtime_t totalRxChannelIdleTime = t - totalSuccessfulRxTime;

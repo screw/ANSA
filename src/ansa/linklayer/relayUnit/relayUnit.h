@@ -40,11 +40,11 @@ class INET_API relayUnit : public cSimpleModule, public ILifecycle
     relayUnit();
 
   protected:
-    MACAddress bridgeAddress;
-    MACAddress bridgeGroupCDPAddress;
-    MACAddress bridgeGroupLLDPAddress;
+    MacAddress bridgeAddress;
+    MacAddress bridgeGroupCDPAddress;
+    MacAddress bridgeGroupLLDPAddress;
     IInterfaceTable *ifTable = nullptr;
-    IMACAddressTable *macTable = nullptr;
+    IMacAddressTable *macTable = nullptr;
     InterfaceEntry *ie = nullptr;
     bool isOperational = false;
     bool isCDPAware = false;

@@ -190,9 +190,9 @@ int EigrpNeighborTable<IPAddress>::setAckOnIface(int ifaceId, uint32_t ackNum)
     return neighCnt;
 }
 
-template class EigrpNeighborTable<IPv4Address>;
+template class EigrpNeighborTable<Ipv4Address>;
 
 #ifndef DISABLE_EIGRP_IPV6
-template class EigrpNeighborTable<IPv6Address>;
+template class EigrpNeighborTable<Ipv6Address>;
 #endif /* DISABLE_EIGRP_IPV6 */
 }

@@ -85,7 +85,7 @@ class EigrpNeighborTable : public cSimpleModule
 //TODO - mozna predelat kontejnery do samostatnych souboru
 //typedef EigrpNeighborTable<IPv4Address> EigrpIpv4NeighborTable;       //IPv6 - ADDED for backward compatibility with old IPv4-only version
 
-class EigrpIpv4NeighborTable : public EigrpNeighborTable<IPv4Address>
+class EigrpIpv4NeighborTable : public EigrpNeighborTable<Ipv4Address>
 {
 //container class for IPv4NT, must exist because of Define_Module()
 public:
@@ -102,7 +102,7 @@ class INET_API Eigrpv4NeighTableAccess : public ModuleAccess<EigrpIpv4NeighborTa
 
 
 #ifndef DISABLE_EIGRP_IPV6
-class EigrpIpv6NeighborTable : public EigrpNeighborTable<IPv6Address>
+class EigrpIpv6NeighborTable : public EigrpNeighborTable<Ipv6Address>
 {
 //container class for IPv6NT, must exist because of Define_Module()
 public:

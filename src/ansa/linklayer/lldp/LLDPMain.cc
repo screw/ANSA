@@ -365,7 +365,7 @@ bool LLDPMain::frameValidation(LLDPUpdate *msg, LLDPAgent *agent)
 
     for(i=0; i < msg->getOptionArraySize(); i++)
     {
-        TLVOptionBase *option = &msg->getOption(i);
+        TlvOptionBase *option = &msg->getOption(i);
         type = msg->getOption(i).getType();
 
         // validation of option position/occurrence
@@ -461,7 +461,7 @@ bool LLDPMain::frameValidation(LLDPUpdate *msg, LLDPAgent *agent)
     // remove options after End Of TLV
     for(; i < msg->getOptionArraySize(); i++)
     {
-        TLVOptionBase *option = &msg->getOption(i);
+        TlvOptionBase *option = &msg->getOption(i);
         msg->getOptions().remove(option);
         st->tlvsDiscardedTotal++;
     }

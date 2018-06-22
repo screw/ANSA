@@ -45,7 +45,7 @@ cplusplus {{
 	#include "inet/networklayer/contract/ipv4/IPv4Address.h"
 }}
 
-class noncobject IPv4Address;
+class noncobject Ipv4Address;
 
 namespace inet;
 
@@ -65,5 +65,5 @@ packet VRRPv2Advertisement
 	unsigned char authType;
 	uint16_t	  checksum;
 	unsigned char adverInt;
-	IPv4Address addresses[];
+	Ipv4Address addresses[];
 }

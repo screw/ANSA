@@ -18,7 +18,7 @@ package ansa.linklayer.rbridge;
 import inet.linklayer.contract.IWiredNic;
 import inet.common.queue.IOutputQueue;
 import inet.linklayer.ethernet.EtherEncap;
-import inet.linklayer.ethernet.EtherMAC;
+import inet.linklayer.ethernet.EtherMac;
 //import inet.ansa.linklayer.ethernet.AnsaEtherMAC;
 //
 // TODO auto-generated type
@@ -38,7 +38,7 @@ module RBEthernetInterface  like IWiredNic
             parameters:
                 @display("p=92,71;q=l2queue");
         }
-        mac: EtherMAC {
+        mac: EtherMac {
             parameters:
                 queueModule = "queue";
                 txQueueLimit = 1; // queue sends one packet at a time

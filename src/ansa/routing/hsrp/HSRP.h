@@ -42,7 +42,7 @@ class HSRP : public cSimpleModule{
         std::vector<HSRPVirtualRouter *> virtualRouterTable;        //!< HSRP groups on this router
         std::vector<int> multicastInterfaces;                       //!< Joined multicast interfaces for HSRP listening
         L3Address *hsrpMulticast = nullptr;                         //!< HSRP multicast address
-        UDPSocket *socket;                                          //!< bound to the HSRP port (see udpPort parameter)
+        UdpSocket *socket;                                          //!< bound to the HSRP port (see udpPort parameter)
         std::string hostname;                                       //!< hostname of the device
         cModule *containingModule;                                  //!< Pointer to router which contain HSRP module
 

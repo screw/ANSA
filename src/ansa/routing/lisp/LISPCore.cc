@@ -255,7 +255,7 @@ void LISPCore::scheduleRlocProbing() {
         rlocprobe->setPreviousNonce(DEFAULT_NONCE_VAL);
         rlocprobe->setRetryCount(0);
         //Shift IPv6 probes +30 seconds from IPv4 ones
-        if (ciscoStartupDelays && it->getEids().back().first.getEidAddr().getType() == L3Address::IPv6) {
+        if (ciscoStartupDelays && it->getEids().back().first.getEidAddr().getType() == L3Address::Ipv6) {
             scheduleAt(simTime() + DEFAULT_PROBETIMER_VAL/2, rlocprobe);
         }
         //IPv4 or otherwise IPv4/IPv6 probes start at the same time
@@ -782,8 +782,8 @@ void LISPCore::receiveMapRegister(LISPMapRegister* lmreg) {
 
         for (TRecordCItem it = lmreg->getRecords().begin(); it != lmreg->getRecords().end(); ++it) {
             //Trying to store EID from AF that server does not operate
-            if ( (it->EidPrefix.getEidAddr().getType() == L3Address::IPv6  && !mapServerV6)
-                 || (!(it->EidPrefix.getEidAddr().getType() == L3Address::IPv6) && !mapServerV4) ) {
+            if ( (it->EidPrefix.getEidAddr().getType() == L3Address::Ipv6  && !mapServerV6)
+                 || (!(it->EidPrefix.getEidAddr().getType() == L3Address::Ipv6) && !mapServerV4) ) {
                 EV << "Map-register contains EID " << it->EidPrefix << " with AF not recognized by map server!" << endl;
                 continue;
             }
@@ -909,7 +909,7 @@ unsigned long LISPCore::sendEncapsulatedMapRequest(L3Address& srcEid, L3Address&
 
         //Multiple Recs in Map-Request, TODO: Vesely - Currently it is not supported yet
         lmreq->setRecordCount(1);
-        LISPEidPrefix irec = dstEid.getType() == L3Address::IPv6 ? LISPEidPrefix(dstEid, 128) : LISPEidPrefix(dstEid, 32);
+        LISPEidPrefix irec = dstEid.getType() == L3Address::Ipv6 ? LISPEidPrefix(dstEid, 128) : LISPEidPrefix(dstEid, 32);
         lmreq->getRecs().push_back(irec);
 
         //Map-Reply Record
@@ -934,7 +934,7 @@ unsigned long LISPCore::sendEncapsulatedMapRequest(L3Address& srcEid, L3Address&
 
     cPacket* middle;
     //Create IPv6 envelope
-    if (srcEid.getType() == L3Address::IPv6 && dstEid.getType() == L3Address::IPv6) {
+    if (srcEid.getType() == L3Address::Ipv6 && dstEid.getType() == L3Address::Ipv6) {
         IPv6Datagram *datagram = new IPv6Datagram(REQUEST_MSG);
         datagram->setByteLength(IPv6_HEADER_BYTES);
         datagram->encapsulate(udpPacket);
@@ -976,7 +976,7 @@ void LISPCore::receiveMapRequest(LISPMapRequest* lmreq) {
     MsgLog->addMsg(lmreq, LISPMsgEntry::REQUEST, src, true);
 
     //Process as MR-MS
-    if ( ( this->mapResolverV4 && !(src.getType() == L3Address::IPv6) ) || ( this->mapResolverV6 && src.getType() == L3Address::IPv6 ) ) {
+    if ( ( this->mapResolverV4 && !(src.getType() == L3Address::Ipv6) ) || ( this->mapResolverV6 && src.getType() == L3Address::Ipv6 ) ) {
 
         //Parse request(s)
         //Vesely - Current version should contain single request, thus FOR has 1 iteration
@@ -997,7 +997,7 @@ void LISPCore::receiveMapRequest(LISPMapRequest* lmreq) {
                 bool proxyReply = false;
                 for (EtrItem jt = res.begin(); jt != res.end(); ++jt) {
                     //TODO: Vesely - Is it okay to erase ETR servers which have different AFI?
-                    if ( ((*jt).getServerEntry().getAddress().getType() == L3Address::IPv6) xor (src.getType() == L3Address::IPv6) )
+                    if ( ((*jt).getServerEntry().getAddress().getType() == L3Address::Ipv6) xor (src.getType() == L3Address::Ipv6) )
                         res.erase(jt++);
                     //Filter only the best EID from each ETR TODO: Vesely - What if I want more less precise mapping answers?
                     LISPMapEntry me = *( (*jt).lookupMapEntry( it->getEidAddr() ) );

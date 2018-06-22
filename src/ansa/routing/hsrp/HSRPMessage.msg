@@ -39,7 +39,7 @@ const std::string HSRP_MULTICAST_ADDRESS = "224.0.0.2";
 const int HSRP_UDP_PORT = 1985;
 }}
 
-class noncobject IPv4Address;
+class noncobject Ipv4Address;
 
 namespace inet;
 
@@ -78,5 +78,5 @@ packet HSRPMessage {
 	unsigned char holdtime;		///holdtime value
 	unsigned char priority;		///priority value
 	unsigned char group;		///group number value
-	IPv4Address address;		///IPv4 address of this message
+	Ipv4Address address;		///IPv4 address of this message
 }

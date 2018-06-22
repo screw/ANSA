@@ -88,7 +88,7 @@ class INET_API Ipv6RoutingTable : public cSimpleModule, public IRoutingTable, pr
   public:
 #endif
     // internal: routes of different type can only be added via well-defined functions
-    virtual void addRoute(IPv6Route *route);
+    virtual void addRoute(Ipv6Route *route);
 
 #ifdef ANSAINET
   protected:

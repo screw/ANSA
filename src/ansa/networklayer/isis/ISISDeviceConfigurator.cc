@@ -517,7 +517,7 @@ void ISISDeviceConfigurator::loadISISCoreDefaultConfig(ISISMain *isisModule){
 
 void ISISDeviceConfigurator::loadISISInterfaceDefaultConfig(ISISMain *isisModule, InterfaceEntry *ie){
 
-    ISISInterfaceData *d = new ISISInterfaceData();
+    IsisInterfaceData *d = new IsisInterfaceData();
         ISISinterface newIftEntry;
         newIftEntry.intID = ie->getInterfaceId();
         d->setIfaceId(ie->getInterfaceId());

@@ -103,7 +103,7 @@ class ISISMain : public cSimpleModule
         std::string configFile; /*!< config file specified in simulation */
 
         SystemID systemId;
-        AreaID areaID;
+        AreaId areaID;
 
         CLNSAddress localAddr;
 //        std::string netAddr; /*!<  OSI network address in simplified NSAP format */
@@ -191,7 +191,7 @@ class ISISMain : public cSimpleModule
         ISISadj *getAdjByGateIndex(int gateIndex, short circuitType, int offset = 0); // return something corresponding to adjacency on specified link
         ISISadj *getAdjBySystemID(SystemID systemID, short circuitType, int gateIndex = -1);
         ISISadj *getAdj(ISISMessage *inMsg, short circuitType = L1_TYPE); //returns adjacency representing sender of inMsg or NULL when ANY parameter of System-ID, MAC address and gate index doesn't match
-        ISISadj *getAdjByMAC(const MACAddress &address, short circuitType, int gateIndex = -1);
+        ISISadj *getAdjByMAC(const MacAddress &address, short circuitType, int gateIndex = -1);
         ISISinterface *getIfaceByGateIndex(int gateIndex); //return ISISinterface for specified gateIndex
         bool isAdjBySystemID(SystemID systemID, short circuitType); //do we have adjacency for systemID on specified circuitType
         bool isUp(int gateIndex, short circuitType); //returns true if ISISInterface specified by the corresponding gateIndex have at least one adjacency in state UP
@@ -245,7 +245,7 @@ class ISISMain : public cSimpleModule
         void fullSPF(ISISTimer *timer);
         bool extractISO(ISISCons_t *initial, short circuitType); /*!< Extracts ISO informations from lspDb needed to perform SPF calculation. > */
         ISISPath *getPath(ISISPaths_t *paths, PseudonodeID id);
-        ISISAPath *getAPath(ISISAPaths_t *paths, AreaID id);
+        ISISAPath *getAPath(ISISAPaths_t *paths, AreaId id);
         ISISCons_t *getCons(ISISCons_t *cons, PseudonodeID from);
         void getBestMetric(ISISPaths_t *paths);
         ISISPath *getBestPath(ISISPaths_t *paths);
@@ -310,7 +310,7 @@ class ISISMain : public cSimpleModule
         unsigned char *getSubTLVByType(TLV_t *tlv, enum TLVtypes subTLVType, int offset = 0);
 
         bool isMessageOK(ISISMessage *inMsg);
-        bool isAreaIDOK(TLV_t *areaAddressTLV, AreaID compare); //if compare is NULL then use this->areaId for comparison
+        bool isAreaIDOK(TLV_t *areaAddressTLV, AreaId compare); //if compare is NULL then use this->areaId for comparison
         int getIfaceIndex(ISISinterface *interface); //returns index to ISISIft
 
         /* General */
@@ -410,8 +410,8 @@ class ISISMain : public cSimpleModule
         unsigned int getISISIftSize();
         void setAtt(bool att);
         TRILLNickname getNickname() const;
-    AreaID getAreaId() const;
-    void setAreaId(AreaID areaId);
+    AreaId getAreaId() const;
+    void setAreaId(AreaId areaId);
     void setSystemId(const SystemID& systemId);
 };
 

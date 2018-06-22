@@ -33,6 +33,6 @@ simple HSRP like IUDPApp
     gates:
         input hsrpIn[];					///from HSRPVR to GLBP
         output hsrpOut[];    			///from GLBP module to HSRPVR
-        input udpIn @labels(UDPControlInfo/up);		///from UDP module to GLBP
-        output udpOut @lables(UDPControlInfo/down);	///from GLBP module to UDP
+        input udpIn @labels(UdpControlInfo/up);		///from UDP module to GLBP
+        output udpOut @lables(UdpControlInfo/down);	///from GLBP module to UDP
 }

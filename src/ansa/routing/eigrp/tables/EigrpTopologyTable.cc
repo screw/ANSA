@@ -481,7 +481,7 @@ EigrpRouteSource<IPAddress> *EigrpTopologyTable<IPAddress>::findRouteByNextHop(i
 }
 
 template<typename IPAddress>
-EigrpRouteSource<IPAddress> * EigrpTopologyTable<IPAddress>::findOrCreateRoute(IPAddress& routeAddr, IPAddress& routeMask, IPv4Address& routerId,
+EigrpRouteSource<IPAddress> * EigrpTopologyTable<IPAddress>::findOrCreateRoute(IPAddress& routeAddr, IPAddress& routeMask, Ipv4Address& routerId,
         EigrpInterface *eigrpIface, int nextHopId, bool *sourceNew)
 {
     EigrpRoute<IPAddress> *route = NULL;
@@ -551,9 +551,9 @@ EigrpRoute<IPAddress> *EigrpTopologyTable<IPAddress>::findRouteInfoById(int rout
 
 }
 
-template class EigrpTopologyTable<IPv4Address>;
+template class EigrpTopologyTable<Ipv4Address>;
 
 #ifndef DISABLE_EIGRP_IPV6
-template class EigrpTopologyTable<IPv6Address>;
+template class EigrpTopologyTable<Ipv6Address>;
 #endif /* DISABLE_EIGRP_IPV6 */
 }

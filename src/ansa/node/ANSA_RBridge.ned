@@ -28,7 +28,7 @@ package ansa.node;
 //import inet.ansa.linklayer.switch.stp.Stp;
 //import inet.nodes.inet.BurstHost;
 //import inet.base.NotificationBoard;
-import inet.linklayer.ethernet.EtherMAC;
+import inet.linklayer.ethernet.EtherMac;
 //import inet.ansa.linklayer.ethernet.AnsaEtherMAC;
 //import inet.linklayer.IWiredNic;
 //import inet.ansa.linklayer.switch.ANSASwitchCore;

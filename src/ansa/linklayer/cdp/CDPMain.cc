@@ -339,7 +339,7 @@ void CDPMain::neighbourUpdate(CDPUpdate *msg)
 {
     std::string prefix;
     bool newNeighbour = false;
-    IPv4Address ipAddress, nextHopeIp;
+    Ipv4Address ipAddress, nextHopeIp;
     L3Address l3Address, defaultRoute, nextHope;
     CDPODRRoute *odrRoute;
 
@@ -393,7 +393,7 @@ void CDPMain::neighbourUpdate(CDPUpdate *msg)
     neighbour->setLastUpdated(simTime());
     for(unsigned int i=0; i < msg->getOptionArraySize(); i++)
     {
-        const TLVOptionBase *option = &msg->getOption(i);
+        const TlvOptionBase *option = &msg->getOption(i);
         switch(msg->getOption(i).getType())
         {
             case CDPTLV_DEV_ID: {
@@ -495,7 +495,7 @@ void CDPMain::neighbourUpdate(CDPUpdate *msg)
                     {
                         const CDPOptionODRDef *opt = check_and_cast<const CDPOptionODRDef *> (option);
 
-                        defaultRoute.set(IPv4Address());
+                        defaultRoute.set(Ipv4Address());
 
                         ipAddress.set(opt->getDefaultRoute());
                         l3Address.set(ipAddress);
@@ -525,12 +525,12 @@ void CDPMain::processPrefixes(CDPUpdate *msg, int tlvPosition, CDPNeighbour *nei
         return;
 
     uint32_t mask;
-    IPv4Address nextHopeIp;
+    Ipv4Address nextHopeIp;
     L3Address nextHope;
     CDPODRRoute *odrRoute;
 
     // get next hope from TLV_ADDRESS
-    const TLVOptionBase *option = msg->findOptionByType(CDPTLV_ADDRESS, 0);
+    const TlvOptionBase *option = msg->findOptionByType(CDPTLV_ADDRESS, 0);
     if(option != nullptr)
     {
         const CDPOptionAddr *optAddress = check_and_cast<const CDPOptionAddr *> (option);
@@ -561,7 +561,7 @@ void CDPMain::processPrefixes(CDPUpdate *msg, int tlvPosition, CDPNeighbour *nei
         prefix = &opt->getPrefixes(i);
         mask = (uint32_t)prefix->getMask();
 
-        IPv4Address destIpAddress(prefix->getNetwork());
+        Ipv4Address destIpAddress(prefix->getNetwork());
         L3Address dest(destIpAddress);
 
         odrRoute = ort->findRoute(dest.getPrefix(mask), mask, nextHope);
@@ -662,7 +662,7 @@ void CDPMain::sendUpdate(int interfaceId, bool shutDown)
 
     // set control info
     Ieee802Ctrl *controlInfo = new Ieee802Ctrl();
-    controlInfo->setDest(MACAddress("01-00-0c-cc-cc-cc"));
+    controlInfo->setDest(MacAddress("01-00-0c-cc-cc-cc"));
     controlInfo->setInterfaceId(interfaceId);
     msg->setControlInfo(controlInfo);
 
@@ -864,7 +864,7 @@ void CDPMain::rescheduleODRRouteTimer(CDPODRRoute *odrRoute)
 void CDPMain::addDefaultRoute(InterfaceEntry *ie, const L3Address& nextHope)
 {
     L3Address defaultGateway;
-    defaultGateway.set(IPv4Address());
+    defaultGateway.set(Ipv4Address());
     CDPODRRoute *defaultRoute = ort->findRoute(rt->getDefaultRoute());
 
     if(defaultRoute == nullptr || (defaultRoute != nullptr && defaultRoute->isInvalide()))
@@ -915,7 +915,7 @@ IRoute *CDPMain::addRouteToRT(const L3Address& dest, int prefixLength, const Int
     route->setInterface(const_cast<InterfaceEntry *>(ie));
     route->setNextHop(nextHop);
     route->setMetric(1);
-    ((IPv4Route *)route)->setAdminDist(IPv4Route::dODR);
+    ((Ipv4Route *)route)->setAdminDist(Ipv4Route::dODR);
     rt->addRoute(route);
     return route;
 }
@@ -1073,7 +1073,7 @@ bool CDPMain::ipInterfaceExist(int interfaceId)
     return false;
 }
 
-IPv4Address CDPMain::ipOnInterface(int interfaceId)
+Ipv4Address CDPMain::ipOnInterface(int interfaceId)
 {
     if(ift->getInterfaceById(interfaceId)->ipv4Data() != nullptr &&
             !ift->getInterfaceById(interfaceId)->ipv4Data()->getIPAddress().isUnspecified())
@@ -1081,7 +1081,7 @@ IPv4Address CDPMain::ipOnInterface(int interfaceId)
         return ift->getInterfaceById(interfaceId)->ipv4Data()->getIPAddress();
     }
     else
-        return IPv4Address();
+        return Ipv4Address();
 }
 
 void CDPMain::setTlvAddress(CDPUpdate *msg, int pos, int interfaceId)

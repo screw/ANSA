@@ -73,7 +73,7 @@ class IEigrpModule
      *
      * @param   routerID        EIGRP process routerID, represented as IPv4 address
      */
-    virtual void setRouterId(IPv4Address routerID) = 0;
+    virtual void setRouterId(Ipv4Address routerID) = 0;
 
     /**
      * Adds information about IPv6 network prefix

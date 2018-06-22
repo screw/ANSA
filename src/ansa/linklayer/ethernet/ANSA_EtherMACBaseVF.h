@@ -33,7 +33,7 @@ class InterfaceEntry;
 class ANSA_InterfaceEntry;
 
 
-class ANSA_EtherMACBaseVF: public EtherMACBase {
+class ANSA_EtherMACBaseVF: public EtherMacBase {
   public:
     ANSA_EtherMACBaseVF() {};
 

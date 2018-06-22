@@ -59,7 +59,7 @@ const RBMACTable::AddressTable * RBMACTable::getTable() {
 /*
  * This method is used to learn the triplet from native frame
  */
-void RBMACTable::updateNative(MACAddress& addr, int vlanId, int port){
+void RBMACTable::updateNative(MacAddress& addr, int vlanId, int port){
 
     Enter_Method_Silent();
 
@@ -111,7 +111,7 @@ void RBMACTable::updateNative(MACAddress& addr, int vlanId, int port){
 /*
  * This method is used to learn triplet of innerFrame within TRILL-encapsulated frame
  */
-void RBMACTable::updateTRILLData(MACAddress &addr, int vlanId, TRILLNickname ingressNickname){
+void RBMACTable::updateTRILLData(MacAddress &addr, int vlanId, TRILLNickname ingressNickname){
     Enter_Method_Silent();
 
     flushAged();
@@ -153,7 +153,7 @@ void RBMACTable::updateTRILLData(MACAddress &addr, int vlanId, TRILLNickname ing
 
     }
 }
-void RBMACTable::update(MACAddress& addr, int port) {
+void RBMACTable::update(MacAddress& addr, int port) {
     Enter_Method_Silent();
 
     flushAged();
@@ -199,7 +199,7 @@ void RBMACTable::update(MACAddress& addr, int port) {
   return;
 }
 
-RBMACTable::tSpec RBMACTable::getSpec(MACAddress& addr) {
+RBMACTable::tSpec RBMACTable::getSpec(MacAddress& addr) {
     Enter_Method_Silent();
 
     AddressTable::iterator iter = table.find(addr);
@@ -221,7 +221,7 @@ RBMACTable::tSpec RBMACTable::getSpec(MACAddress& addr) {
 }
 
 /** Returns list of egress ports for specified address @param addr */
-RBMACTable::tPortList& RBMACTable::getPorts(MACAddress& addr) {
+RBMACTable::tPortList& RBMACTable::getPorts(MacAddress& addr) {
 
     Enter_Method_Silent();
 
@@ -378,7 +378,7 @@ void RBMACTable::removeOldest() {
 }
 
 
-void RBMACTable::add(MACAddress addr, int port, tType type, tSpec spec) {
+void RBMACTable::add(MacAddress addr, int port, tType type, tSpec spec) {
   AddressTable::iterator iter;
 
   iter = this->table.find(addr);
@@ -424,7 +424,7 @@ void RBMACTable::add(MACAddress addr, int port, tType type, tSpec spec) {
   return;
 }
 
-void RBMACTable::remove(MACAddress addr) {
+void RBMACTable::remove(MacAddress addr) {
     AddressTable::iterator iter;
 
     iter = this->table.find(addr);
@@ -436,7 +436,7 @@ void RBMACTable::remove(MACAddress addr) {
     return;
 }
 
-void RBMACTable::removePort(MACAddress addr, int port) {
+void RBMACTable::removePort(MacAddress addr, int port) {
     AddressTable::iterator iter;
 
     iter = this->table.find(addr);
@@ -455,7 +455,7 @@ void RBMACTable::removePort(MACAddress addr, int port) {
     return;
 }
 
-void RBMACTable::addStatic(MACAddress addr, tPortList ports) {
+void RBMACTable::addStatic(MacAddress addr, tPortList ports) {
     AddressTable::iterator iter;
 
     iter = this->table.find(addr);
@@ -536,7 +536,7 @@ void RBMACTable::initialize() {
 
     /* IEEE802.1D Table 7-10 Reserved addresses */
       // Bridge Group Address -> go to STP
-    add(MACAddress("01-80-C2-00-00-00"), 0, STATIC, STP);
+    add(MacAddress("01-80-C2-00-00-00"), 0, STATIC, Stp);
     /* end of table */
 
 

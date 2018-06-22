@@ -25,7 +25,7 @@ package ansa.node;
 import ansa.linklayer.cdp.CDP;
 import ansa.linklayer.lldp.LLDP;
 import inet.common.lifecycle.NodeStatus;
-import inet.linklayer.contract.IMACAddressTable;
+import inet.linklayer.contract.IMacAddressTable;
 import ansa.linklayer.contract.ANSA_IMACRelayUnit;
 import inet.linklayer.contract.ISpanningTree;
 import inet.linklayer.contract.IWiredNic;
@@ -81,7 +81,7 @@ module ANSA_EtherSwitch
         interfaceTable: InterfaceTable {
             @display("p=73,65;is=s");
         }
-        macTable: <macTableType> like IMACAddressTable {
+        macTable: <macTableType> like IMacAddressTable {
             @display("p=73,19;is=s");
         }
         relayUnit: <relayUnitType> like ANSA_IMACRelayUnit {

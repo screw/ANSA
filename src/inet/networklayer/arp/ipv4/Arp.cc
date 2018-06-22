@@ -43,7 +43,7 @@ namespace inet {
 simsignal_t Arp::arpRequestSentSignal = registerSignal("arpRequestSent");
 simsignal_t Arp::arpReplySentSignal = registerSignal("arpReplySent");
 #ifdef ANSAINET
-simsignal_t ARP::recvReqSignal = registerSignal("recvRequest"); //TODO Rename it to fit the new naming style
+simsignal_t Arp::recvReqSignal = registerSignal("recvRequest"); //TODO Rename it to fit the new naming style
 #endif
 
 static std::ostream& operator<<(std::ostream& out, cMessage *msg)
@@ -389,7 +389,7 @@ void Arp::processARPPacket(Packet *packet)
                         if (GLBPVf->isAVG()){
                             emit(recvReqSignal,true);
                             myMACAddress = GLBPVf->getMacAddress();
-                            if (myMACAddress.compareTo(MACAddress("00-00-00-00-00-00")) == 0){
+                            if (myMACAddress.compareTo(MacAddress("00-00-00-00-00-00")) == 0){
                                 delete arp;
                                 return;
                             }
@@ -526,7 +526,7 @@ L3Address Arp::getL3AddressFor(const MacAddress& macAddr) const
 
 #if defined(ANSAINET)
 
-void ARP::sendARPGratuitous(const InterfaceEntry *ie, MACAddress srcAddr, IPv4Address ipAddr, int opCode)
+void Arp::sendARPGratuitous(const InterfaceEntry *ie, MacAddress srcAddr, Ipv4Address ipAddr, int opCode)
 {
     Enter_Method_Silent();
 
@@ -535,23 +535,23 @@ void ARP::sendARPGratuitous(const InterfaceEntry *ie, MACAddress srcAddr, IPv4Ad
     ASSERT(!ipAddr.isUnspecified());
 
     // fill out everything in ARP Request packet except dest MAC address
-    ARPPacket *arp = new ARPPacket("arpGrt");
+    ArpPacket *arp = new ArpPacket("arpGrt");
     arp->setByteLength(ARP_HEADER_BYTES);
     arp->setOpcode(opCode);
     arp->setSrcMACAddress(srcAddr);
     arp->setSrcIPAddress(ipAddr);
     arp->setDestIPAddress(ipAddr);
-    arp->setDestMACAddress(MACAddress::BROADCAST_ADDRESS);
+    arp->setDestMACAddress(MacAddress::BROADCAST_ADDRESS);
 
     // add control info with MAC address
     Ieee802Ctrl *controlInfo = new Ieee802Ctrl();
-    controlInfo->setDest(MACAddress::BROADCAST_ADDRESS);
+    controlInfo->setDest(MacAddress::BROADCAST_ADDRESS);
     controlInfo->setEtherType(ETHERTYPE_ARP);
     controlInfo->setSrc(srcAddr);
     controlInfo->setInterfaceId(ie->getInterfaceId());
     arp->setControlInfo(controlInfo);
 
-    ARPCacheEntry *entry = new ARPCacheEntry();
+    ArpCacheEntry *entry = new ArpCacheEntry();
     auto where = arpCache.insert(arpCache.begin(), std::make_pair(ipAddr, entry));
     entry->myIter = where;
     entry->ie = ie;

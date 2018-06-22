@@ -26,7 +26,7 @@ namespace inet {
 Register_Abstract_Class(Ipv6Route);
 
 #ifdef ANSAINET
-const char* inet::IPv6Route::getSourceTypeAbbreviation() const {
+const char* inet::Ipv6Route::getSourceTypeAbbreviation() const {
     switch (_sourceType) {
         case IFACENETMASK:
             return "C";

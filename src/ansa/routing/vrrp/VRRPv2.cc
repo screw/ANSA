@@ -114,7 +114,7 @@ void VRRPv2::handleMessage(cMessage *msg)
 
             for (int i = 0; i < (int) virtualRouterTable.size(); i++)
                 if (virtualRouterTable.at(i)->getVrid() == advert->getVrid() &&
-                        ((IPv4ControlInfo *) msg->getControlInfo())->getInterfaceId() ==
+                        ((Ipv4ControlInfo *) msg->getControlInfo())->getInterfaceId() ==
                                 virtualRouterTable.at(i)->getInterface()->getInterfaceId()
                 )
                 {

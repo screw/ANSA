@@ -31,7 +31,7 @@ const MACTable::AddressTable * MACTable::getTable() {
 
 
 
-void MACTable::update(MACAddress& addr, int port) {
+void MACTable::update(MacAddress& addr, int port) {
 	Enter_Method_Silent();
 
     flushAged();
@@ -77,7 +77,7 @@ void MACTable::update(MACAddress& addr, int port) {
   return;
 }
 
-MACTable::tSpec MACTable::getSpec(MACAddress& addr) {
+MACTable::tSpec MACTable::getSpec(MacAddress& addr) {
 	Enter_Method_Silent();
 
     AddressTable::iterator iter = table.find(addr);
@@ -99,7 +99,7 @@ MACTable::tSpec MACTable::getSpec(MACAddress& addr) {
 }
 
 /** Returns list of egress ports for specified address @param addr */
-MACTable::tPortList& MACTable::getPorts(MACAddress& addr) {
+MACTable::tPortList& MACTable::getPorts(MacAddress& addr) {
 
 	Enter_Method_Silent();
 
@@ -204,7 +204,7 @@ void MACTable::removeOldest() {
 }
 
 
-void MACTable::add(MACAddress addr, int port, tType type, tSpec spec) {
+void MACTable::add(MacAddress addr, int port, tType type, tSpec spec) {
   AddressTable::iterator iter;
 
   iter = this->table.find(addr);
@@ -250,7 +250,7 @@ void MACTable::add(MACAddress addr, int port, tType type, tSpec spec) {
   return;
 }
 
-void MACTable::remove(MACAddress addr) {
+void MACTable::remove(MacAddress addr) {
 	AddressTable::iterator iter;
 
 	iter = this->table.find(addr);
@@ -262,7 +262,7 @@ void MACTable::remove(MACAddress addr) {
 	return;
 }
 
-void MACTable::removePort(MACAddress addr, int port) {
+void MACTable::removePort(MacAddress addr, int port) {
 	AddressTable::iterator iter;
 
 	iter = this->table.find(addr);
@@ -281,7 +281,7 @@ void MACTable::removePort(MACAddress addr, int port) {
 	return;
 }
 
-void MACTable::addStatic(MACAddress addr, tPortList ports) {
+void MACTable::addStatic(MacAddress addr, tPortList ports) {
 	AddressTable::iterator iter;
 
 	iter = this->table.find(addr);
@@ -362,7 +362,7 @@ void MACTable::initialize() {
 
 	/* IEEE802.1D Table 7-10 Reserved addresses */
 	  // Bridge Group Address -> go to STP
-	add(MACAddress("01-80-C2-00-00-00"), 0, STATIC, STP);
+	add(MacAddress("01-80-C2-00-00-00"), 0, STATIC, Stp);
 	/* end of table */
 
 
