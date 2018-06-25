@@ -16,7 +16,7 @@
 
 #include "inet/common/lifecycle/NodeOperations.h"
 #include "inet/common/lifecycle/NodeStatus.h"
-#include "inet/common/NotifierConsts.h"
+#include "inet/common/Simsignals.h"
 
 namespace inet {
 
@@ -75,9 +75,9 @@ void HSRPVirtualRouter::initialize(int stage)
 
         //TODO another reactions to different signals (router down and so on..)
         //subscribe to notifications
-//        containingModule->subscribe(NF_INTERFACE_CREATED, this);
-//        containingModule->subscribe(NF_INTERFACE_DELETED, this);
-        containingModule->subscribe(NF_INTERFACE_STATE_CHANGED, this);
+//        containingModule->subscribe(interfaceCreatedSignal, this);
+//        containingModule->subscribe(interfaceDeletedSignal, this);
+        containingModule->subscribe(interfaceStateChangedSignal, this);
 
         //start HSRP
         scheduleAt(simTime() , initmessage);
@@ -583,9 +583,9 @@ HSRPVirtualRouter::~HSRPVirtualRouter() {
     cancelAndDelete(initmessage);
 
     // unsubscribe to notifications
-//    containingModule->unsubscribe(NF_INTERFACE_CREATED, this);
-//    containingModule->unsubscribe(NF_INTERFACE_DELETED, this);
-    containingModule->unsubscribe(NF_INTERFACE_STATE_CHANGED, this);
+//    containingModule->unsubscribe(interfaceCreatedSignal, this);
+//    containingModule->unsubscribe(interfaceDeletedSignal, this);
+    containingModule->unsubscribe(interfaceStateChangedSignal, this);
 
 //    This is the end
 //    Beautiful friend
@@ -604,7 +604,7 @@ void HSRPVirtualRouter::receiveSignal(cComponent *source, simsignal_t signalID, 
     const ANSA_InterfaceEntry *ief;
     const InterfaceEntryChangeDetails *change;
 
-    if (signalID == NF_INTERFACE_STATE_CHANGED) {
+    if (signalID == interfaceStateChangedSignal) {
 
         change = check_and_cast<const InterfaceEntryChangeDetails *>(obj);
         ief = check_and_cast<const ANSA_InterfaceEntry *>(change->getInterfaceEntry());

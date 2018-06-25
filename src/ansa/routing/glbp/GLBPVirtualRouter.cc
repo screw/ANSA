@@ -124,9 +124,9 @@ void GLBPVirtualRouter::initialize(int stage)
 
         //TODO another signals for device down and so on...
         //signal for interface down
-        containingModule->subscribe(NF_INTERFACE_STATE_CHANGED, this);
-//        containingModule->subscribe(NF_INTERFACE_CREATED, this);
-//        containingModule->subscribe(NF_INTERFACE_DELETED, this);
+        containingModule->subscribe(interfaceStateChangedSignal, this);
+//        containingModule->subscribe(interfaceCreatedSignal, this);
+//        containingModule->subscribe(interfaceDeletedSignal, this);
 
         WATCH(glbpState);
 
@@ -619,7 +619,7 @@ void GLBPVirtualRouter::receiveSignal(cComponent *source, simsignal_t signalID, 
      const ANSA_InterfaceEntry *ief;
      const InterfaceEntryChangeDetails *change;
 
-     if (signalID == NF_INTERFACE_STATE_CHANGED) {
+     if (signalID == interfaceStateChangedSignal) {
 
          change = check_and_cast<const InterfaceEntryChangeDetails *>(obj);
          ief = check_and_cast<const ANSA_InterfaceEntry *>(change->getInterfaceEntry());
@@ -1300,7 +1300,7 @@ GLBPVirtualRouter::~GLBPVirtualRouter() {
         cancelAndDelete(redirecttimer[i]);
         cancelAndDelete(timeouttimer[i]);
     }
-    containingModule->unsubscribe(NF_INTERFACE_STATE_CHANGED, this);
+    containingModule->unsubscribe(interfaceStateChangedSignal, this);
     //arp->unsubscribe(Arp::recvReqSignal,this);
 //    This is the end
 //    My only friend, the end ...

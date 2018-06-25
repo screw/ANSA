@@ -21,7 +21,7 @@
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "ansa/networklayer/clns/CLNSInterfaceData.h"
 #include "ansa/networklayer/clns/CLNSRoute.h"
-#include "inet/common/NotifierConsts.h"
+#include "inet/common/Simsignals.h"
 //#include "inet/networklayer/ipv4/RoutingTableParser.h"
 #include "inet/common/lifecycle/NodeOperations.h"
 #include "inet/common/lifecycle/NodeStatus.h"
@@ -67,10 +67,10 @@ void CLNSRoutingTable::initialize(int stage)
   if (stage == INITSTAGE_LOCAL) {
       // get a pointer to the host module and IInterfaceTable
       cModule *host = getContainingNode(this);
-      host->subscribe(NF_INTERFACE_CREATED, this);
-      host->subscribe(NF_INTERFACE_DELETED, this);
-      host->subscribe(NF_INTERFACE_STATE_CHANGED, this);
-      host->subscribe(NF_INTERFACE_CONFIG_CHANGED, this);
+      host->subscribe(interfaceCreatedSignal, this);
+      host->subscribe(interfaceDeletedSignal, this);
+      host->subscribe(interfaceStateChangedSignal, this);
+      host->subscribe(interfaceConfigChangedSignal, this);
       host->subscribe(interfaceClnsConfigChangedSignal, this);
 
       ift = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
@@ -192,7 +192,7 @@ void CLNSRoutingTable::addRoute(CLNSRoute *entry)
     invalidateCache();
     updateDisplayString();
 
-    emit(NF_ROUTE_ADDED, entry);
+    emit(routeAddedSignal, entry);
 }
 
 CLNSRoute *CLNSRoutingTable::internalRemoveRoute(CLNSRoute *entry)
@@ -312,20 +312,20 @@ void CLNSRoutingTable::receiveSignal(cComponent *source, simsignal_t signalID, c
     Enter_Method_Silent();
     printNotificationBanner(signalID, obj);
 
-    if (signalID == NF_INTERFACE_CREATED) {
+    if (signalID == interfaceCreatedSignal) {
         // add netmask route for the new interface
       //TODO A1 NETMASK
 //        updateNetmaskRoutes();
     }
-    else if (signalID == NF_INTERFACE_DELETED) {
+    else if (signalID == interfaceDeletedSignal) {
         // remove all routes that point to that interface
         const InterfaceEntry *entry = check_and_cast<const InterfaceEntry *>(obj);
 //        deleteInterfaceRoutes(entry);
     }
-    else if (signalID == NF_INTERFACE_STATE_CHANGED) {
+    else if (signalID == interfaceStateChangedSignal) {
         invalidateCache();
     }
-    else if (signalID == NF_INTERFACE_CONFIG_CHANGED) {
+    else if (signalID == interfaceConfigChangedSignal) {
         invalidateCache();
     }
     else if (signalID == interfaceClnsConfigChangedSignal) {
@@ -384,7 +384,7 @@ void CLNSRoutingTable::routeChanged(CLNSRoute *entry, int fieldCode)
         invalidateCache();
         updateDisplayString();
     }
-    emit(NF_ROUTE_CHANGED, entry);    // TODO include fieldCode in the notification
+    emit(routeChangedSignal, entry);    // TODO include fieldCode in the notification
 }
 
 void CLNSRoutingTable::updateDisplayString()

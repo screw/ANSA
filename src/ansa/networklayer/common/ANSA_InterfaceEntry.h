@@ -72,11 +72,11 @@ class INET_API ANSA_InterfaceEntry : public InterfaceEntry
         int getTransLoad() const        { return transLoad; }
 
         virtual void setDatarate(double d) override;
-        void setBandwidth(uint64_t bandwidth){ if (this->bandwidth != bandwidth) { this->bandwidth = bandwidth; configChanged(NF_INTERFACE_CONFIG_CHANGED); } }
-        void setDelay(uint64_t delay)        { if (this->delay != delay) { this->delay = delay; configChanged(NF_INTERFACE_CONFIG_CHANGED); } }
-        void setReliability(int reliability) { if (this->reliability != reliability) { this->reliability = reliability; configChanged(NF_INTERFACE_CONFIG_CHANGED); } }
-        void setRecvLoad(int recvLoad)       { if (this->recvLoad != recvLoad) { this->recvLoad = recvLoad; configChanged(NF_INTERFACE_CONFIG_CHANGED); } }
-        void setTransLoad(int transLoad)     { if (this->transLoad != transLoad) { this->transLoad = transLoad; configChanged(NF_INTERFACE_CONFIG_CHANGED); } }
+        void setBandwidth(uint64_t bandwidth){ if (this->bandwidth != bandwidth) { this->bandwidth = bandwidth; configChanged(interfaceConfigChangedSignal); } }
+        void setDelay(uint64_t delay)        { if (this->delay != delay) { this->delay = delay; configChanged(interfaceConfigChangedSignal); } }
+        void setReliability(int reliability) { if (this->reliability != reliability) { this->reliability = reliability; configChanged(interfaceConfigChangedSignal); } }
+        void setRecvLoad(int recvLoad)       { if (this->recvLoad != recvLoad) { this->recvLoad = recvLoad; configChanged(interfaceConfigChangedSignal); } }
+        void setTransLoad(int transLoad)     { if (this->transLoad != transLoad) { this->transLoad = transLoad; configChanged(interfaceConfigChangedSignal); } }
 };
 }
 #endif /* ANSAINTERFACEENTRY_H_ */

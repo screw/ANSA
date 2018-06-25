@@ -48,7 +48,7 @@
 #include "inet/networklayer/common/InterfaceTable.h"
 //#include "InterfaceTableAccess.h"
 //#include "NotificationBoard.h"
-#include "inet/common/NotifierConsts.h"
+#include "inet/common/Simsignals.h"
 //#include "InterfaceStateManager.h"
 //#include "RoutingTableAccess.h"
 #include "inet/networklayer/contract/IRoutingTable.h"

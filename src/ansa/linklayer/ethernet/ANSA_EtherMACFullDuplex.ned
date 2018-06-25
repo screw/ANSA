@@ -141,7 +141,7 @@ simple ANSA_EtherMACFullDuplex like IEtherMac
         @signal[rxPkOk](type=EtherFrame);
         @signal[txPausePkUnits](type=long);
         @signal[rxPausePkUnits](type=long);
-        @signal[rxPkFromHL](type=EtherFrame);
+        @signal[rxPkFromHl](type=EtherFrame);
         @signal[dropPkNotForUs](type=EtherFrame);
         @signal[dropPkBitError](type=EtherFrame);
         @signal[dropPkIfaceDown](type=EtherTraffic);        // emitted at end of receiving
@@ -158,7 +158,7 @@ simple ANSA_EtherMACFullDuplex like IEtherMac
         @statistic[passedUpPk](title="packets passed to higher layer"; source=packetSentToUpper; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[txPausePkUnits](title="pause units sent"; record=count,sum,vector; interpolationmode=none);
         @statistic[rxPausePkUnits](title="pause units received"; record=count,sum,vector; interpolationmode=none);
-        @statistic[rxPkFromHL](title="packet bytes from higher layer"; source=rxPkFromHL; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        @statistic[rxPkFromHl](title="packet bytes from higher layer"; source=rxPkFromHl; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[droppedPkIfaceDown](title="packets dropped/interface down"; source=dropPkIfaceDown; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[droppedPkBitError](title="packets dropped/bit error"; source=dropPkBitError; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         @statistic[droppedPkNotForUs](title="packets dropped/not for us"; source=dropPkNotForUs; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);

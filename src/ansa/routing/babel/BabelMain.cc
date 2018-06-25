@@ -33,7 +33,7 @@
 #include "inet/transportlayer/contract/udp/UDPControlInfo.h"
 #include <cmath>
 
-#include "inet/common/NotifierConsts.h"
+#include "inet/common/Simsignals.h"
 #include "inet/common/ModuleAccess.h"
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32) || defined(__CYGWIN__) || defined(_WIN64)
@@ -122,7 +122,7 @@ void BabelMain::initialize(int stage)
         resetTimer(buffgc, defval::BUFFER_GC_INTERVAL);
 
         //nb = NotificationBoardAccess().get();
-        host->subscribe(NF_INTERFACE_STATE_CHANGED, this);
+        host->subscribe(interfaceStateChangedSignal, this);
         //EV << "--------------" << this->mt->getNumbersDrawn()<< endl;
     }
 
@@ -211,7 +211,7 @@ void BabelMain::receiveChangeNotification(int category, const cObject *details)
     Enter_Method_Silent();
     printNotificationBanner(category, details);
 
-    if(category == NF_INTERFACE_STATE_CHANGED)
+    if(category == interfaceStateChangedSignal)
     {
         InterfaceEntry *iface = check_and_cast<InterfaceEntry*>(details);
         BabelInterface *biface = bit.findInterfaceById(iface->getInterfaceId());
@@ -240,7 +240,7 @@ void BabelMain::receiveSignal(cComponent* source, simsignal_t signalID, cObject*
     Enter_Method_Silent("BabelRouting::receiveChangeNotification(%s)", notificationCategoryName(signalID));
 
     const InterfaceEntryChangeDetails *change = nullptr;
-    if(signalID == NF_INTERFACE_STATE_CHANGED)
+    if(signalID == interfaceStateChangedSignal)
     {
         change = check_and_cast<const InterfaceEntryChangeDetails *>(obj);
         InterfaceEntry *iface = change->getInterfaceEntry();

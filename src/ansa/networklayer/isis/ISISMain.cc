@@ -276,7 +276,7 @@ void ISISMain::initialize(int stage) {
       attIS = nullptr;
         //TODO A! Notification board
 //         nb = NotificationBoardAccess().get();
-////         nb->subscribe(this, NF_INTERFACE_STATE_CHANGED);
+////         nb->subscribe(this, interfaceStateChangedSignal);
 //         nb->subscribe(this, isisAdjChangedSignal);
 
         ift = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
@@ -3365,7 +3365,7 @@ void ISISMain::setMode(ISIS_MODE mode) {
 //TODO A! Signals
 //void ISIS::subscribeNb(void)
 //{
-//    nb->subscribe(this, NF_INTERFACE_STATE_CHANGED);
+//    nb->subscribe(this, interfaceStateChangedSignal);
 //    nb->subscribe(this, clnsRouteDeletedSignal);
 //    nb->subscribe(this, isisAdjChangedSignal);
 //

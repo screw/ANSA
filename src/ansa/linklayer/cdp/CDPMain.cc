@@ -21,7 +21,7 @@
 */
 
 #include "ansa/linklayer/cdp/CDPMain.h"
-//#include "inet/common/NotifierConsts.h"
+//#include "inet/common/Simsignals.h"
 #include "inet/common/Simsignals.h"
 #include "inet/common/lifecycle/NodeOperations.h"
 #include "inet/common/lifecycle/NodeStatus.h"
@@ -41,10 +41,10 @@ CDPMain::CDPMain() {
 }
 
 CDPMain::~CDPMain() {
-    containingModule->unsubscribe(NF_INTERFACE_STATE_CHANGED, this);
-    containingModule->unsubscribe(NF_INTERFACE_CREATED, this);
-    containingModule->unsubscribe(NF_INTERFACE_DELETED, this);
-    containingModule->unsubscribe(NF_ROUTE_DELETED, this);
+    containingModule->unsubscribe(interfaceStateChangedSignal, this);
+    containingModule->unsubscribe(interfaceCreatedSignal, this);
+    containingModule->unsubscribe(interfaceDeletedSignal, this);
+    containingModule->unsubscribe(routeDeletedSignal, this);
 }
 
 std::string Statistics::info() const
@@ -115,10 +115,10 @@ void CDPMain::initialize(int stage)
         WATCH(isOperational);
     }
     if (stage == INITSTAGE_LAST) {
-        containingModule->subscribe(NF_INTERFACE_STATE_CHANGED, this);
-        containingModule->subscribe(NF_INTERFACE_CREATED, this);
-        containingModule->subscribe(NF_INTERFACE_DELETED, this);
-        containingModule->subscribe(NF_ROUTE_DELETED, this);
+        containingModule->subscribe(interfaceStateChangedSignal, this);
+        containingModule->subscribe(interfaceCreatedSignal, this);
+        containingModule->subscribe(interfaceDeletedSignal, this);
+        containingModule->subscribe(routeDeletedSignal, this);
 
         NodeStatus *nodeStatus = dynamic_cast<NodeStatus *>(containingModule->getSubmodule("status"));
         isOperational = (!nodeStatus) || nodeStatus->getState() == NodeStatus::UP;
@@ -144,19 +144,19 @@ void CDPMain::receiveSignal(cComponent *source, simsignal_t signalID, cObject *o
     IRoute *route;
     InterfaceEntry *interface;
 
-    if(signalID == NF_INTERFACE_CREATED)
+    if(signalID == interfaceCreatedSignal)
     {
         //new interface created
         interface = check_and_cast<const InterfaceEntryChangeDetails *>(obj)->getInterfaceEntry();
         activateInterface(interface);
     }
-    else if(signalID == NF_INTERFACE_DELETED)
+    else if(signalID == interfaceDeletedSignal)
     {
         //interface deleted
         interface = check_and_cast<const InterfaceEntryChangeDetails *>(obj)->getInterfaceEntry();
         deactivateInterface(interface, true);
     }
-    else if(signalID == NF_INTERFACE_STATE_CHANGED)
+    else if(signalID == interfaceStateChangedSignal)
     {
         //interface state changed
         interface = check_and_cast<const InterfaceEntryChangeDetails *>(obj)->getInterfaceEntry();
@@ -171,7 +171,7 @@ void CDPMain::receiveSignal(cComponent *source, simsignal_t signalID, cObject *o
         else
             deactivateInterface(interface, false);
     }
-    else if (signalID == NF_ROUTE_DELETED) {
+    else if (signalID == routeDeletedSignal) {
         // remove references to the deleted route and invalidate the RIP route
         route = const_cast<IRoute *>(check_and_cast<const IRoute *>(obj));
         if (route->getSource() != this) {
@@ -231,8 +231,8 @@ void CDPMain::startCDP()
     isOperational = true;
 
     for(int i=0; i < ift->getNumInterfaces(); i++)
-    {
-        if(isInterfaceSupported(ift->getInterface(i)->getInterfaceModule()->getName()))
+    {   //TODO Check that getInterfaceName() returns the same as previously getInterfaceModule()->getName()
+        if(isInterfaceSupported(ift->getInterface(i)->getInterfaceName()))
         {
             interface = ift->getInterface(i);
             activateInterface(interface);
@@ -255,7 +255,7 @@ void CDPMain::activateInterface(InterfaceEntry *interface)
 
     scheduleAt(simTime(), cdpInterface->getUpdateTimer());
 
-    EV_INFO << "Interface " << interface->getName() << " go up, id:" << interface->getInterfaceId() <<  endl;
+    EV_INFO << "Interface " << interface->getInterfaceName() << " go up, id:" << interface->getInterfaceId() <<  endl;
 }
 
 void CDPMain::deactivateInterface(InterfaceEntry *interface, bool removeFromTable)
@@ -279,7 +279,7 @@ void CDPMain::deactivateInterface(InterfaceEntry *interface, bool removeFromTabl
             else
                 ++it;
         }
-        EV_INFO << "Interface " << interface->getName() << " go down, id: " << interface->getInterfaceId() << endl;
+        EV_INFO << "Interface " << interface->getInterfaceName() << " go down, id: " << interface->getInterfaceId() << endl;
     }
 }
 
@@ -366,7 +366,7 @@ void CDPMain::neighbourUpdate(CDPUpdate *msg)
 
         newNeighbour = true;
         neighbour = new CDPNeighbour();
-        neighbour->setInterface(ift->getInterfaceByNetworkLayerGateIndex(msg->getArrivalGate()->getIndex()));
+        neighbour->setInterface(ift->getInterfaceById(msg->getTag<InterfaceInd>()->getInteraceId()));
         neighbour->setPortReceive(msg->getArrivalGateId());
 
         CDPOptionDevId *deviceIdOption = check_and_cast<CDPOptionDevId *> (msg->findOptionByType(CDPTLV_DEV_ID, 0));

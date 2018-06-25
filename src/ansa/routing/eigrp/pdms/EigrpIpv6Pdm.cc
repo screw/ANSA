@@ -130,13 +130,13 @@ void EigrpIpv6Pdm::initialize(int stage)
         WATCH(eigrpStub.summaryRt);
 
         // Subscribe for changes in the device
-        //nb->subscribe(this, NF_INTERFACE_STATE_CHANGED);
-        //nb->subscribe(this, NF_INTERFACE_CONFIG_CHANGED);
+        //nb->subscribe(this, interfaceStateChangedSignal);
+        //nb->subscribe(this, interfaceConfigChangedSignal);
         //nb->subscribe(this, NF_IPv6_ROUTE_DELETED);
         cModule* host = getParentModule()->getParentModule();
-        host->subscribe(NF_INTERFACE_STATE_CHANGED, this);
-        host->subscribe(NF_INTERFACE_CONFIG_CHANGED, this);
-        host->subscribe(NF_ROUTE_DELETED, this);
+        host->subscribe(interfaceStateChangedSignal, this);
+        host->subscribe(interfaceConfigChangedSignal, this);
+        host->subscribe(routeDeletedSignal, this);
     }
 }
 
@@ -154,12 +154,12 @@ void EigrpIpv6Pdm::receiveSignal(cComponent* source, simsignal_t signalID, cObje
     */
     Enter_Method_Silent("EigrpIPv6Pdm::receiveChangeNotification(%s)", notificationCategoryName(signalID));
 
-    if (signalID == NF_INTERFACE_STATE_CHANGED)
+    if (signalID == interfaceStateChangedSignal)
     {
         InterfaceEntryChangeDetails *ifcecd = check_and_cast<InterfaceEntryChangeDetails*>(obj);
         processIfaceStateChange(check_and_cast<ANSA_InterfaceEntry*>(ifcecd->getInterfaceEntry()));
     }
-    else if (signalID == NF_INTERFACE_CONFIG_CHANGED)
+    else if (signalID == interfaceConfigChangedSignal)
     {
         InterfaceEntryChangeDetails *ifcecd = check_and_cast<InterfaceEntryChangeDetails*>(obj);
         ANSA_InterfaceEntry *iface = check_and_cast<ANSA_InterfaceEntry*>(ifcecd->getInterfaceEntry());
@@ -185,7 +185,7 @@ void EigrpIpv6Pdm::receiveSignal(cComponent* source, simsignal_t signalID, cObje
         }
 
     }
-    else if (signalID == NF_ROUTE_DELETED)
+    else if (signalID == routeDeletedSignal)
     { //
         processRTRouteDel(obj);
     }

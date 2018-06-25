@@ -24,7 +24,7 @@
 #include "inet/linklayer/ethernet/EtherFrame_m.h"
 
 #include "inet/common/queue/IPassiveQueue.h"
-#include "inet/common/NotifierConsts.h"
+#include "inet/common/Simsignals.h"
 #include "inet/linklayer/ethernet/EtherFrame.h"
 #include "ansa/routing/glbp/GLBPMessage.h"
 #include "inet/networklayer/ipv4/IPv4Datagram.h"
@@ -217,7 +217,7 @@ void ANSA_EtherMACFullDuplex::processFrameFromUpperLayer(EtherFrame *frame)
 
     if (!isPauseFrame) {
         numFramesFromHL++;
-        emit(rxPkFromHLSignal, frame);
+        emit(rxPkFromHlSignal, frame);
     }
 
     if (txQueue.extQueue) {
