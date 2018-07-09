@@ -22,6 +22,7 @@
 
 #include "ansa/linklayer/cdp/CDPMain.h"
 //#include "inet/common/Simsignals.h"
+#include "inet/common/packet/Packet.h"
 #include "inet/common/Simsignals.h"
 #include "inet/common/lifecycle/NodeOperations.h"
 #include "inet/common/lifecycle/NodeStatus.h"
@@ -642,7 +643,9 @@ std::string CDPMain::capabilitiesConvert(char cap1, char cap2, char cap3, char c
 
 void CDPMain::sendUpdate(int interfaceId, bool shutDown)
 {
-    CDPUpdate *msg = new CDPUpdate();
+//    CDPUpdate *msg = new CDPUpdate();
+    Packet *packet = new Packet("CDPUpdate");
+    const auto& msg = makeShared<CDPUpdate>();
     if(!shutDown)
     {
         createTlv(msg, interfaceId); // set all TLV
