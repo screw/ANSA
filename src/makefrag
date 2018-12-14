@@ -5,3 +5,14 @@ MSGC:=$(MSGC) --msg6
 
 # disable anoying "... hides overloaded virtual function" warning
 CFLAGS += -Wno-overloaded-virtual
+
+
+
+# dump out the actual compiler and linker command line for easier debugging
+ifneq ($(MAKECMDGOALS),clean)
+$(info *** COMPILING with:)
+$(info $(CXX) -c $(CXXFLAGS) $(COPTS))
+$(info *** LINKING with:)
+$(info $(SHLIB_LD) -o $O/$(TARGET) $(AS_NEEDED_OFF) $(WHOLE_ARCHIVE_ON) $(LIBS) $(WHOLE_ARCHIVE_OFF) $(OMNETPP_LIBS) $(LDFLAGS))
+$(info Building...)
+endif
