@@ -21,7 +21,7 @@ cache:
 docker_command: &DOCKER_COMMAND travis_wait 30 sleep infinity &
                   docker run -ti --env TARGET_PLATFORM --env MODE --env TRAVIS_REPO_SLUG
                   -v /home/travis/build/$TRAVIS_REPO_SLUG:/$TRAVIS_REPO_SLUG
-                  -v $HOME/docker_ccache:/root/.ccache xmarek02/travis-ansainet:5.4.1-180629
+                  -v $HOME/docker_ccache:/root/.ccache xmarek02/omnetpp-travis-ansainet:5.4.1-180629
                   /bin/bash /$TRAVIS_REPO_SLUG/scripts/travis/travis-stage-$STAGE.sh $INNER_ARGS
                    # the last two (STAGE and INNER_ARGS) come from export statements, not env: lines
 
