@@ -15,7 +15,7 @@ set -e # make the script exit with error if any executed command exits with erro
 
 ccache -cCz # we don't use ccache across builds, only across stages within each build
 
-#export PATH="/root/omnetpp-5.4.1-$TARGET_PLATFORM/bin:/usr/lib/ccache:$PATH"
+export PATH="/root/omnetpp-5.4.1-$TARGET_PLATFORM/bin:/usr/lib/ccache:$PATH"
 
 #clone INET
 #git clone --recursive --single-branch --depth 1 -b "v4.0.0" https://github.com/inet-framework/inet.git
