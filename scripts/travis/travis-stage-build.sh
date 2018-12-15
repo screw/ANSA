@@ -21,7 +21,7 @@ export PATH="/root/omnetpp-5.4.1-$TARGET_PLATFORM/bin:/usr/lib/ccache:$PATH"
 #git clone --recursive --single-branch --depth 1 -b "v4.0.0" https://github.com/inet-framework/inet.git
 # this is where the cloned INET repo is mounted into the container (as prescribed in /.travis.yml)
 echo $INET_ROOT
-cd inet/
+cd /root/inet/
 
 . setenv -f
 
