@@ -27,6 +27,7 @@
 #include "inet/common/lifecycle/NodeStatus.h"
 #include "inet/common/INETUtils.h"
 #include "inet/common/ModuleAccess.h"
+#include <algorithm>
 
 #ifdef ANSAINET
 #include "ansa/networklayer/common/ANSA_InterfaceEntry.h"
