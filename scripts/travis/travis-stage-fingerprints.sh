@@ -48,3 +48,4 @@ if [ "$MODE" = "debug" ]; then
 else
     ./fingerprinttest "$@"
 fi
+#
