@@ -36,7 +36,7 @@ if [ "$TARGET_PLATFORM" = "linux" ]; then
     # We do it here as well to make the compiler arguments match.
     # Only when compiling to linux though, as for cross-compiling we use GCC,
     # and it has a different flag for this. And we only need this for linux anyway.
-    echo -e "CFLAGS += -fcolor-diagnostics\n\n$(cat src/makefrag)" > src/makefrag
+    #echo -e "CFLAGS += -fcolor-diagnostics\n\n$(cat src/makefrag)" > src/makefrag
 
     # On linux we can't use precompiled headers, because ccache can't work with them,
     # and we need ccache, but we are fine without precompiled headers (on linux that is).
@@ -49,14 +49,14 @@ else
     PCH=yes
 fi
 
-if [ "$TARGET_PLATFORM" = "windows" ]; then
+#if [ "$TARGET_PLATFORM" = "windows" ]; then
     # The --no-keep-memory flag decreased linking time by ~10 percent in debug builds
     # (a bit more in release), which is needed because otherwise it sometimes took over 10 minutes,
     # triggering the other kind of Travis timeout. The --stats option is just to check, and it
     # produces some output before the command terminates (before the .dll file is written to disk),
     # which also helps. We only need these with mingw, and they don't work with clang (for the macos builds).
-    echo -e "LDFLAGS += -Wl,--stats -Wl,--no-keep-memory\n\n$(cat src/makefrag)" > src/makefrag
-fi
+#    echo -e "LDFLAGS += -Wl,--stats -Wl,--no-keep-memory\n\n$(cat src/makefrag)" > src/makefrag
+#fi
 
 make makefiles
 make MODE=$MODE USE_PRECOMPILED_HEADER=$PCH -j $(nproc)
