@@ -25,7 +25,7 @@
 #include "ansa/networklayer/common/VirtualForwarder.h"
 
 namespace inet{
-class INET_API ANSA_InterfaceEntry : public InterfaceEntry
+class ANSA_API ANSA_InterfaceEntry : public InterfaceEntry
 {
     public:
         typedef std::vector<VirtualForwarder *> VirtualForwarderVector;

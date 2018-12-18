@@ -19,7 +19,7 @@
 // @copyright Brno University of Technology (www.fit.vutbr.cz) under GPLv3
 
 cplusplus {{
-    #include "inet/common/INETDefs.h"
+    #include "ansa/common/ANSADefs.h"
     #include "inet/networklayer/common/L3Address.h"
     #include "ansa/routing/lisp/LISPEidPrefix.h"  
 }}

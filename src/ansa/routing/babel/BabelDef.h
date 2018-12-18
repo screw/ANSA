@@ -217,7 +217,7 @@ typedef cMessage BabelTimer;
 
 
 
-/*class INET_API BabelTimer : public cMessage
+/*class ANSA_API BabelTimer : public cMessage
 {
 //TODO - dodelat konstruktory
     virtual std::string detailedInfo() const
@@ -513,7 +513,7 @@ class netPrefix
 /**
  * Babel packet class
  */
-class INET_API BabelMessage : public BabelMessage_Base
+class ANSA_API BabelMessage : public BabelMessage_Base
 {
   private:
     void copy(const BabelMessage& other);

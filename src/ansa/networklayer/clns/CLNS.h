@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "inet/common/IProtocolRegistrationListener.h"
 #include "inet/networklayer/contract/INetworkProtocol.h"
@@ -51,7 +51,7 @@ class InterfaceEntry;
 /**
  * TODO - Generated class
  */
-class INET_API CLNS : public QueueBase, public INetworkProtocol, public IProtocolRegistrationListener
+class ANSA_API CLNS : public QueueBase, public INetworkProtocol, public IProtocolRegistrationListener
 {
   public:
     typedef std::vector<ClnsAddress> CLNSAddressVector;

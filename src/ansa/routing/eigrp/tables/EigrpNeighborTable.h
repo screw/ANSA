@@ -93,7 +93,7 @@ public:
 };
 
 /*
-class INET_API Eigrpv4NeighTableAccess : public ModuleAccess<EigrpIpv4NeighborTable>
+class ANSA_API Eigrpv4NeighTableAccess : public ModuleAccess<EigrpIpv4NeighborTable>
 {
     public:
     Eigrpv4NeighTableAccess() : ModuleAccess<EigrpIpv4NeighborTable>("eigrpIpv4NeighborTable") {}
@@ -110,7 +110,7 @@ public:
 };
 
 /*
-class INET_API Eigrpv6NeighTableAccess : public ModuleAccess<EigrpIpv6NeighborTable>
+class ANSA_API Eigrpv6NeighTableAccess : public ModuleAccess<EigrpIpv6NeighborTable>
 {
     public:
     Eigrpv6NeighTableAccess() : ModuleAccess<EigrpIpv6NeighborTable>("eigrpIpv6NeighborTable") {}

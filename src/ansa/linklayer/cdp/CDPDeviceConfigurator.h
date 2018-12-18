@@ -23,7 +23,7 @@
 #ifndef CDPDEVICECONFIGURATOR_H_
 #define CDPDEVICECONFIGURATOR_H_
 
-#include <omnetpp.h>
+#include "ansa/common/ANSADefs.h"
 
 #include "ansa/linklayer/cdp/CDPMain.h"
 #include "ansa/linklayer/cdp/tables/CDPInterfaceTable.h"

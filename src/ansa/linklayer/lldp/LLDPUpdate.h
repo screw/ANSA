@@ -24,13 +24,13 @@
 #ifndef LLDPUPDATE_H_
 #define LLDPUPDATE_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "ansa/linklayer/lldp/LLDPUpdate_m.h"
 
 namespace inet {
 
 
-class INET_API LLDPUpdate : public LLDPUpdate_Base
+class ANSA_API LLDPUpdate : public LLDPUpdate_Base
 {
   private:
     void copy(const LLDPUpdate& other){};

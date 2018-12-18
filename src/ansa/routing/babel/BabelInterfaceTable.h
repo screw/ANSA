@@ -26,7 +26,7 @@
 #ifndef __ANSA_BABELINTERFACETABLE_H_
 #define __ANSA_BABELINTERFACETABLE_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "ansa/routing/babel/BabelDef.h"
 //#include "UdpSocket.h"

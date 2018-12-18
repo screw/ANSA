@@ -15,7 +15,7 @@
 
 #include "inet/transportlayer/contract/udp/UdpSocket.h"
 #include "inet/networklayer/arp/ipv4/Arp.h"
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/networklayer/contract/IL3AddressType.h"
 #include "inet/networklayer/contract/IRoutingTable.h"

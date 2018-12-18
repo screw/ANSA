@@ -30,7 +30,7 @@
 #include "ansa/routing/babel/BabelFtlv.h"
 namespace inet {
 
-class INET_API BabelBuffer : public cObject
+class ANSA_API BabelBuffer : public cObject
 {
   protected:
     L3Address dst;

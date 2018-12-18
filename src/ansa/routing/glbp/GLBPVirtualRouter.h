@@ -30,7 +30,7 @@
 
 #include "inet/networklayer/arp/ipv4/Arp.h"
 #include "inet/transportlayer/contract/udp/UdpSocket.h"
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 namespace inet {
 /**

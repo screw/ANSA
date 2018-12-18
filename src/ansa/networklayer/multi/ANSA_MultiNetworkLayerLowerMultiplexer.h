@@ -21,11 +21,11 @@
 #ifndef ANSA_MULTINETWORKLAYERLOWERMULTIPLEXER_H_
 #define ANSA_MULTINETWORKLAYERLOWERMULTIPLEXER_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 namespace inet {
 
-class INET_API ANSA_MultiNetworkLayerLowerMultiplexer : public cSimpleModule
+class ANSA_API ANSA_MultiNetworkLayerLowerMultiplexer : public cSimpleModule
 {
   public:
     ANSA_MultiNetworkLayerLowerMultiplexer(){};

@@ -24,9 +24,7 @@
 #ifndef __LLDPMAIN_H_
 #define __LLDPMAIN_H_
 
-#include <omnetpp.h>
-
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/lifecycle/ILifecycle.h"
@@ -44,7 +42,7 @@
 
 namespace inet {
 
-class INET_API LLDPMain: public cSimpleModule, protected cListener, public ILifecycle
+class ANSA_API LLDPMain: public cSimpleModule, protected cListener, public ILifecycle
 {
   protected:
     std::string hostName;       // name of the module

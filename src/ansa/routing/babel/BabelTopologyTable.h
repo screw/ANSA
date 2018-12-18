@@ -27,13 +27,13 @@
 #define BABELTOPOLOGYTABLE_H_
 
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "ansa/routing/babel/BabelDef.h"
 #include "ansa/routing/babel/BabelNeighbourTable.h"
 
 namespace inet {
-class INET_API BabelRoute : public cObject
+class ANSA_API BabelRoute : public cObject
 {
 protected:
     Babel::netPrefix<L3Address> prefix;

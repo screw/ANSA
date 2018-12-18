@@ -27,6 +27,7 @@
 #ifndef ISISMAIN_H_
 #define ISISMAIN_H_
 
+
 #include <algorithm>
 #include <stdlib.h>
 #include <omnetpp.h>
@@ -34,6 +35,7 @@
 #include <vector>
 #include <queue>
 #include <iomanip>
+#include "ansa/common/ANSADefs.h"
 
 #include "ansa/networklayer/clns/CLNSRoutingTable.h"
 //#include "CLNSTableAccess.h"

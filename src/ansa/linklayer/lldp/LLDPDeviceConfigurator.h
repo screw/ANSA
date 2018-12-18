@@ -21,14 +21,15 @@
 #ifndef LLDPDEVICECONFIGURATOR_H_
 #define LLDPDEVICECONFIGURATOR_H_
 
-#include <omnetpp.h>
+
 #include <algorithm>
+#include "ansa/common/ANSADefs.h"
 
 #include "ansa/linklayer/lldp/LLDPMain.h"
 //#include "ansa/linklayer/lldp/tables/LLDPAgentTable.h"
 
 namespace inet {
-class INET_API LLDPDeviceConfigurator
+class ANSA_API LLDPDeviceConfigurator
 {
 
    private:

@@ -23,13 +23,13 @@
 #ifndef CDPUPDATE_H_
 #define CDPUPDATE_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "ansa/linklayer/cdp/CDPUpdate_m.h"
 
 namespace inet {
 
 
-class INET_API CDPUpdate : public CDPUpdate_Base
+class ANSA_API CDPUpdate : public CDPUpdate_Base
 {
   private:
     void copy(const CDPUpdate& other){};

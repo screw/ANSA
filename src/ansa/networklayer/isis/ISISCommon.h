@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 
 namespace inet{

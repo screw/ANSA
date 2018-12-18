@@ -26,13 +26,13 @@
 #ifndef BABELPENSRTABLE_H_
 #define BABELPENSRTABLE_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "ansa/routing/babel/BabelDef.h"
 #include "ansa/routing/babel/BabelNeighbourTable.h"
 #include "ansa/routing/babel/BabelFtlv.h"
 namespace inet {
-class INET_API BabelPenSR : public cObject
+class ANSA_API BabelPenSR : public cObject
 {
 protected:
     BabelSeqnoReqFtlv request;

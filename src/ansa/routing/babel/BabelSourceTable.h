@@ -26,11 +26,11 @@
 #ifndef BABELSOURCETABLE_H_
 #define BABELSOURCETABLE_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "ansa/routing/babel/BabelDef.h"
 namespace inet {
-class INET_API BabelSource: public cObject
+class ANSA_API BabelSource: public cObject
 {
 protected:
     Babel::netPrefix<L3Address> prefix;

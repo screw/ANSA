@@ -23,9 +23,7 @@
 #ifndef CDP_H_
 #define CDP_H_
 
-#include <omnetpp.h>
-
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/packet/Packet.h"
@@ -54,7 +52,7 @@ struct Statistics
     std::string info() const;
 };
 
-class INET_API CDPMain: public cSimpleModule, public ILifecycle, public cListener {
+class ANSA_API CDPMain: public cSimpleModule, public ILifecycle, public cListener {
 public:
     CDPMain();
     virtual ~CDPMain();

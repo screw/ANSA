@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "inet/networklayer/contract/clns/ClnsAddress.h"
 #include "ansa/networklayer/clns/CLNSRoute.h"

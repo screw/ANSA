@@ -17,7 +17,7 @@
 //
 
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "SomeUDPApp.h"
 #include "inet/transportlayer/contract/udp/UDPControlInfo_m.h"

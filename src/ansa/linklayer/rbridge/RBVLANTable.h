@@ -52,7 +52,7 @@
 
 namespace inet {
 
-class INET_API RBVLANTable : public cSimpleModule
+class ANSA_API RBVLANTable : public cSimpleModule
 {
 public:
 
