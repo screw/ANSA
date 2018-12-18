@@ -1,6 +1,11 @@
 .PHONY: all clean cleanall makefiles makefiles-so makefiles-lib makefiles-exe checkmakefiles doxy doc
 
-all: checkmakefiles src/ansa/features.h 
+ifeq ($(INET_ROOT),)
+INET_ROOT := ../inet/
+endif
+
+all: checkmakefiles src/ansa/features.h
+	cd ${INET_ROOT} && $(MAKE) all
 	cd src && $(MAKE) all
 
 clean: checkmakefiles
@@ -15,7 +20,7 @@ cleanall: checkmakefiles
 cleantmp:
 	cd src && rm -f .tmp* sta*	
 
-MAKEMAKE_OPTIONS := -f --deep -o INET -O out --no-deep-includes -I.
+MAKEMAKE_OPTIONS := -f --deep -o ANSA -O out -KINET_PROJ=$(abspath $(INET_ROOT)) -DINET_IMPORT --no-deep-includes -I. -I$$\(INET_PROJ\)/src -L$$\(INET_PROJ\)/src -lINET$$\(D\)
 
 makefiles: src/ansa/features.h makefiles-so
 
