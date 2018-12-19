@@ -26,13 +26,13 @@
 #ifndef __ANSA_BABELNEIGHBOURTABLE_H_
 #define __ANSA_BABELNEIGHBOURTABLE_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "ansa/routing/babel/BabelDef.h"
 #include "ansa/routing/babel/BabelInterfaceTable.h"
 
 namespace inet {
-class INET_API BabelNeighbour : public cObject
+class ANSA_API BabelNeighbour : public cObject
 {
   protected:
     BabelInterface *interface;

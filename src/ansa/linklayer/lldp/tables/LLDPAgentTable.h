@@ -22,8 +22,7 @@
 #ifndef LLDPAGENT_H_
 #define LLDPAGENT_H_
 
-#include <omnetpp.h>
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "ansa/linklayer/lldp/LLDPTimer_m.h"
 #include "ansa/linklayer/lldp/LLDPUpdate.h"
@@ -97,7 +96,7 @@ class LLDPManAddTab
 /**
  * Class holding information about a LLDP agent.
  */
-class INET_API LLDPAgent: public cObject
+class ANSA_API LLDPAgent: public cObject
 {
     friend class LLDPAgentTable;
 
@@ -263,7 +262,7 @@ public:
 /**
  * Class holding informatation about LLDP agents.
  */
-class INET_API LLDPAgentTable : public cSimpleModule
+class ANSA_API LLDPAgentTable : public cSimpleModule
 {
   protected:
     std::vector<LLDPAgent *> agents;

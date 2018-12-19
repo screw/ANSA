@@ -22,8 +22,11 @@
 #ifndef CDPINTERFACE_H_
 #define CDPINTERFACE_H_
 
-#include "ansa/linklayer/cdp/CDPTimer_m.h"
+#include "ansa/common/ANSADefs.h"
+
 #include "inet/networklayer/common/InterfaceEntry.h"
+
+#include "ansa/linklayer/cdp/CDPTimer_m.h"
 
 namespace inet {
 
@@ -31,7 +34,7 @@ namespace inet {
  * Class holding informatation about interface that are capable
  * to run CDP.
  */
-class INET_API CDPInterface : public cObject {
+class ANSA_API CDPInterface : public cObject {
         friend class CDPInterfaceTable;
     protected:
         InterfaceEntry *interface;  // Physical network interface
@@ -68,7 +71,7 @@ class INET_API CDPInterface : public cObject {
  * Class holding informatation about interfaces that are capable
  * to run CDP.
  */
-class INET_API CDPInterfaceTable : public cSimpleModule
+class ANSA_API CDPInterfaceTable : public cSimpleModule
 {
   protected:
     std::vector<CDPInterface *> interfaces;

@@ -24,7 +24,7 @@
 
 #include <omnetpp.h>
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "inet/common/lifecycle/ILifecycle.h"
 #include "inet/common/lifecycle/NodeStatus.h"
 #include "inet/networklayer/contract/IInterfaceTable.h"
@@ -36,7 +36,7 @@ using namespace omnetpp;
 
 namespace inet {
 
-class INET_API MultiNetworkNodeConfigurator : public cSimpleModule, public ILifecycle
+class ANSA_API MultiNetworkNodeConfigurator : public cSimpleModule, public ILifecycle
 {
 
   protected:

@@ -24,8 +24,7 @@
 #ifndef LLDPNEIGHBOURTABLE_H_
 #define LLDPNEIGHBOURTABLE_H_
 
-#include <omnetpp.h>
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "ansa/linklayer/lldp/tables/LLDPAgentTable.h"
 
 namespace inet {
@@ -33,7 +32,7 @@ namespace inet {
 /**
  * Class holding information about a LLDP neighbour.
  */
-class INET_API LLDPNeighbour: public cObject
+class ANSA_API LLDPNeighbour: public cObject
 {
     friend class LLDPNeighbourTable;
 protected:
@@ -95,7 +94,7 @@ public:
  * Class holding information about a LLDP neighbours.
  * Expired entries are automatically deleted.
  */
-class INET_API LLDPNeighbourTable : public cSimpleModule
+class ANSA_API LLDPNeighbourTable : public cSimpleModule
 {
 protected:
     std::vector<LLDPNeighbour *> neighbours;

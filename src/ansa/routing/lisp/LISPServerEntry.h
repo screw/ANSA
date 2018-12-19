@@ -23,7 +23,7 @@
 #ifndef LISPSERVERENTRY_H_
 #define LISPSERVERENTRY_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "inet/networklayer/common/L3Address.h"
 #include "ansa/routing/lisp/LISPCommon.h"
 

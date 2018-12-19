@@ -27,7 +27,7 @@
 #define RBMACTABLE_H_
 
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -43,7 +43,7 @@
 
 namespace inet {
 
-class INET_API RBMACTable : public cSimpleModule
+class ANSA_API RBMACTable : public cSimpleModule
 {
 public:
   RBMACTable();

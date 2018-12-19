@@ -21,7 +21,7 @@
 #ifndef GLBPMESSAGE_H_
 #define GLBPMESSAGE_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "ansa/routing/glbp/GLBPMessage_m.h"
 
 namespace inet {

@@ -22,9 +22,12 @@
 #ifndef CDPODRROUTETABLE_H_
 #define CDPODRROUTETABLE_H_
 
-#include "ansa/linklayer/cdp/CDPTimer_m.h"
+#include "ansa/common/ANSADefs.h"
 #include "inet/networklayer/contract/IRoute.h"
 #include "inet/networklayer/ipv4/Ipv4RoutingTable.h"
+
+#include "ansa/linklayer/cdp/CDPTimer_m.h"
+
 
 
 namespace inet {
@@ -32,7 +35,7 @@ namespace inet {
 /**
  * Class holding information about a ODR route.
  */
-class INET_API CDPODRRoute : public cObject
+class ANSA_API CDPODRRoute : public cObject
 {
     friend class CDPODRRouteTable;
 
@@ -97,7 +100,7 @@ class INET_API CDPODRRoute : public cObject
 /**
  * Class holding informatation about learned ODR routes.
  */
-class INET_API CDPODRRouteTable : public cSimpleModule
+class ANSA_API CDPODRRouteTable : public cSimpleModule
 {
 protected:
   std::vector<CDPODRRoute *> routes;

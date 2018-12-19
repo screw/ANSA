@@ -23,14 +23,14 @@
 
 #include <vector>
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "UDPAppBase.h"
 
 
 /**
  * A copy of UDPBasicApp, just for testing.
- * NOTE that this class is NOT declared INET_API!
+ * NOTE that this class is NOT declared ANSA_API!
  */
 class SomeUDPApp : public UDPAppBase
 {

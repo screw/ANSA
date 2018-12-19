@@ -20,7 +20,7 @@
 // @author Vladimir Vesely (ivesely@fit.vutbr.cz)
 // @copyright Brno University of Technology (www.fit.vutbr.cz) under GPLv3
 
-
+import ansa.common.ANSADefs;
 namespace inet;
 
 enum LLDPTimerType

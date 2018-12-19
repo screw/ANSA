@@ -26,7 +26,7 @@
 #ifndef __ANSA_BABELMAIN_H_
 #define __ANSA_BABELMAIN_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "ansa/routing/babel/BabelDef.h"
 #include "ansa/routing/babel/BabelInterfaceTable.h"
@@ -51,7 +51,7 @@
 
 namespace inet {
 
-class INET_API BabelMain : protected cListener, public cSimpleModule
+class ANSA_API BabelMain : protected cListener, public cSimpleModule
 //, public INotifiable
 {
   protected:

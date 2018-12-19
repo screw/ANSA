@@ -352,7 +352,7 @@ class EigrpIpv6Pdm : public cSimpleModule, public IEigrpModule<Ipv6Address>, pub
  * @brief Class gives access to the PimNeighborTable.
  */
 /*
-class INET_API EigrpIpv6PdmAccess : public ModuleAccess<EigrpIpv6Pdm>
+class ANSA_API EigrpIpv6PdmAccess : public ModuleAccess<EigrpIpv6Pdm>
 {
   public:
     EigrpIpv6PdmAccess() : ModuleAccess<EigrpIpv6Pdm>("EigrpIpv6Pdm") {}

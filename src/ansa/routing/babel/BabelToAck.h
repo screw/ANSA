@@ -31,7 +31,7 @@
 
 namespace inet {
 
-class INET_API BabelToAck : public cObject
+class ANSA_API BabelToAck : public cObject
 {
   protected:
     uint16_t nonce;

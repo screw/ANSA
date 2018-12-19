@@ -28,7 +28,7 @@
 #include "ansa/networklayer/isis/ISISMain.h"
 #include <omnetpp.h>
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "inet/networklayer/common/InterfaceEntry.h"
 #include "ansa/networklayer/isis/ISIStypes.h"
 

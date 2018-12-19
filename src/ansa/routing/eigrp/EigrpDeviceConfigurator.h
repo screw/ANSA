@@ -40,7 +40,7 @@
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "ansa/networklayer/common/ANSA_InterfaceEntry.h"
 namespace inet {
-class INET_API EigrpDeviceConfigurator
+class ANSA_API EigrpDeviceConfigurator
 {
    private:
       //const char *deviceType = NULL;

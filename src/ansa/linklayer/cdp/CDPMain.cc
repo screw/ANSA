@@ -31,10 +31,11 @@
 #include "inet/linklayer/common/InterfaceTag_m.h"
 #include "inet/networklayer/ipv4/Ipv4InterfaceData.h"
 #include "inet/networklayer/contract/IRoutingTable.h"
+#include "inet/common/IProtocolRegistrationListener.h"
 
 #include "ansa/linklayer/cdp/CDPDeviceConfigurator.h"
 
-#include "inet/common/IProtocolRegistrationListener.h"
+
 
 
 namespace inet {

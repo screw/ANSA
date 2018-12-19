@@ -18,14 +18,14 @@
 
 #include <vector>
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "inet/networklayer/common/InterfaceEntry.h"
 #include "inet/networklayer/contract/clns/ClnsAddress.h"
 
 namespace inet {
 
-class INET_API CLNSInterfaceData : public InterfaceProtocolData
+class ANSA_API CLNSInterfaceData : public InterfaceProtocolData
 {
   private:
     int circuitID;

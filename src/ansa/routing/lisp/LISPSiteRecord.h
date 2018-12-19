@@ -23,7 +23,7 @@
 #ifndef LISPSITERECORD_H_
 #define LISPSITERECORD_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "ansa/routing/lisp/LISPServerEntry.h"
 #include "ansa/routing/lisp/LISPMapStorageBase.h"
 

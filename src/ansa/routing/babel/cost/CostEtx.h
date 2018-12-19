@@ -26,7 +26,7 @@
 #ifndef __ANSA_COSTETX_H_
 #define __ANSA_COSTETX_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "ansa/routing/babel/cost/IBabelCostComputation.h"
 namespace inet {
 class CostEtx : public cSimpleModule, public IBabelCostComputation

@@ -24,7 +24,7 @@
 #ifndef __INET_EIGRPINTERFACETABLE_H_
 #define __INET_EIGRPINTERFACETABLE_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 //#include "ModuleAccess.h"
 #include "inet/common/ModuleAccess.h"
@@ -194,13 +194,13 @@ class EigrpInterfaceTable : public cSimpleModule
     EigrpInterface *getInterface(int k) const { return eigrpInterfaces[k]; }
 };
 /*
-class INET_API EigrpIfTableAccess : public ModuleAccess<EigrpInterfaceTable>
+class ANSA_API EigrpIfTableAccess : public ModuleAccess<EigrpInterfaceTable>
 {
     public:
     EigrpIfTableAccess() : ModuleAccess<EigrpInterfaceTable>("eigrpInterfaceTable") {}
 };
 
-class INET_API EigrpIfTable6Access : public ModuleAccess<EigrpInterfaceTable>
+class ANSA_API EigrpIfTable6Access : public ModuleAccess<EigrpInterfaceTable>
 {
     public:
     EigrpIfTable6Access() : ModuleAccess<EigrpInterfaceTable>("eigrpInterfaceTable6") {}

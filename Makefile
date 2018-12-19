@@ -5,7 +5,7 @@ INET_ROOT := ../inet/
 endif
 
 all: checkmakefiles src/ansa/features.h
-	cd ${INET_ROOT} && $(MAKE) all
+	cd ${INET_ROOT} && $(MAKE) all #how to get INET project path from the IDE?
 	cd src && $(MAKE) all
 
 clean: checkmakefiles
@@ -20,7 +20,7 @@ cleanall: checkmakefiles
 cleantmp:
 	cd src && rm -f .tmp* sta*	
 
-MAKEMAKE_OPTIONS := -f --deep -O out -KINET_PROJ=$(abspath $(INET_ROOT)) -DINET_IMPORT -I. --no-deep-includes -I. -I$$\(INET_PROJ\)/src -L$$\(INET_PROJ\)/src -lINET$$\(D\)
+MAKEMAKE_OPTIONS := -f --deep -o ANSA -O out -pANSA -KINET_PROJ=$(abspath $(INET_ROOT)) -DINET_IMPORT -I. --no-deep-includes -I. -I$$\(INET_PROJ\)/src -L$$\(INET_PROJ\)/src -lINET$$\(D\)
 
 makefiles: src/ansa/features.h makefiles-so
 

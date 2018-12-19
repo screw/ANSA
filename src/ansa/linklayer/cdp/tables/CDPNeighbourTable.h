@@ -22,8 +22,10 @@
 #ifndef CDPTABLEENTRY_H_
 #define CDPTABLEENTRY_H_
 
-#include "ansa/linklayer/cdp/CDPTimer_m.h"
+#include "ansa/common/ANSADefs.h"
 #include "inet/networklayer/common/InterfaceEntry.h"
+#include "ansa/linklayer/cdp/CDPTimer_m.h"
+
 
 namespace inet {
 
@@ -32,7 +34,7 @@ namespace inet {
  * Device are identified by the name and port which they
  * are connected
  */
-class INET_API CDPNeighbour : public cObject {
+class ANSA_API CDPNeighbour : public cObject {
     friend class CDPNeighbourTable;
 
 private:
@@ -100,7 +102,7 @@ public:
  * Devices are identified by the name and port which they
  * are connected
  */
-class INET_API CDPNeighbourTable : public cSimpleModule
+class ANSA_API CDPNeighbourTable : public cSimpleModule
 {
   protected:
     std::vector<CDPNeighbour *> neighbours;

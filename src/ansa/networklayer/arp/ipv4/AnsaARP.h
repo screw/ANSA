@@ -20,7 +20,7 @@
 
 #include <map>
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "inet/networklayer/arp/ipv4/Arp.h"
 
@@ -29,7 +29,7 @@ namespace inet {
 /**
  * Arp implementation.
  */
-class INET_API AnsaARP : public Arp
+class ANSA_API AnsaARP : public Arp
 {
   public:
     static simsignal_t recvReqSignal;

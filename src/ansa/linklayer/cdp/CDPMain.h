@@ -23,12 +23,12 @@
 #ifndef CDP_H_
 #define CDP_H_
 
-#include <omnetpp.h>
-
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/packet/Packet.h"
+//TODO Remove after direct call fix (KLUDGE from INET)
+#include "inet/linklayer/ieee8021d/relay/Ieee8021dRelay.h"
 
 #include "ansa/linklayer/cdp/CDPUpdate.h"
 #include "ansa/linklayer/cdp/CDPTimer_m.h"
@@ -37,8 +37,7 @@
 #include "ansa/linklayer/cdp/tables/CDPODRRouteTable.h"
 
 
-//TODO Remove after direct call fix (KLUDGE from INET)
-#include "inet/linklayer/ieee8021d/relay/Ieee8021dRelay.h"
+
 
 namespace inet {
 
@@ -54,7 +53,7 @@ struct Statistics
     std::string info() const;
 };
 
-class INET_API CDPMain: public cSimpleModule, public ILifecycle, public cListener {
+class ANSA_API CDPMain: public cSimpleModule, public ILifecycle, public cListener {
 public:
     CDPMain();
     virtual ~CDPMain();

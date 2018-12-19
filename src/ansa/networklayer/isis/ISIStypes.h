@@ -26,6 +26,7 @@
 #ifndef ISISTYPES_H_
 #define ISISTYPES_H_
 
+#include "ansa/common/ANSADefs.h"
 #include "inet/linklayer/common/MacAddress.h"
 #include "inet/networklayer/common/InterfaceEntry.h"
 #include "ansa/networklayer/isis/ISISTimer_m.h"

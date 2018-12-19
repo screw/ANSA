@@ -22,12 +22,12 @@
 #ifndef ANSAETHERMACFULLDUPLEX_H_
 #define ANSAETHERMACFULLDUPLEX_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "ansa/linklayer/ethernet/ANSA_EtherMACBaseVF.h"
 #include "inet/linklayer/ethernet/EtherMacBase.h"
 
 namespace inet{
-class INET_API ANSA_EtherMACFullDuplex : public ANSA_EtherMACBaseVF
+class ANSA_API ANSA_EtherMACFullDuplex : public ANSA_EtherMACBaseVF
 {
   public:
     ANSA_EtherMACFullDuplex() {};

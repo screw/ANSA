@@ -26,7 +26,7 @@
 #ifndef __INET_CLNSROUTE_H
 #define __INET_CLNSROUTE_H
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 #include "inet/networklayer/contract/clns/ClnsAddress.h"
 #include "inet/networklayer/contract/IRoute.h"
@@ -37,7 +37,7 @@ class InterfaceEntry;
 class CLNSRoutingTable;
 
 
-class INET_API CLNSRoute : public cObject, public IRoute
+class ANSA_API CLNSRoute : public cObject, public IRoute
 {
   public:
     /** Cisco like administrative distances */
@@ -174,7 +174,7 @@ class INET_API CLNSRoute : public cObject, public IRoute
 // *
 // * @see IIpv4RoutingTable, Ipv4RoutingTable
 // */
-//class INET_API Ipv4MulticastRoute : public cObject, public IMulticastRoute
+//class ANSA_API Ipv4MulticastRoute : public cObject, public IMulticastRoute
 //{
 //  private:
 //    IIpv4RoutingTable *rt;    ///< the routing table in which this route is inserted, or nullptr

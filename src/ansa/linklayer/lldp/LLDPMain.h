@@ -24,27 +24,26 @@
 #ifndef __LLDPMAIN_H_
 #define __LLDPMAIN_H_
 
-#include <omnetpp.h>
-
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/lifecycle/ILifecycle.h"
 #include "inet/common/packet/Packet.h"
+//TODO FIX REMOVE RelayUnit references
+// KLUDGE from INET
+#include "inet/linklayer/ieee8021d/relay/Ieee8021dRelay.h"
 
 #include "ansa/linklayer/lldp/LLDPTimer_m.h"
 #include "ansa/linklayer/lldp/tables/LLDPAgentTable.h"
 #include "ansa/linklayer/lldp/tables/LLDPNeighbourTable.h"
 
-//TODO FIX REMOVE RelayUnit references
-// KLUDGE from INET
-#include "inet/linklayer/ieee8021d/relay/Ieee8021dRelay.h"
+
 
 //#define CREDIT            // uncomment to enable credit system
 
 namespace inet {
 
-class INET_API LLDPMain: public cSimpleModule, protected cListener, public ILifecycle
+class ANSA_API LLDPMain: public cSimpleModule, protected cListener, public ILifecycle
 {
   protected:
     std::string hostName;       // name of the module

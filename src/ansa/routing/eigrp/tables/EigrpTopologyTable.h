@@ -121,13 +121,13 @@ public:
     virtual ~EigrpIpv6TopologyTable() {};
 };
 /*
-class INET_API Eigrpv4TopolTableAccess : public ModuleAccess<EigrpIpv4TopologyTable>
+class ANSA_API Eigrpv4TopolTableAccess : public ModuleAccess<EigrpIpv4TopologyTable>
 {
     public:
     Eigrpv4TopolTableAccess() : ModuleAccess<EigrpIpv4TopologyTable>("eigrpIpv4TopologyTable") {}
 };
 
-class INET_API Eigrpv6TopolTableAccess : public ModuleAccess<EigrpIpv6TopologyTable>
+class ANSA_API Eigrpv6TopolTableAccess : public ModuleAccess<EigrpIpv6TopologyTable>
 {
     public:
     Eigrpv6TopolTableAccess() : ModuleAccess<EigrpIpv6TopologyTable>("eigrpIpv6TopologyTable") {}

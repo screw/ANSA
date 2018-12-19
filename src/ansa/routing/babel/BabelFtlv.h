@@ -31,7 +31,7 @@
 #include "ansa/routing/babel/BabelDef.h"
 //#include "BabelTopologyTable.h"
 namespace inet {
-class INET_API BabelFtlv {
+class ANSA_API BabelFtlv {
   protected:
     uint8_t type;
     int sendNum;
@@ -67,7 +67,7 @@ class INET_API BabelFtlv {
 
 };
 
-class INET_API BabelPad1Ftlv : public BabelFtlv {
+class ANSA_API BabelPad1Ftlv : public BabelFtlv {
   protected:
 
     void copy(const BabelPad1Ftlv& other);
@@ -114,7 +114,7 @@ class BabelPadNFtlv : public BabelFtlv {
 
 };
 
-class INET_API BabelAckReqFtlv : public BabelFtlv {
+class ANSA_API BabelAckReqFtlv : public BabelFtlv {
   protected:
     uint16_t reserved;
     uint16_t nonce;
@@ -156,7 +156,7 @@ class INET_API BabelAckReqFtlv : public BabelFtlv {
     void setInterval(uint16_t i) {interval = i;}
 };
 
-class INET_API BabelAckFtlv : public BabelFtlv {
+class ANSA_API BabelAckFtlv : public BabelFtlv {
   protected:
     uint16_t nonce;
 
@@ -186,7 +186,7 @@ class INET_API BabelAckFtlv : public BabelFtlv {
     void setNonce(uint16_t n) {nonce = n;}
 };
 
-class INET_API BabelHelloFtlv : public BabelFtlv {
+class ANSA_API BabelHelloFtlv : public BabelFtlv {
   protected:
     uint16_t reserved;
     uint16_t seqno;
@@ -228,7 +228,7 @@ class INET_API BabelHelloFtlv : public BabelFtlv {
     void setInterval(uint16_t i) {interval = i;}
 };
 
-class INET_API BabelIhuFtlv : public BabelFtlv {
+class ANSA_API BabelIhuFtlv : public BabelFtlv {
   protected:
     uint8_t ae;
     uint8_t reserved;
@@ -291,7 +291,7 @@ class INET_API BabelIhuFtlv : public BabelFtlv {
     void setAddress(const L3Address& a) {address = a;}
 };
 
-class INET_API BabelRouterIdFtlv : public BabelFtlv {
+class ANSA_API BabelRouterIdFtlv : public BabelFtlv {
   protected:
     uint16_t reserved;
     Babel::rid routerId;
@@ -326,7 +326,7 @@ class INET_API BabelRouterIdFtlv : public BabelFtlv {
     void setRouterId(const Babel::rid& r) {routerId = r;}
 };
 
-class INET_API BabelNextHopFtlv : public BabelFtlv {
+class ANSA_API BabelNextHopFtlv : public BabelFtlv {
   protected:
     uint8_t ae;
     uint8_t reserved;
@@ -376,7 +376,7 @@ class INET_API BabelNextHopFtlv : public BabelFtlv {
 };
 
 
-class INET_API BabelUpdateFtlv : public BabelFtlv {
+class ANSA_API BabelUpdateFtlv : public BabelFtlv {
   protected:
     uint8_t ae;
     uint8_t flags;
@@ -464,7 +464,7 @@ class INET_API BabelUpdateFtlv : public BabelFtlv {
 
 };
 
-class INET_API BabelRouteReqFtlv : public BabelFtlv {
+class ANSA_API BabelRouteReqFtlv : public BabelFtlv {
   protected:
     uint8_t ae;
     Babel::netPrefix<L3Address> prefix;
@@ -506,7 +506,7 @@ class INET_API BabelRouteReqFtlv : public BabelFtlv {
     void setPrefix(const Babel::netPrefix<L3Address>& p) {prefix = p;}
 };
 
-class INET_API BabelSeqnoReqFtlv : public BabelFtlv {
+class ANSA_API BabelSeqnoReqFtlv : public BabelFtlv {
   protected:
     uint8_t ae;
     uint16_t seqno;

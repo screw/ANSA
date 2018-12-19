@@ -14,7 +14,7 @@
 
 namespace inet {
 
-class INET_API VLANTableXMLparser {
+class ANSA_API VLANTableXMLparser {
 
 public:
 	VLANTableXMLparser(VLANTable *);

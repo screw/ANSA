@@ -12,7 +12,7 @@
 #ifndef __VLANTABLE_H__
 #define __VLANTABLE_H__
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 //#include "inet/networklayer/contract/ipv4/Ipv4Address.h"
 //#include "IPvXAddressResolver.h"
@@ -37,7 +37,7 @@
 
 namespace inet {
 
-class INET_API VLANTable : public cSimpleModule
+class ANSA_API VLANTable : public cSimpleModule
 {
 public:
 

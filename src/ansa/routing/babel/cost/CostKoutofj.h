@@ -26,7 +26,7 @@
 #ifndef __ANSA_COSTKOUTOFJ_H_
 #define __ANSA_COSTKOUTOFJ_H_
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 #include "ansa/routing/babel/cost/IBabelCostComputation.h"
 namespace inet {
 class CostKoutofj : public cSimpleModule, public IBabelCostComputation

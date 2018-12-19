@@ -24,11 +24,11 @@
 #ifndef __INET_ANSAMULTINETWORKLAYERUPPERMULTIPLEXER_H
 #define __INET_ANSAMULTINETWORKLAYERUPPERMULTIPLEXER_H
 
-#include "inet/common/INETDefs.h"
+#include "ansa/common/ANSADefs.h"
 
 namespace inet {
 
-class INET_API ANSA_MultiNetworkLayerUpperMultiplexer : public cSimpleModule
+class ANSA_API ANSA_MultiNetworkLayerUpperMultiplexer : public cSimpleModule
 {
   public:
     ANSA_MultiNetworkLayerUpperMultiplexer() {}

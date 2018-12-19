@@ -38,13 +38,13 @@ namespace inet {
 //#endif
 
 // dll export symbol
-#ifndef INET_API
+#ifndef ANSA_API
 #  if defined(INET_EXPORT)
-#    define INET_API  OPP_DLLEXPORT
+#    define ANSA_API  OPP_DLLEXPORT
 #  elif defined(INET_IMPORT)
-#    define INET_API  OPP_DLLIMPORT
+#    define ANSA_API  OPP_DLLIMPORT
 #  else
-#    define INET_API
+#    define ANSA_API
 #  endif
 #endif
 
@@ -70,7 +70,7 @@ namespace inet {
  * </pre>
  */
 
-class INET_API TRILLFrame : public TRILLFrame_Base
+class ANSA_API TRILLFrame : public TRILLFrame_Base
 {
   protected:
 //    uint16_t Ethertype_var;

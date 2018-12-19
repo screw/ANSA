@@ -334,7 +334,7 @@ class EigrpIpv4Pdm : public cSimpleModule, public IEigrpModule<Ipv4Address>, pub
  * @brief Class gives access to the PimNeighborTable.
  */
 /*
-class INET_API EigrpIpv4PdmAccess : public ModuleAccess<EigrpIpv4Pdm>
+class ANSA_API EigrpIpv4PdmAccess : public ModuleAccess<EigrpIpv4Pdm>
 {
   public:
     EigrpIpv4PdmAccess() : ModuleAccess<EigrpIpv4Pdm>("EigrpIpv4Pdm") {}

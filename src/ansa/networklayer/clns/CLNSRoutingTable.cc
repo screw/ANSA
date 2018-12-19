@@ -13,6 +13,8 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
+#include "ansa/common/ANSADefs.h"
+#include <algorithm>
 
 #include "inet/common/INETUtils.h"
 
