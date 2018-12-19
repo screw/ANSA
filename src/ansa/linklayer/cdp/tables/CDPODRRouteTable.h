@@ -23,9 +23,11 @@
 #define CDPODRROUTETABLE_H_
 
 #include "ansa/common/ANSADefs.h"
-#include "ansa/linklayer/cdp/CDPTimer_m.h"
 #include "inet/networklayer/contract/IRoute.h"
 #include "inet/networklayer/ipv4/Ipv4RoutingTable.h"
+
+#include "ansa/linklayer/cdp/CDPTimer_m.h"
+
 
 
 namespace inet {

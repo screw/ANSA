@@ -29,14 +29,15 @@
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/lifecycle/ILifecycle.h"
 #include "inet/common/packet/Packet.h"
+//TODO FIX REMOVE RelayUnit references
+// KLUDGE from INET
+#include "inet/linklayer/ieee8021d/relay/Ieee8021dRelay.h"
 
 #include "ansa/linklayer/lldp/LLDPTimer_m.h"
 #include "ansa/linklayer/lldp/tables/LLDPAgentTable.h"
 #include "ansa/linklayer/lldp/tables/LLDPNeighbourTable.h"
 
-//TODO FIX REMOVE RelayUnit references
-// KLUDGE from INET
-#include "inet/linklayer/ieee8021d/relay/Ieee8021dRelay.h"
+
 
 //#define CREDIT            // uncomment to enable credit system
 

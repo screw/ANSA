@@ -20,6 +20,7 @@
 // @copyright Brno University of Technology (www.fit.vutbr.cz) under GPLv3
 //
 
+import ansa.common.ANSADefs;
 import inet.common.TlvOptions;
 import inet.common.packet.chunk.Chunk;
 

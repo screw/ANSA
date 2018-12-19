@@ -27,10 +27,11 @@
 #include "inet/common/lifecycle/NodeStatus.h"
 #include "inet/common/IProtocolRegistrationListener.h"
 #include "inet/linklayer/common/InterfaceTag_m.h"
+#include "inet/common/IProtocolRegistrationListener.h"
 
 #include "ansa/linklayer/lldp/LLDPDeviceConfigurator.h"
 
-#include "inet/common/IProtocolRegistrationListener.h"
+
 
 
 

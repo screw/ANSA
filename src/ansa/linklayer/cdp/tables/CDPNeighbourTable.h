@@ -23,8 +23,9 @@
 #define CDPTABLEENTRY_H_
 
 #include "ansa/common/ANSADefs.h"
-#include "ansa/linklayer/cdp/CDPTimer_m.h"
 #include "inet/networklayer/common/InterfaceEntry.h"
+#include "ansa/linklayer/cdp/CDPTimer_m.h"
+
 
 namespace inet {
 

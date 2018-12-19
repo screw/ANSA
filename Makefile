@@ -5,7 +5,7 @@ INET_ROOT := ../inet/
 endif
 
 all: checkmakefiles src/ansa/features.h
-	cd ${INET_ROOT} && $(MAKE) all
+#	cd ${INET_ROOT} && $(MAKE) all #how to get INET project path from the IDE?
 	cd src && $(MAKE) all
 
 clean: checkmakefiles

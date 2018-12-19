@@ -27,6 +27,8 @@
 #include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/packet/Packet.h"
+//TODO Remove after direct call fix (KLUDGE from INET)
+#include "inet/linklayer/ieee8021d/relay/Ieee8021dRelay.h"
 
 #include "ansa/linklayer/cdp/CDPUpdate.h"
 #include "ansa/linklayer/cdp/CDPTimer_m.h"
@@ -35,8 +37,7 @@
 #include "ansa/linklayer/cdp/tables/CDPODRRouteTable.h"
 
 
-//TODO Remove after direct call fix (KLUDGE from INET)
-#include "inet/linklayer/ieee8021d/relay/Ieee8021dRelay.h"
+
 
 namespace inet {
 

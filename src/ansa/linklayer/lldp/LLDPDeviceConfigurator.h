@@ -22,8 +22,9 @@
 #define LLDPDEVICECONFIGURATOR_H_
 
 
-#include <algorithm>
 #include "ansa/common/ANSADefs.h"
+#include <algorithm>
+
 
 #include "ansa/linklayer/lldp/LLDPMain.h"
 //#include "ansa/linklayer/lldp/tables/LLDPAgentTable.h"
