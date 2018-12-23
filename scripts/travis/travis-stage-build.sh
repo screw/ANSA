@@ -27,6 +27,8 @@ cd $INET_BASE-$TARGET_PLATFORM-$MODE
 
 cp -r /root/nsc-0.5.3 3rdparty
 
+# prepending src/makefrag (see below) is disabled because it is a reused script from INET build stage and therefore already applied
+
 # enabling some features only with native compilation, because we don't [want to?] have cross-compiled ffmpeg and NSC
 if [ "$TARGET_PLATFORM" = "linux" ]; then
     opp_featuretool enable VoIPStream VoIPStream_examples TCP_NSC TCP_lwIP
@@ -62,7 +64,9 @@ make makefiles
 make MODE=$MODE USE_PRECOMPILED_HEADER=$PCH -j $(nproc)
 
 
-#finally build ANSA
+# finally build ANSA
+# how about generate the same makefrag as INET?
+
 cd /$TRAVIS_REPO_SLUG
 make makefiles
 make MODE=$MODE USE_PRECOMPILED_HEADER=$PCH -j $(nproc)
