@@ -64,7 +64,7 @@ enum AS
 /**
  * Class holding information about a management address TLV.
  */
-class LLDPManAdd: public LLDPOptionManAdd
+class ANSA_API LLDPManAdd: public LLDPOptionManAdd
 {
         bool updated;
 
@@ -76,7 +76,7 @@ class LLDPManAdd: public LLDPOptionManAdd
 /**
  * Class holding information about a management address TLVs.
  */
-class LLDPManAddTab
+class ANSA_API LLDPManAddTab
 {
     protected:
         std::vector<LLDPManAdd *> manAddresses;
