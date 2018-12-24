@@ -11,9 +11,9 @@ services:
   - docker
 
 before_install:
-  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-linux-release
+  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-${TARGET_PLATFORM}-${MODE}
 #  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-linux-debug
-  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-windows-release
+#  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-windows-release
 #  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-windows-debug
 #  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-macosx-release
 #  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-macosx-debug
@@ -44,11 +44,11 @@ jobs:
 
     - stage: build
       env: TARGET_PLATFORM=linux MODE=release
-#    - env: TARGET_PLATFORM=linux MODE=debug
-#    - env: TARGET_PLATFORM=windows MODE=release
+    - env: TARGET_PLATFORM=linux MODE=debug
+    - env: TARGET_PLATFORM=windows MODE=release
     - env: TARGET_PLATFORM=windows MODE=debug
-#    - env: TARGET_PLATFORM=macosx MODE=release
-#    - env: TARGET_PLATFORM=macosx MODE=debug
+    - env: TARGET_PLATFORM=macosx MODE=release
+    - env: TARGET_PLATFORM=macosx MODE=debug
 
     # The following atrocity was necessitated by the timeout limits on Travis,
     # the fact that our debug builds are slow as heck, and the fingerprint test
