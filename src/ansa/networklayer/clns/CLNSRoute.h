@@ -106,6 +106,7 @@ class ANSA_API CLNSRoute : public cObject, public IRoute
     virtual void setGateway(ClnsAddress _gateway) { if (gateway != _gateway) { gateway = _gateway; changed(F_NEXTHOP); } }
     virtual void setInterface(InterfaceEntry *_interfacePtr) override { if (interfacePtr != _interfacePtr) { interfacePtr = _interfacePtr; changed(F_IFACE); } }
     virtual void setSourceType(SourceType _source) override { if (sourceType != _source) { sourceType = _source; changed(F_SOURCE); } }
+    //FIX Not necessary?
 #ifdef ANSAINET
     const char* getSourceTypeAbbreviation() const;
 #endif

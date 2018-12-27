@@ -21,7 +21,7 @@
  */
 
 #include "ansa/networklayer/clns/CLNS.h"
-#include "ansa/networklayer/clns/CLNSRoutingTable.h"
+
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/common/ModuleAccess.h"
 //#include "ansa/networklayer/isis/ISISMessage_m.h"
@@ -29,6 +29,7 @@
 #include "inet/linklayer/common/InterfaceTag_m.h"
 //#include "inet/networklayer/contract/clns/ClnsControlInfo.h"
 
+#include "ansa/networklayer/clns/CLNSRoutingTable.h"
 namespace inet {
 
 Define_Module(CLNS);
@@ -200,6 +201,7 @@ ClnsAddress CLNS::getKAddress(unsigned int k) const {
     {
         return localAddresses[k];
     }
+    return ClnsAddress::UNSPECIFIED_ADDRESS;
 }
 
 } //namespace

@@ -90,7 +90,7 @@ class ANSA_API CLNS : public QueueBase, public INetworkProtocol, public IProtoco
   protected:
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
     virtual void initialize(int stage) override;
-    virtual void handleMessage(cMessage *msg);
+    virtual void handleMessage(cMessage *msg) override;
     virtual void updateDisplayString();
 
     virtual void endService(cPacket *packet) override;

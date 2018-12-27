@@ -16,6 +16,9 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
+import ansa.common.ANSADefs;
+
+
 cplusplus {{
   #include "ansa/networklayer/isis/ISISCommon.h"
 }}

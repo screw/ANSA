@@ -16,7 +16,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 //namespace inet;
-
+import ansa.common.ANSADefs;
 import inet.common.packet.chunk.Chunk;
 
 cplusplus {{

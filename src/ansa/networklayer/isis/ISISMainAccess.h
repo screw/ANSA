@@ -27,12 +27,13 @@
 #ifndef ISISACCESS_H_
 #define ISISACCESS_H_
 
+#include "ansa/common/ANSADefs.h"
 #include <ISISMain.h>
 #include "ModuleAccess.h"
 
 namespace inet {
 
-class ISISAccess : public ModuleAccess<ISISMain>
+class INET_API ISISAccess : public ModuleAccess<ISISMain>
 {
     public:
         ISISAccess() :

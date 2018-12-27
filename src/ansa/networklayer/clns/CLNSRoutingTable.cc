@@ -13,23 +13,27 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "ansa/common/ANSADefs.h"
+
 #include <algorithm>
 
-#include "inet/common/INETUtils.h"
-
-//#include "inet/common/PatternMatcher.h"
 #include "ansa/networklayer/clns/CLNSRoutingTable.h"
-#include "inet/networklayer/contract/IInterfaceTable.h"
-#include "ansa/networklayer/clns/CLNSInterfaceData.h"
-#include "ansa/networklayer/clns/CLNSRoute.h"
-#include "inet/common/Simsignals.h"
-//#include "inet/networklayer/ipv4/RoutingTableParser.h"
+
+#include "inet/common/INETUtils.h"
 #include "inet/common/lifecycle/NodeOperations.h"
 #include "inet/common/lifecycle/NodeStatus.h"
 #include "inet/common/INETUtils.h"
 #include "inet/common/ModuleAccess.h"
-#include <algorithm>
+#include "inet/networklayer/contract/IInterfaceTable.h"
+#include "inet/common/Simsignals.h"
+
+//#include "inet/common/PatternMatcher.h"
+#include "ansa/networklayer/clns/CLNSRoutingTable.h"
+
+#include "ansa/networklayer/clns/CLNSInterfaceData.h"
+#include "ansa/networklayer/clns/CLNSRoute.h"
+
+//#include "inet/networklayer/ipv4/RoutingTableParser.h"
+
 
 #ifdef ANSAINET
 #include "ansa/networklayer/common/ANSA_InterfaceEntry.h"
@@ -322,7 +326,7 @@ void CLNSRoutingTable::receiveSignal(cComponent *source, simsignal_t signalID, c
     }
     else if (signalID == interfaceDeletedSignal) {
         // remove all routes that point to that interface
-        const InterfaceEntry *entry = check_and_cast<const InterfaceEntry *>(obj);
+//        const InterfaceEntry *entry = check_and_cast<const InterfaceEntry *>(obj);
 //        deleteInterfaceRoutes(entry);
     }
     else if (signalID == interfaceStateChangedSignal) {

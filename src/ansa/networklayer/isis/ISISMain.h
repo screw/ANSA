@@ -37,12 +37,6 @@
 #include <iomanip>
 #include "ansa/common/ANSADefs.h"
 
-#include "ansa/networklayer/clns/CLNSRoutingTable.h"
-//#include "CLNSTableAccess.h"
-#include "ansa/networklayer/isis/ISISMessage_m.h"
-#include "ansa/networklayer/isis/IsisInterfaceData.h"
-
-
 #include "inet/linklayer/common/Ieee802Ctrl.h"
 #include "inet/linklayer/common/MacAddress.h"
 //#include "AnsaInterfaceTable.h"
@@ -56,6 +50,14 @@
 #include "inet/networklayer/contract/IRoutingTable.h"
 //#include "IPRoute.h"
 #include "inet/networklayer/ipv4/Ipv4Route.h"
+
+#include "ansa/networklayer/clns/CLNSRoutingTable.h"
+//#include "CLNSTableAccess.h"
+#include "ansa/networklayer/isis/ISISMessage_m.h"
+#include "ansa/networklayer/isis/IsisInterfaceData.h"
+
+
+
 #include "ansa/networklayer/isis/ISISTimer_m.h"
 //#include "xmlParser.h"
 #include "ansa/networklayer/isis/ISIStypes.h"
@@ -80,7 +82,7 @@ namespace inet {
 /**
  * Single class providing all functionality of whole module.
  */
-class ISISMain : public cSimpleModule
+class INET_API ISISMain : public cSimpleModule
 {
     //TODO ANSAINET4.0 Uncomment with TRILL
 //        friend class TRILL;

@@ -25,11 +25,9 @@
  *       TODO B3 Add SimTime isisStarted; and compute initial wait period (for LSP generating and SPF calculation} from such variable
  */
 
-#include "inet/common/packet/Packet.h"
-
-#include "ansa/networklayer/isis/ISISDeviceConfigurator.h"
 #include "ansa/networklayer/isis/ISISMain.h"
 
+#include "inet/common/packet/Packet.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/linklayer/common/MacAddressTag_m.h"
 #include "inet/linklayer/common/InterfaceTag_m.h"
@@ -37,6 +35,11 @@
 #include "inet/common/IProtocolRegistrationListener.h"
 #include "inet/linklayer/common/Ieee802SapTag_m.h"
 #include "inet/common/ProtocolTag_m.h"
+
+#include "ansa/networklayer/isis/ISISDeviceConfigurator.h"
+
+
+
 
 
 //#include "TRILL.h"

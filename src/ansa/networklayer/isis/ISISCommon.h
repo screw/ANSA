@@ -19,7 +19,7 @@ static const int ISIS_AREA_ID_LEN = 3;
 static const int ISIS_AREA_ADDRESS_TLV_LEN = ISIS_AREA_ID_LEN + 1;
 static const int ISIS_LSP_ID_TLV_LEN = ISIS_SYSTEM_ID + 2;
 
-class SystemID {
+class ANSA_API SystemID {
 
 protected:
     uint64 systemID;
@@ -83,7 +83,7 @@ inline std::ostream& operator<<(std::ostream& os, const SystemID& sysID)
     return os << sysID.str();
 }
 
-class AreaId {
+class ANSA_API AreaId {
 
 
 private:
@@ -173,7 +173,7 @@ inline std::ostream& operator<<(std::ostream& os, const AreaId& areaID)
     return os << areaID.str();
 }
 
-class PseudonodeID : public SystemID
+class ANSA_API PseudonodeID : public SystemID
 {
 protected:
 //    uint64 pseudoID;
@@ -297,7 +297,7 @@ inline std::ostream& operator<<(std::ostream& os, const PseudonodeID& pseudoID)
     return os << pseudoID.str();
 }
 
-class LspID : public PseudonodeID
+class ANSA_API LspID : public PseudonodeID
 {
 protected:
 

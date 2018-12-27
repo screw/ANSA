@@ -24,10 +24,11 @@
 
 
 #include "ansa/networklayer/clns/CLNSRoute.h"
-#include "ansa/networklayer/clns/CLNSRoutingTable.h"
-#include "inet/networklayer/contract/IRoutingTable.h"
 
 #include "inet/networklayer/common/InterfaceEntry.h"
+#include "inet/networklayer/contract/IRoutingTable.h"
+
+#include "ansa/networklayer/clns/CLNSRoutingTable.h"
 
 namespace inet {
 

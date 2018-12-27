@@ -24,18 +24,17 @@
 #ifndef ANSA_NETWORKLAYER_ISIS_ISISDEVICECONFIGURATOR_H_
 #define ANSA_NETWORKLAYER_ISIS_ISISDEVICECONFIGURATOR_H_
 
+#include "ansa/common/ANSADefs.h"
+
+#include "inet/networklayer/common/InterfaceEntry.h"
 
 #include "ansa/networklayer/isis/ISISMain.h"
-#include <omnetpp.h>
-
-#include "ansa/common/ANSADefs.h"
-#include "inet/networklayer/common/InterfaceEntry.h"
 #include "ansa/networklayer/isis/ISIStypes.h"
 
 namespace inet {
 class ISISMain;
 
-class ISISDeviceConfigurator {
+class ANSA_API ISISDeviceConfigurator {
 private:
 
 

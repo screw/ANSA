@@ -26,14 +26,15 @@
 #ifndef ISISINTERFACEDATA_H_
 #define ISISINTERFACEDATA_H_
 
+#include "ansa/common/ANSADefs.h"
+#include "inet/common/packet/Packet.h"
 #include "inet/networklayer/common/InterfaceEntry.h"
 #include "ansa/networklayer/isis/ISISMessage_m.h"
 #include "ansa/networklayer/isis/ISIStypes.h"
-#include "inet/common/packet/Packet.h"
 
 namespace inet {
 
-class IsisInterfaceData : public InterfaceProtocolData
+class ANSA_API IsisInterfaceData : public InterfaceProtocolData
 {
 
 

@@ -16,10 +16,10 @@
 
 /**
  * @file ISIStypes.h
- * @author Matej Hrncirik, Marcel Marek (mailto:xscrew02@gmail.com), Vladimir Vesely (mailto:ivesely@fit.vutbr.cz)
+ * @author Marcel Marek (mailto:xmarek02@gmail.com), Vladimir Vesely (mailto:ivesely@fit.vutbr.cz)
  * @date 7.3.2012
  * @brief Contains various types used in IS-IS module.
- * @detail Contains various types used in IS-IS module. Namely structure fo adjacency, LSP record and path with metric to its neighbors.
+ * @detail Contains various types used in IS-IS module. Namely structure for adjacency, LSP record and path with metric to its neighbors.
  * @todo
  */
 
