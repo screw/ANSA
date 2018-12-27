@@ -139,7 +139,7 @@ enum TLVtypes
 	AUTH_INFO_RFC = 133;  		//IS-IS packet authentication (similar to Type 10, but doesn't define authentication Type 255)  
 	// -------------------------------------------------------
 	
-	//RFC 6165 *********************************************
+	//RFC 6165 
 	TLV_MT_PORT_CAP = 143; //Multi-topology-aware port capability
 	//and it's subTLVs
 	//RFC 6326 2.2.1 The Special VLANs and Flags Sub-TLV
@@ -147,7 +147,7 @@ enum TLVtypes
 	TLV_MT_PORT_CAP_APP_FWD = 3;
 	
 	
-	//*****************************************************
+	//
 	
 	
 	//RFC 6326 2.5. TRILL Neighbor TLV

@@ -1719,6 +1719,7 @@ void ISISMain::schedule(ISISTimer *timer, double timee) {
         } else if (timer->getIsType() == L2_TYPE) {
             timeAt = (double) this->L2LspSendInterval;
         } else {
+            throw omnetpp::cRuntimeError("ISIS: Warning: Unsupported IS-Type in schedule for CSNP_TIMER");
             EV
                       << "ISIS: Warning: Unsupported IS-Type in schedule for PERIODIC_SEND_TIMER"
                       << endl;
@@ -1765,6 +1766,7 @@ void ISISMain::schedule(ISISTimer *timer, double timee) {
             timeAt =
                     getIfaceById(timer->getInterfaceId())->L2CsnpInterval;
         } else {
+            throw omnetpp::cRuntimeError("ISIS: Warning: Unsupported IS-Type in schedule for CSNP_TIMER");
             EV
                       << "ISIS: Warning: Unsupported IS-Type in schedule for CSNP_TIMER"
                       << endl;
@@ -1783,6 +1785,7 @@ void ISISMain::schedule(ISISTimer *timer, double timee) {
             timeAt =
                     getIfaceById(timer->getInterfaceId())->L2PsnpInterval;
         } else {
+            throw omnetpp::cRuntimeError("ISIS: Warning: Unsupported IS-Type in schedule for PSNP_TIMER");
             EV
                       << "ISIS: Warning: Unsupported IS-Type in schedule for PSNP_TIMER"
                       << endl;
@@ -1825,6 +1828,7 @@ void ISISMain::schedule(ISISTimer *timer, double timee) {
                 timeAt = this->L2LspGenInterval;
             }
         } else {
+            throw omnetpp::cRuntimeError("ISIS: ERROR: Unsupported IS-Type in PERIODIC_SEND_TIMER timer");
             EV
                       << "ISIS: ERROR: Unsupported IS-Type in PERIODIC_SEND_TIMER timer"
                       << endl;
@@ -1841,6 +1845,7 @@ void ISISMain::schedule(ISISTimer *timer, double timee) {
         } else if (timer->getIsType() == L2_TYPE) {
             timeAt = this->L2SPFFullInterval;
         } else {
+            throw omnetpp::cRuntimeError("ISIS: Error Unsupported IS-Type in SPF_FULL timer");
             EV << "ISIS: Error Unsupported IS-Type in SPF_FULL timer" << endl;
         }
         randomTime = uniform(0, 0.25 * timeAt);
@@ -1849,6 +1854,7 @@ void ISISMain::schedule(ISISTimer *timer, double timee) {
         break;
     }
     default:
+        throw omnetpp::cRuntimeError("ISIS: ERROR: Unsupported timer type in schedule");
         EV << "ISIS: ERROR: Unsupported timer type in schedule" << endl;
         break;
     }
@@ -1960,7 +1966,7 @@ void ISISMain::handleL1HelloMsg(Packet* packet) {
     ISISinterface *tmpIntf = this->getIfaceById(interfaceId);
 //    Ptr<ISISLANHelloPacket> msg = static_cast<Ptr<ISISLANHelloPacket> >(inMsg);
 
-    short circuitType = L1_TYPE;
+//    short circuitType = L1_TYPE;
 
     //duplicate system ID check
     if (this->checkDuplicateSysID(msg.get())) {
@@ -2873,6 +2879,8 @@ ISISadj* ISISMain::getAdj(Packet* packet, Ptr<ISISMessage> inMsg, short circuitT
         } else if (circuitType == L2_TYPE) {
             adjTable = &(this->adjL2Table);
         }
+    }else {
+        throw omnetpp::cRuntimeError("ISIS: Unsupported message type in getAdj()");
     }
 
 
@@ -4523,7 +4531,6 @@ void ISISMain::handleCsnp(Packet* packet) {
 std::vector<LspID>* ISISMain::getLspRange(LspID startLspID, LspID endLspID,
         short circuitType) {
 
-    int res1, res2;
     LspID lspID;
     std::vector<LSPRecord *> *lspDb = this->getLSPDb(circuitType);
     std::vector<LspID> *lspRange = new std::vector<LspID>;
@@ -4532,8 +4539,7 @@ std::vector<LspID>* ISISMain::getLspRange(LspID startLspID, LspID endLspID,
     for (std::vector<LSPRecord *>::iterator it = lspDb->begin();
             it != lspDb->end(); ++it) {
         lspID = (*it)->LSP->getLspID();
-//        res1 = memcmp(startLspID, lspID, ISIS_SYSTEM_ID + 2);
-//        res2 = memcmp(lspID, endLspID, ISIS_SYSTEM_ID + 2);
+
         if (startLspID <= lspID && lspID <= endLspID) {
             lspRange->push_back(lspID);
         }
