@@ -20,25 +20,27 @@ export PATH="/root/omnetpp-5.4.1-$TARGET_PLATFORM/bin:/usr/lib/ccache:$PATH"
 #clone INET
 #git clone --recursive --single-branch --depth 1 -b "v4.0.0" https://github.com/inet-framework/inet.git
 # this is where the cloned INET repo is mounted into the container (as prescribed in /.travis.yml)
-echo $INET_BASE
-cd $INET_BASE-$TARGET_PLATFORM-$MODE
-
+#echo
+cd $INET_BASE
 . setenv -f
+cd /$TRAVIS_REPO_SLUG
 
-cp -r /root/nsc-0.5.3 3rdparty
+#. setenv -f
+
+#cp -r /root/nsc-0.5.3 3rdparty
 
 # prepending src/makefrag (see below) is disabled because it is a reused script from INET build stage and therefore already applied
 
 # enabling some features only with native compilation, because we don't [want to?] have cross-compiled ffmpeg and NSC
 if [ "$TARGET_PLATFORM" = "linux" ]; then
-    opp_featuretool enable VoIPStream VoIPStream_examples TCP_NSC TCP_lwIP
+#    opp_featuretool enable VoIPStream VoIPStream_examples TCP_NSC TCP_lwIP
 
     # In the fingerprints stage we have to force enable diagnostics coloring
     # to make ccache work well, see https://github.com/ccache/ccache/issues/222
     # We do it here as well to make the compiler arguments match.
     # Only when compiling to linux though, as for cross-compiling we use GCC,
     # and it has a different flag for this. And we only need this for linux anyway.
-    #echo -e "CFLAGS += -fcolor-diagnostics\n\n$(cat src/makefrag)" > src/makefrag
+    echo -e "CFLAGS += -fcolor-diagnostics\n\n$(cat src/makefrag)" > src/makefrag
 
     # On linux we can't use precompiled headers, because ccache can't work with them,
     # and we need ccache, but we are fine without precompiled headers (on linux that is).
@@ -57,17 +59,18 @@ fi
     # triggering the other kind of Travis timeout. The --stats option is just to check, and it
     # produces some output before the command terminates (before the .dll file is written to disk),
     # which also helps. We only need these with mingw, and they don't work with clang (for the macos builds).
-#    echo -e "LDFLAGS += -Wl,--stats -Wl,--no-keep-memory\n\n$(cat src/makefrag)" > src/makefrag
+    echo -e "LDFLAGS += -Wl,--stats -Wl,--no-keep-memory\n\n$(cat src/makefrag)" > src/makefrag
 #fi
 
-make makefiles
-make MODE=$MODE USE_PRECOMPILED_HEADER=$PCH -j $(nproc)
+#make makefiles
+#make MODE=$MODE USE_PRECOMPILED_HEADER=$PCH -j $(nproc)
 
 
 # finally build ANSA
 # how about generate the same makefrag as INET?
 
-cd /$TRAVIS_REPO_SLUG
+# add oppfeaturetool once we purge .featurestate from repo
+
 make makefiles
 make MODE=$MODE USE_PRECOMPILED_HEADER=$PCH -j $(nproc)
 
