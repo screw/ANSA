@@ -120,7 +120,7 @@ void RBMACTable::updateTRILLData(MacAddress &addr, int vlanId, TRILLNickname ing
     iter = this->eSTable.find(std::make_pair(addr, vlanId));
     if(iter == this->eSTable.end()){
         if(this->addressTableSize != 0 && this->eSTable.size() == (unsigned int) this->addressTableSize){
-            EV << "Making room in Addres Table by throwing out aged entries. \n";
+            EV << "Making room in Address Table by throwing out aged entries. \n";
             if(this->eSTable.size() == (unsigned int)addressTableSize){
                 removeOldest();
             }

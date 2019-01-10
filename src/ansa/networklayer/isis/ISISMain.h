@@ -63,8 +63,8 @@
 #include "ansa/networklayer/isis/ISIStypes.h"
 //#include <cmessage.h>
 //#include <crng.h>
-//TODO ANSAINET4.0 Uncomment with TRILL
-//#include "ansa/linklayer/rbridge/TRILL.h"
+
+#include "ansa/linklayer/rbridge/TRILL.h"
 
 
 
@@ -84,8 +84,7 @@ namespace inet {
  */
 class INET_API ISISMain : public cSimpleModule
 {
-    //TODO ANSAINET4.0 Uncomment with TRILL
-//        friend class TRILL;
+        friend class TRILL;
     public:
         enum ISIS_MODE
         {
@@ -99,8 +98,8 @@ class INET_API ISISMain : public cSimpleModule
         CLNSRoutingTable *clnsrt;
 //        NotificationBoard *nb; /*!< Provides access to the notification board */
 
-        //TODO ANSAINET4.0 Uncomment with TRILL
-//        TRILL *trill; /*!< Pointer to TRILL module, NULL if mode is L3_ISIS_MODE */
+
+        TRILL *trill; /*!< Pointer to TRILL module, NULL if mode is L3_ISIS_MODE */
         ISIS_MODE mode;
 
         std::string deviceType; /*!< device type specified in .ned when using this module */
@@ -115,8 +114,7 @@ class INET_API ISISMain : public cSimpleModule
 //        unsigned char *areaId; /*!< first 3Bytes of netAddr as area ID */
 //        unsigned char *sysId; /*!< next 6Bytes of NetAddr as system ID */
 //        unsigned char *NSEL; /*!< last 1Byte of Netaddr as NSEL identifier */
-        //TODO ANSAINET4.0 Uncomment with TRILL
-//        TRILLNickname nickname; /*!<16b long RBridge's nickname (L2_ISIS_MODE only) */
+        TRILLNickname nickname; /*!<16b long RBridge's nickname (L2_ISIS_MODE only) */
         AdjTab_t adjL1Table; /*!< table of L1 adjacencies */
         AdjTab_t adjL2Table; /*!< table of L2 adjacencies */
         short isType; /*!< defines router IS-IS operational mode (L1,L2,L1L2) */
@@ -165,9 +163,8 @@ class INET_API ISISMain : public cSimpleModule
         ISISTimer *spfL2Timer; /*!< Reference to timer that initiate full spf for L2*/
         ISISTimer *periodicL1Timer;
         ISISTimer *periodicL2Timer;
-        //TODO ANSAINET4.0 Uncomment TRILL
 //        /* TRILL related */
-//        std::map<TRILLNickname, ISISPaths_t *> distribTrees;
+        std::map<TRILLNickname, ISISPaths_t *> distribTrees;
 
         /* Init */
         void initISIS(); // main init
@@ -236,6 +233,7 @@ class INET_API ISISMain : public cSimpleModule
         void schedulePeriodicSend(short circuitType);
         void sendCsnp(ISISTimer *timer);
         void sendPsnp(ISISTimer *timer);
+        void sendDown(Packet* packet);
         LspID getLSPID();
         //double getHoldtimeInterval(int interfaceIndex, short circuitType); //return hold time interval for specified interface and circuitType.
         LSPRecord *getLSPFromDbByID(LspID LSPID, short circuitType);
@@ -267,9 +265,8 @@ class INET_API ISISMain : public cSimpleModule
         void moveToTentDT(ISISCons_t *initial, ISISPath *path, PseudonodeID from, uint32_t metric,
                 ISISPaths_t *ISISTent);
         void bestToPathDT(ISISCons_t *init, ISISPaths_t *ISISTent, ISISPaths_t *ISISPaths);
-        //TODO ANSAINET4.0 Uncomment with TRILL
-//        std::vector<SystemID> *getSystemIDsFromTreeOnlySource(TRILLNickname nickname, SystemID systemId);
-//        std::vector<SystemID> *getSystemIDsFromTree(TRILLNickname nickname, SystemID systemId);
+        std::vector<SystemID> *getSystemIDsFromTreeOnlySource(TRILLNickname nickname, SystemID systemId);
+        std::vector<SystemID> *getSystemIDsFromTree(TRILLNickname nickname, SystemID systemId);
 
         /* Flags */
         FlagRecQ_t *findQueue(FlagRecQQ_t *queue, int interfaceId);
@@ -369,8 +366,8 @@ class INET_API ISISMain : public cSimpleModule
         void printAdjTable(); //print adjacency table
         void printLSPDB(); //print content of link-state database
 //        void setClnsTable(CLNSTable *clnsTable);
-        //TODO ANSAINET4.0 Uncomment with TRILL
-//        void setTrill(TRILL *trill);
+
+        void setTrill(TRILL *trill);
         void setIft(IInterfaceTable *ift);
 //        void setNb(NotificationBoard *nb);
         void subscribeNb(void);
@@ -417,8 +414,7 @@ class INET_API ISISMain : public cSimpleModule
         ISIS_MODE getMode() const;
         unsigned int getISISIftSize();
         void setAtt(bool att);
-        //TODO ANSAINET4.0 Uncomment with TRILL
-//        TRILLNickname getNickname() const;
+        TRILLNickname getNickname() const;
     AreaId getAreaId() const;
     void setAreaId(AreaId areaId);
     void setSystemId(const SystemID& systemId);

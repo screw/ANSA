@@ -355,7 +355,10 @@ void IsisInterfaceData::setHelloValid(bool helloValid)
 
 IsisInterfaceData::~IsisInterfaceData()
 {
-    // TODO Auto-generated destructor stub
+    std::vector<Packet*>::iterator it = hellos.begin();
+    for (; it != hellos.end(); ++it) {
+        delete (*it);
+    }
 }
 
 }//end namespace inet

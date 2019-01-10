@@ -26,7 +26,8 @@
 #define TRILLFRAME_H_
 
 
-#include <omnetpp.h>
+#include "ansa/common/ANSADefs.h"
+
 #include "TRILLFrame_m.h"
 
 namespace inet {

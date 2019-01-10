@@ -27,6 +27,11 @@
 #ifndef RBRIDGESPLITTER_H_
 #define RBRIDGESPLITTER_H_
 
+
+#include "ansa/common/ANSADefs.h"
+
+#include "inet/networklayer/contract/IInterfaceTable.h"
+
 //#include <csimplemodule.h>
 //#include <rbridge/TRILLAccess.h>
 //#include "ISISAccess.h"
@@ -35,7 +40,7 @@
 //#include "RBPortTable.h"
 //#include "AnsaEtherFrame_m.h"
 
-#include "inet/networklayer/contract/IInterfaceTable.h"
+
 //#include "InterfaceTableAccess.h"
 
 
@@ -43,7 +48,7 @@ namespace inet {
 
 
 
-class RBridgeSplitter : public cSimpleModule
+class ANSA_API RBridgeSplitter : public cSimpleModule
 {
 //    public:
 //        RBridgeSplitter();

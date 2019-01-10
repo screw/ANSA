@@ -29,7 +29,7 @@
 #include <rbridge/TRILL.h>
 #include "ModuleAccess.h"
 namespace inet {
-class TRILLAccess : public ModuleAccess<TRILL>
+class ANSA_API TRILLAccess : public ModuleAccess<TRILL>
 {
     public :
         TRILLAccess() :

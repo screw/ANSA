@@ -26,7 +26,7 @@
 #ifndef RBVLANTABLE_H_
 #define RBVLANTABLE_H_
 
-#include <omnetpp.h>
+#include "ansa/common/ANSADefs.h"
 
 #include "inet/networklayer/contract/ipv4/Ipv4Address.h"
 //#include "IPvXAddressResolver.h"

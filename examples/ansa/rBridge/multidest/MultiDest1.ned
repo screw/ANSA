@@ -19,7 +19,7 @@ import ansa.node.ANSA_RBridge;
 import ansa.node.ANSA_Host;
 import inet.node.ethernet.Eth100M;
 //import inet.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
-import inet.networklayer.configurator.ipv4.IPv4NetworkConfigurator;
+import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 
 //
 // TODO Auto-generated network

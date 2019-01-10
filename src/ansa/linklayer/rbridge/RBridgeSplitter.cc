@@ -48,30 +48,30 @@ void RBridgeSplitter::initialize(int stage){
 
 void RBridgeSplitter::handleMessage(cMessage *msg)
 {
-
-    cGate* gate = msg->getArrivalGate();
-    std::string gateName = gate->getBaseName();
-    int gateIndex = gate->getIndex();
-
-    // packet coming from network layer modules within the router
- if (gateName == "upperLayerIn" || gateName == "trillIn")
-    {
-        this->send(msg, "ifOut", gateIndex);
-    }
-    else
-    {
-        if (dynamic_cast<AnsaEtherFrame *>(msg))
-        {
-//            EthernetIIFrame * frame = (EthernetIIFrame *) msg;
-            AnsaEtherFrame * frame = (AnsaEtherFrame *) msg;
-            //if src unicast
-            //trillModule->learn(msg);
-
-            //check integrity, ...
-            this->send(msg, "trillOut", gateIndex);
-
-        }
-//TODO ANSAINET4.0 Uncomment and fix the code below
+//TODO ANSAINET4.0 This module won't be needed anymore, right?
+//    cGate* gate = msg->getArrivalGate();
+//    std::string gateName = gate->getBaseName();
+//    int gateIndex = gate->getIndex();
+//
+//    // packet coming from network layer modules within the router
+// if (gateName == "upperLayerIn" || gateName == "trillIn")
+//    {
+//        this->send(msg, "ifOut", gateIndex);
+//    }
+//    else
+//    {
+//        if (dynamic_cast<AnsaEtherFrame *>(msg))
+//        {
+////            EthernetIIFrame * frame = (EthernetIIFrame *) msg;
+//            AnsaEtherFrame * frame = (AnsaEtherFrame *) msg;
+//            //if src unicast
+//            //trillModule->learn(msg);
+//
+//            //check integrity, ...
+//            this->send(msg, "trillOut", gateIndex);
+//
+//        }
+////TODO ANSAINET4.0 Fix the code below
 //        else if (dynamic_cast<EthernetIIFrame *>(msg))
 //        {
 //            EthernetIIFrame * frame = (EthernetIIFrame *) msg;
@@ -88,17 +88,17 @@ void RBridgeSplitter::handleMessage(cMessage *msg)
 //
 //                return;
 //            }
-
-            else
-            {
-                this->send(msg, "trillOut", gateIndex);
-            }
-        }
-        else
-        {
-            EV<< "Warning: received unsupported frame type" << endl;
-        }
-    }
+//
+//            else
+//            {
+//                this->send(msg, "trillOut", gateIndex);
+//            }
+//        }
+//        else
+//        {
+//            EV<< "Warning: received unsupported frame type" << endl;
+//        }
+//    }
 
 }
 

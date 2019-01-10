@@ -27,11 +27,13 @@
 #define RBMACTABLE_H_
 
 
-#include "ansa/common/ANSADefs.h"
 #include <string>
 #include <vector>
 #include <map>
 #include <utility>
+
+#include "ansa/common/ANSADefs.h"
+
 
 
 //#include "inet/linklayer/ethernet/Ethernet.h"
@@ -89,24 +91,13 @@ public:
   /* compare structure for std::map */
   struct ESRecordCompare{
           bool operator()(const ESTKey& u1, const ESTKey& u2) const{
-              if (u1.second < u2.second)
+              if (u1.second == u2.second)
               {
-                  return true;
-              }
-              else if (u1.second == u2.second)
-              {
-                  if (u1.first.compareTo(u2.first) > 0)
-                  {
-                      return true;
-                  }
-                  else
-                  {
-                      return false;
-                  }
+                  return u1.first.compareTo(u2.first) > 0;
               }
               else
               {
-                  return false;
+                  return u1.second < u2.second;
               }
          }
      };
@@ -125,11 +116,11 @@ public:
       Stp = 1, // switching to Stp ports
   } tSpec;
 
-  /* enahanced MAC table record */
+  /* enhanced MAC table record */
   typedef struct s_record {
       MacAddress addr; // mac address
       simtime_t insert_time; // time of insertion of update for ageing process
-      tPortList portList; // list of destination ports (multiple ports for group adresses)
+      tPortList portList; // list of destination ports (multiple ports for group addresses)
       tType type; // record type = {static, dynamic, group}
       tSpec spec; // address specialities
   } tRecord;
@@ -140,6 +131,7 @@ public:
           {return u1.compareTo(u2) < 0;}
   };
 
+  //TODO ANSAINET4.0 Remove AddressTable -> unused (eStable is the new 'thang')
   /* table map type */
   typedef std::map<MacAddress, tRecord, MacCompare> AddressTable;
 

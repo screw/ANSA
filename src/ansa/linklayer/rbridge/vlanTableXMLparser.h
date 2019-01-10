@@ -8,8 +8,11 @@
 #ifndef VLANTABLEXMLPARSER_H_
 #define VLANTABLEXMLPARSER_H_
 
-#include <omnetpp.h>
+
 #include <string>
+
+#include "ansa/common/ANSADefs.h"
+
 #include "vlanTable.h"
 
 namespace inet {

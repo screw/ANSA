@@ -16,7 +16,7 @@
 //
 // TODO generated message class
 //
-
+import ansa.common.ANSADefs;
 import inet.common.packet.chunk.Chunk;
 cplusplus {{
     

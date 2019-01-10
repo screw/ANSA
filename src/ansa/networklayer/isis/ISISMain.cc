@@ -297,17 +297,21 @@ void ISISMain::initialize(int stage) {
 //        configFile = std::string((const char *) par("configFile"));
         if (deviceType == "Router") {
             this->mode = L3_ISIS_MODE;
+            //register service and protocol
+            registerService(Protocol::isis, nullptr, gate("lowerLayerIn"));
+            registerProtocol(Protocol::isis, gate("lowerLayerOut"), nullptr);
         } else if (deviceType == "RBridge") {
             this->mode = L2_ISIS_MODE;
+            //register service and protocol
+            registerService(Protocol::l2isis, nullptr, gate("lowerLayerIn"));
+            registerProtocol(Protocol::l2isis, gate("lowerLayerOut"), nullptr);
         } else {
             throw cRuntimeError("Unknown device type for IS-IS module");
         }
 
     }else if (stage == INITSTAGE_LINK_LAYER)
     {
-        //register sservice and protocol
-        registerService(Protocol::isis, nullptr, gate("lowerLayerIn"));
-        registerProtocol(Protocol::isis, gate("lowerLayerOut"), nullptr);
+
 
 //        registerService(Protocol::isis, nullptr, gate("trillIn"));
 //        registerProtocol(Protocol::isis, gate("trillOut"), nullptr);
@@ -322,8 +326,8 @@ void ISISMain::initialize(int stage) {
 
         devConf->prepareAddress(mode);
         systemId.setSystemId(devConf->getSystemId());
-        //TODO ANSAINET4.0 Uncomment with TRILL
-//        nickname.set(systemId.toInt());
+
+        nickname.set(systemId.toInt());
         areaID.setAreaId(devConf->getAreaId());
 
         devConf->loadISISConfig(this, this->mode);
@@ -1314,7 +1318,7 @@ void ISISMain::sendBroadcastHelloMsg(int interfaceId, short circuitType) {
         hello->setPriority(iface->priority);
 
         packet->insertAtFront(hello);
-        send(packet, "lowerLayerOut");
+        sendDown(packet);
 
 //        EV<< "'devideId :" << deviceId << " ISIS: L1 Hello packet was sent from " << iface->entry->getName() << "\n";
         EV << "ISIS::sendLANHello: Source-ID: " << systemId;
@@ -1406,7 +1410,7 @@ void ISISMain::sendPTPHelloMsg(int interfaceId, short circuitType) {
 //    this->send(ptpHello, "lowerLayerOut", iface->interfaceId);
 
     packet->insertAtFront(ptpHello);
-        this->send(packet, "lowerLayerOut");
+        this->sendDown(packet);
 
 }
 
@@ -1579,8 +1583,7 @@ void ISISMain::sendTRILLBroadcastHelloMsg(int interfaceId, short circuitType) {
 
         //set appropriate destination MAC addresses
         MacAddress ma;
-        //TODO ANSAINET4.0 Uncomment with TRILL;
-//        ma.setAddress(ALL_IS_IS_RBRIDGES);
+        ma.setAddress(ALL_IS_IS_RBRIDGES);
 
         auto macTag = packet->addTag<MacAddressReq>();
         macTag->setDestAddress(ma);
@@ -1588,7 +1591,7 @@ void ISISMain::sendTRILLBroadcastHelloMsg(int interfaceId, short circuitType) {
         auto interfaceTag = packet->addTag<InterfaceReq>();
         interfaceTag->setInterfaceId(ie->getInterfaceId());
 
-        this->send(packet, "lowerLayerOut");
+        this->sendDown(packet);
 
     }
 
@@ -1623,8 +1626,7 @@ void ISISMain::sendTRILLPTPHelloMsg(int interfaceId,
     /*
      * I assume that since there is only one level, destination is All ISIS Systems.
      */
-    //TODO ANSAINET4.0 Uncomment with TRILL
-//    ma.setAddress(ALL_IS_IS_RBRIDGES);
+
 
 
     //type
@@ -1668,7 +1670,7 @@ void ISISMain::sendTRILLPTPHelloMsg(int interfaceId,
 
 
     packet->insertAtFront(ptpHello);
-    this->send(packet, "lowerLayerOut");
+    this->sendDown(packet);
 
 }
 
@@ -2326,39 +2328,42 @@ void ISISMain::handleTRILLHelloMsg(Packet* packet) {
 //    tr = (subTLV[9] >> 7) & 0x01;
 
 
-      int interfaceId = packet->getTag<InterfaceInd>()->getInterfaceId();
+
+    int interfaceId = packet->getTag<InterfaceInd>()->getInterfaceId();
+    msg->addTag<InterfaceInd>()->setInterfaceId(interfaceId);
+
     ISISinterface *tmpIntf = this->getIfaceById(interfaceId);
     MacAddress tmpMAC = tmpIntf->entry->getMacAddress();
     unsigned char *tmpMACChars = new unsigned char[MAC_ADDRESS_SIZE];
     tmpMAC.getAddressBytes(tmpMACChars);
     //if sender is DIS
     if (msg->getSourceID() == tmpIntf->L1DIS) {
-        //TODO ANSAINET4.0 Uncomment with TRILL
-//        TrillInterfaceData *trillD = tmpIntf->entry->trillData();
-//        trillD->setDesigVlan(tmpDesigVlanId);
-//        if ((subTLV = this->getSubTLVByType(tmpTLV, TLV_MT_PORT_CAP_APP_FWD))
-//                != NULL) {
-//            //THIS SHOULD BE HANDLED IN electDIS. based on result act accordingly
-//            //handle Appointed Forwarders subTLV
-//            //TODO A2 appointed Fwd should be touples <nickname, vlanIdRange> or simply <nickname, vlanId>
-//
-//
-//            trillD->clearAppointedForwarder();
-//            for (int subLen = 0; subLen < subTLV[1];) {
-//                TRILLNickname appointeeNickname;
-//                appointeeNickname.set(subTLV[subLen + 2] + subTLV[subLen + 1 + 2] * 0xFF);
-//                int startVlan = subTLV[subLen + 2 + 2]
-//                        + (subTLV[subLen + 3 + 2] & 0x0F) * 0xFF;
-//                int endVlan = subTLV[subLen + 4 + 2]
-//                        + (subTLV[subLen + 5 + 2] & 0x0F) * 0xFF;
-//                subLen += 6;
-//
-//                for(int appVlan = startVlan; appVlan <= endVlan; appVlan++){
-//                  trillD->addAppointedForwarder(appVlan, appointeeNickname);
-//                }
-//            }
-//
-//        }
+
+        TrillInterfaceData *trillD = tmpIntf->entry->getProtocolData<TrillInterfaceData>();
+        trillD->setDesigVlan(tmpDesigVlanId);
+        if ((subTLV = this->getSubTLVByType(tmpTLV, TLV_MT_PORT_CAP_APP_FWD))
+                != NULL) {
+            //THIS SHOULD BE HANDLED IN electDIS. based on result act accordingly
+            //handle Appointed Forwarders subTLV
+            //TODO A2 appointed Fwd should be touples <nickname, vlanIdRange> or simply <nickname, vlanId>
+
+
+            trillD->clearAppointedForwarder();
+            for (int subLen = 0; subLen < subTLV[1];) {
+                TRILLNickname appointeeNickname;
+                appointeeNickname.set(subTLV[subLen + 2] + subTLV[subLen + 1 + 2] * 0xFF);
+                int startVlan = subTLV[subLen + 2 + 2]
+                        + (subTLV[subLen + 3 + 2] & 0x0F) * 0xFF;
+                int endVlan = subTLV[subLen + 4 + 2]
+                        + (subTLV[subLen + 5 + 2] & 0x0F) * 0xFF;
+                subLen += 6;
+
+                for(int appVlan = startVlan; appVlan <= endVlan; appVlan++){
+                  trillD->addAppointedForwarder(appVlan, appointeeNickname);
+                }
+            }
+
+        }
     }
 
     //check for presence of TLV Protocols Supported and if so it must list TRILL NLPID (0xC0)
@@ -3269,15 +3274,14 @@ void ISISMain::setIft(IInterfaceTable *ift) {
     this->ift = ift;
 }
 
-//TODO ANSAINET4.0 Uncomment with TRILL
-//void ISISMain::setTrill(TRILL *trill)
-//{
-//    if (trill == NULL)
-//    {
-//        throw cRuntimeError("Got NULL pointer instead of TRILL reference");
-//    }
-//    this->trill = trill;
-//}
+void ISISMain::setTrill(TRILL *trill)
+{
+    if (trill == NULL)
+    {
+        throw cRuntimeError("Got NULL pointer instead of TRILL reference");
+    }
+    this->trill = trill;
+}
 
 /**
  * Print content of L1 LSP database to EV.
@@ -3303,6 +3307,10 @@ void ISISMain::printLSPDB() {
 //    unsigned char *lspId;
     std::vector<LSPRecord *>::iterator it = lspDb->begin();
     for (; it != lspDb->end(); ++it) {
+
+        //Update the remaining lifetime
+        (*it)->LSP->setRemLifeTime(floor((*it)->simLifetime - simTime().dbl()));
+
         EV << "\t";
         //print LSP ID
         EV << (*it)->LSP->getLspID();
@@ -4068,7 +4076,7 @@ void ISISMain::sendCsnp(ISISTimer *timer) {
         //send only on interface specified in timer
 
         packet->insertAtFront(header);
-        send(packet, "lowerLayerOut");
+        sendDown(packet);
 
         EV << "ISIS::sendCSNP: Source-ID: " << systemId;
         EV << endl;
@@ -4222,7 +4230,7 @@ void ISISMain::sendPsnp(ISISTimer *timer) {
     }
 
     packet->insertAtFront(header);
-    send(packet, "lowerLayerOut");
+    sendDown(packet);
 
     EV << "ISIS::sendPSNP: Source-ID: " << systemId;
     EV << endl;
@@ -4824,7 +4832,7 @@ void ISISMain::sendLSP(LSPRecord *lspRec, ISISinterface* iface) {
     interfaceTag->setInterfaceId(iface->entry->getInterfaceId());
 //    lspRec->LSP->d
     packet->insertAtFront(lspRec->LSP->dupShared());
-    send(packet, "lowerLayerOut");
+    sendDown(packet);
 
     EV << "ISIS::sendLSP: Source-ID: " << systemId << endl;
 }
@@ -6764,8 +6772,7 @@ std::vector<TLV_t *> ISISMain::genTLV(enum TLVtypes tlvType, short circuitType,
 
 
         if (ie != NULL) {
-            //TODO ANSAINET4.0 Uncomment with TRILL
-//            d = ie->trillData();
+            d = ie->getProtocolData<TrillInterfaceData>();
         }
 
         myTLV = new TLV_t;
@@ -6799,30 +6806,29 @@ std::vector<TLV_t *> ISISMain::genTLV(enum TLVtypes tlvType, short circuitType,
         myTLV->value[myTLV->length + 1] = interfaceId >> 8;
 
         //TODO B1 Nickname
-        //TODO ANSAINET4.0 Uncomment with TRILL
-////        memcpy(&(myTLV->value[myTLV->length + 2]), &(this->sysId[ISIS_SYSTEM_ID - 3]), 2);
-//        myTLV->value[myTLV->length + 2] = this->nickname.getNickname() & 0xFF;
-//        myTLV->value[myTLV->length + 3] = (this->nickname.getNickname() >> 8) & 0xFF;
-//        //Outer.VLAN
-//        //TODO B1 what to do when the port is configured to strip VLAN tag
-//        //TODO B1 in some cases one hello is sent on EVERY VLAN (0 - 4096)
-//
-//        myTLV->value[myTLV->length + 4] = d->getVlanId() & 0xFF;
-//        myTLV->value[myTLV->length + 5] = (d->getVlanId() >> 8) & 0x0F;
-//        //AF
-//        myTLV->value[myTLV->length + 5] |= (d->isAppointedForwarder(d->getVlanId(), this->nickname) << 7);
-//        //AC
-//        myTLV->value[myTLV->length + 5] |= (d->isAccess() << 6);
-//        //VM VLAN Mapping TODO unable to detect so setting false
-//        myTLV->value[myTLV->length + 5] |= (d->isVlanMapping() << 5);
-//        //BY Bypass pseudonode
-//        myTLV->value[myTLV->length + 5] |= (d->isVlanMapping() << 4);
-//
-//        //Design.VLAN
-//        myTLV->value[myTLV->length + 6] = d->getDesigVlan() && 0xFF;
-//        myTLV->value[myTLV->length + 7] = (d->getDesigVlan() >> 8) && 0x0F;
-//        //TR flag
-//        myTLV->value[myTLV->length + 7] |= (d->isTrunk() << 7);
+//        memcpy(&(myTLV->value[myTLV->length + 2]), &(this->sysId[ISIS_SYSTEM_ID - 3]), 2);
+        myTLV->value[myTLV->length + 2] = this->nickname.getNickname() & 0xFF;
+        myTLV->value[myTLV->length + 3] = (this->nickname.getNickname() >> 8) & 0xFF;
+        //Outer.VLAN
+        //TODO B1 what to do when the port is configured to strip VLAN tag
+        //TODO B1 in some cases one hello is sent on EVERY VLAN (0 - 4096)
+
+        myTLV->value[myTLV->length + 4] = d->getVlanId() & 0xFF;
+        myTLV->value[myTLV->length + 5] = (d->getVlanId() >> 8) & 0x0F;
+        //AF
+        myTLV->value[myTLV->length + 5] |= (d->isAppointedForwarder(d->getVlanId(), this->nickname) << 7);
+        //AC
+        myTLV->value[myTLV->length + 5] |= (d->isAccess() << 6);
+        //VM VLAN Mapping TODO unable to detect so setting false
+        myTLV->value[myTLV->length + 5] |= (d->isVlanMapping() << 5);
+        //BY Bypass pseudonode
+        myTLV->value[myTLV->length + 5] |= (d->isVlanMapping() << 4);
+
+        //Design.VLAN
+        myTLV->value[myTLV->length + 6] = d->getDesigVlan() && 0xFF;
+        myTLV->value[myTLV->length + 7] = (d->getDesigVlan() >> 8) && 0x0F;
+        //TR flag
+        myTLV->value[myTLV->length + 7] |= (d->isTrunk() << 7);
 
         myTLV->length += 8;
 
@@ -6847,9 +6853,9 @@ std::vector<TLV_t *> ISISMain::genTLV(enum TLVtypes tlvType, short circuitType,
             myTLV->length += 2; //size of subTLV header (type, length)
             //Appointee Nickname
 
-            //TODO ANSAINET4.0 Uncomment with TRILL
-//            myTLV->value[myTLV->length + 0] = this->nickname.getNickname() & 0xFF; //Appointee Nickname
-//            myTLV->value[myTLV->length + 1] = (this->nickname.getNickname() >> 8) & 0xFF; //Appointee Nickname
+
+            myTLV->value[myTLV->length + 0] = this->nickname.getNickname() & 0xFF; //Appointee Nickname
+            myTLV->value[myTLV->length + 1] = (this->nickname.getNickname() >> 8) & 0xFF; //Appointee Nickname
             myTLV->value[myTLV->length + 2] = 1; //Start VLAN
             myTLV->value[myTLV->length + 3] = 0; //Start VLAN
             myTLV->value[myTLV->length + 4] = 1; //End VLAN
@@ -7062,8 +7068,7 @@ void ISISMain::addTLV(std::vector<TLV_t *> *tlvTable, enum TLVtypes tlvType, sho
   {
 
     //subTLV VLAN FLAGS
-      //TODO ANSAINET4.0 Uncomment with TRILL
-    myTLVVector;// = genTLV(TLV_MT_PORT_CAP, circuitType, ie->getNetworkLayerGateIndex(), TLV_MT_PORT_CAP_VLAN_FLAG, ie);
+    myTLVVector = genTLV(TLV_MT_PORT_CAP, circuitType, ie->getInterfaceId(), TLV_MT_PORT_CAP_VLAN_FLAG, ie);
     for (std::vector<TLV_t *>::iterator it = myTLVVector.begin(); it != myTLVVector.end();)
     {
       tlvTable->push_back((*it));
@@ -7074,8 +7079,7 @@ void ISISMain::addTLV(std::vector<TLV_t *> *tlvTable, enum TLVtypes tlvType, sho
   }
   else if (tlvType == TLV_TRILL_NEIGHBOR)
   {
-      //TODO ANSAINET4.0 Uncomment with TRILL
-    myTLVVector;// = genTLV(TLV_TRILL_NEIGHBOR, circuitType, ie->getNetworkLayerGateIndex());
+    myTLVVector = genTLV(TLV_TRILL_NEIGHBOR, circuitType, ie->getInterfaceId());
     for (std::vector<TLV_t *>::iterator it = myTLVVector.begin(); it != myTLVVector.end();)
     {
       tlvTable->push_back((*it));
@@ -7177,8 +7181,7 @@ void ISISMain::spfDistribTrees(short int circuitType) {
 
 //    std::map<int, ISISPaths_t *> distribTrees;
     //    std::vector<unsigned char *> idVector;
-    //TODO ANSAINET4.0 Uncomment with TRILL
-//    this->distribTrees.clear();
+    this->distribTrees.clear();
     std::map<SystemID, int> systemIdVector;  //vector of all ISs's systemId
 
     systemIdVector = this->getAllSystemIdsFromLspDb(circuitType);
@@ -7250,8 +7253,8 @@ void ISISMain::spfDistribTrees(short int circuitType) {
 
         //TODO B8 If it works, delete commented line
 //        this->distribTrees.insert(std::make_pair(lspId[ISIS_SYSTEM_ID - 1] + lspId[ISIS_SYSTEM_ID - 2] * 0xFF, ISISPaths));
-        //TODO ANSAINET4.0 Uncomment with TRILL
-//        this->distribTrees.insert(std::make_pair(TRILLNickname(lspId.getSystemId()), ISISPaths));
+
+        this->distribTrees.insert(std::make_pair(TRILLNickname(lspId.getSystemId()), ISISPaths));
 
 
     }
@@ -7487,33 +7490,33 @@ void ISISMain::moveToTentDT(ISISCons_t *initial, ISISPath *path, PseudonodeID fr
     }
 }
 
-//TODO ANSAINET4.0 Uncomment with TRILL
-//std::vector<SystemID> *ISISMain::getSystemIDsFromTreeOnlySource(TRILLNickname nickname, SystemID systemId) {
-//
-//    std::vector<SystemID> *systemIDs = this->getSystemIDsFromTree(nickname, systemId);
-//
-////    it = this->distribTrees.find(nickname);
-//
-//    for (std::vector<SystemID>::iterator it = systemIDs->begin();
-//            it != systemIDs->end();) {
-//        if ((*it) == systemId ) {
-//            it = systemIDs->erase(it);
-//        } else {
-//            ++it;
-//        }
-////            for(ISISNeighbours_t::iterator neighIt = (*pathIt)->from.begin(); neighIt != (*pathIt)->from.end(); ++neighIt){
-////                if (memcmp(systemId, (*neighIt)->id, ISIS_SYSTEM_ID) == 0)
-////                {
-////                    treePaths->push_back((*pathIt)->copy());
-////                    break;
-////                }
-////            }
-//
-//    }
-//
-//    return systemIDs;
-//
-//}
+
+std::vector<SystemID> *ISISMain::getSystemIDsFromTreeOnlySource(TRILLNickname nickname, SystemID systemId) {
+
+    std::vector<SystemID> *systemIDs = this->getSystemIDsFromTree(nickname, systemId);
+
+//    it = this->distribTrees.find(nickname);
+
+    for (std::vector<SystemID>::iterator it = systemIDs->begin();
+            it != systemIDs->end();) {
+        if ((*it) == systemId ) {
+            it = systemIDs->erase(it);
+        } else {
+            ++it;
+        }
+//            for(ISISNeighbours_t::iterator neighIt = (*pathIt)->from.begin(); neighIt != (*pathIt)->from.end(); ++neighIt){
+//                if (memcmp(systemId, (*neighIt)->id, ISIS_SYSTEM_ID) == 0)
+//                {
+//                    treePaths->push_back((*pathIt)->copy());
+//                    break;
+//                }
+//            }
+
+    }
+
+    return systemIDs;
+
+}
 
 /**
  * Returns system-ids of all neighbours for in distribution tree for specified nickname
@@ -7521,52 +7524,52 @@ void ISISMain::moveToTentDT(ISISCons_t *initial, ISISPath *path, PseudonodeID fr
  * @param system-id to look for in distribution tree
  * @return vector of system-ids
  */
-//TODO ANSAINET4.0 Uncomment with TRILL
-//std::vector<SystemID> *ISISMain::getSystemIDsFromTree(TRILLNickname nickname, SystemID systemId) {
-//
-//  std::vector<SystemID> *systemIDs = new std::vector<SystemID>;
-//
-//  std::map<TRILLNickname, ISISPaths_t *>::iterator it;
-//  if (this->distribTrees.find(nickname) == this->distribTrees.end()) {
-//    this->spfDistribTrees(L1_TYPE);
-//  }
-//
-//  it = this->distribTrees.find(nickname);
-//  if (it != this->distribTrees.end()) {
-//    for (ISISPaths_t::iterator pathIt = it->second->begin();  pathIt != it->second->end(); ++pathIt) {
-//      //if destination match -> push_back
-//      if ((*pathIt)->to.getSystemId() == systemId) {
-//        for (ISISNeighbours_t::iterator neighIt = (*pathIt)->from.begin(); neighIt != (*pathIt)->from.end(); ++neighIt) {
-//          //                    unsigned char *tmpSysId = new unsigned char[ISIS_SYSTEM_ID];
-//          //                    memcpy(tmpSysId, (*neighIt)->id, ISIS_SYSTEM_ID);
-//          SystemID tmpSysId;
-//          tmpSysId = (*neighIt)->id;
-//          systemIDs->push_back(tmpSysId);
-//
-//        }
-//
-//        continue;
-//      }
-//      //if at least one "from" match -> push_back (actually there should be only one "from")
-//      for (ISISNeighbours_t::iterator neighIt = (*pathIt)->from.begin();
-//          neighIt != (*pathIt)->from.end(); ++neighIt) {
-//        if (systemId == (*neighIt)->id) {
-//          //                    unsigned char *tmpSysId = new unsigned char[ISIS_SYSTEM_ID];
-//          //                    memcpy(tmpSysId, (*pathIt)->to, ISIS_SYSTEM_ID);
-//          SystemID tmpSysId;
-//          tmpSysId = (*pathIt)->to.getSystemId();
-//          systemIDs->push_back(tmpSysId);
-//
-//          break;
-//        }
-//      }
-//
-//    }
-//
-//  }
-//  return systemIDs;
-//
-//}
+
+std::vector<SystemID> *ISISMain::getSystemIDsFromTree(TRILLNickname nickname, SystemID systemId) {
+
+  std::vector<SystemID> *systemIDs = new std::vector<SystemID>;
+
+  std::map<TRILLNickname, ISISPaths_t *>::iterator it;
+  if (this->distribTrees.find(nickname) == this->distribTrees.end()) {
+    this->spfDistribTrees(L1_TYPE);
+  }
+
+  it = this->distribTrees.find(nickname);
+  if (it != this->distribTrees.end()) {
+    for (ISISPaths_t::iterator pathIt = it->second->begin();  pathIt != it->second->end(); ++pathIt) {
+      //if destination match -> push_back
+      if ((*pathIt)->to.getSystemId() == systemId) {
+        for (ISISNeighbours_t::iterator neighIt = (*pathIt)->from.begin(); neighIt != (*pathIt)->from.end(); ++neighIt) {
+          //                    unsigned char *tmpSysId = new unsigned char[ISIS_SYSTEM_ID];
+          //                    memcpy(tmpSysId, (*neighIt)->id, ISIS_SYSTEM_ID);
+          SystemID tmpSysId;
+          tmpSysId = (*neighIt)->id;
+          systemIDs->push_back(tmpSysId);
+
+        }
+
+        continue;
+      }
+      //if at least one "from" match -> push_back (actually there should be only one "from")
+      for (ISISNeighbours_t::iterator neighIt = (*pathIt)->from.begin();
+          neighIt != (*pathIt)->from.end(); ++neighIt) {
+        if (systemId == (*neighIt)->id) {
+          //                    unsigned char *tmpSysId = new unsigned char[ISIS_SYSTEM_ID];
+          //                    memcpy(tmpSysId, (*pathIt)->to, ISIS_SYSTEM_ID);
+          SystemID tmpSysId;
+          tmpSysId = (*pathIt)->to.getSystemId();
+          systemIDs->push_back(tmpSysId);
+
+          break;
+        }
+      }
+
+    }
+
+  }
+  return systemIDs;
+
+}
 
 /**
  * Returns all system-id from LSP database
@@ -8541,6 +8544,22 @@ ISISAPath * ISISMain::getAPath(ISISAPaths_t *paths, AreaId id) {
 }
 
 
+void ISISMain::sendDown(Packet* packet) {
+
+    if(mode == ISIS_MODE::L2_ISIS_MODE){
+        packet->getTag<MacAddressReq>()->setDestAddress(MacAddress(ALL_IS_IS_RBRIDGES));
+        packet->addTagIfAbsent<PacketProtocolTag>()->setProtocol(&Protocol::l2isis);
+//        packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::trill);
+        packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ethernetMac);
+
+        send(packet, "lowerLayerOut");
+    }else{
+        send(packet, "lowerLayerOut");
+    }
+
+
+}
+
 
 
 
@@ -8707,10 +8726,10 @@ void ISISMain::setAreaId(AreaId areaId) {
 void ISISMain::setSystemId(const SystemID& systemId) {
     this->systemId = systemId;
 }
-//TODO ANSAINET4.0 Uncomment with TRILL
-//TRILLNickname ISISMain::getNickname() const {
-//    return nickname;
-//}
+
+TRILLNickname ISISMain::getNickname() const {
+    return nickname;
+}
 
 void ISISMain::setAtt(bool att) {
     this->att = att;
@@ -8775,3 +8794,4 @@ void ISISMain::generateNetAddr() {
 }
 
 }        //end namespace inet
+

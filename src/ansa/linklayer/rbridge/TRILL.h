@@ -25,22 +25,24 @@
 
 #ifndef TRILL_H_
 #define TRILL_H_
+
 #define TRILL_VERSION 0
 #define ALL_RBRIDGES "01-80-C2-00-00-40"
 #define ALL_IS_IS_RBRIDGES "01-80-C2-00-00-41"
 #define ALL_ESADI_RBRIGES "01-80-C2-00-00-42"
+#define BRIDGE_GROUP_ADDRESS "01-80-C2-00-00-00"
 
 #define TRILL_DEFAULT_VLAN 1
 
 
-#include <omnetpp.h>
-//#include <csimplemodule.h>
+
 
 #include <map>
 #include <string>
 
-//#include "NotificationBoard.h"
-//#include "MacAddress.h"
+#include "ansa/common/ANSADefs.h"
+#include "inet/common/packet/Packet.h"
+
 #include "inet/linklayer/common/MacAddress.h"
 //#include "inet/linklayer/ethernet/Ethernet.h"
 #include "inet/linklayer/ethernet/EtherFrame_m.h"
@@ -48,7 +50,7 @@
 
 #include "ansa/linklayer/rbridge/RBMACTable.h"
 #include "ansa/linklayer/rbridge/RBVLANTable.h"
-#include "ansa/linklayer/rbridge/TrillInterfaceData.h"
+#include "TrillInterfaceData.h"
 #include "ansa/linklayer/rbridge/TRILLFrame.h"
 #include "ansa/linklayer/rbridge/TRILLCommon.h"
 #include "inet/linklayer/common/Ieee802Ctrl.h"
@@ -65,7 +67,7 @@ namespace inet {
 //#include "ISIS.h"
 class ISISMain;
 
-class TRILL : public cSimpleModule
+class ANSA_API TRILL : public cSimpleModule
 {
         friend class ISISMain;
     public:
@@ -83,7 +85,7 @@ class TRILL : public cSimpleModule
 
         /* switch core frame descriptor for internal representation unpacked frame */
         typedef struct s_frame_descriptor {
-          cPacket * payload; // relaying message
+          Packet * payload; // relaying message
           int VID; // frame's VLAN ID
           int rPort; // reception port
           RBVLANTable::tVIDPortList portList; // suggested(then applied) list of destination ports
@@ -97,6 +99,9 @@ class TRILL : public cSimpleModule
 //          std::vector<unsigned char *> systemIDs; //for forwarding TRILL MultiDest (maybe even TRILL unicast)
 //          InterfaceEntry *ie
 //          Ieee802Ctrl *ctrl;
+          Ptr<const EthernetMacHeader> macHeader;
+          Ptr<const TRILLFrame> trillFrame;
+          b offset; //offset in case we need to reset the payload to original state
         } tFrameDescriptor;
 
 
@@ -105,8 +110,8 @@ class TRILL : public cSimpleModule
         MacAddress getBridgeAddress();
 
         bool isAllowedByGate(int vlan, int gateId);//returns true if vlan is allowed on interface specified by gateId
-        void learn(AnsaEtherFrame * frame);
-        void learn(EthernetIIFrame * frame);
+//        void learn(AnsaEtherFrame * frame);
+//        void learn(const Ptr<const EthernetMacHeader> macHeader, Packet* packet);
 
 
       private:
@@ -145,22 +150,23 @@ class TRILL : public cSimpleModule
       virtual void handleMessage(cMessage * msg);
       virtual void finish();
 
-      bool reception(tFrameDescriptor& frame, cMessage *msg);
-      bool reception(tFrameDescriptor& frame, ISISMessage *isisMsg);
+      bool reception(tFrameDescriptor& frame, Packet *packet);
       void relay(tFrameDescriptor& frame);
       void dispatch(tFrameDescriptor& frame);
 
-      bool ingress(tFrameDescriptor& tmp, EthernetIIFrame *frame, int rPort);
-      bool ingress(tFrameDescriptor& tmp, AnsaEtherFrame *frame, int rPort);
+      bool ingress(tFrameDescriptor& tmp, Packet *packet, int rPort);
+      //TODO ANSAINET4.0 Delete below; unified version is above
+//      bool ingress(tFrameDescriptor& tmp, AnsaEtherFrame *frame, int rPort);
       void egress(tFrameDescriptor& frame);
 
       void learn(tFrameDescriptor& frame);
 
       void processFrame(cMessage * msg);
-      void handleIncomingFrame(EthernetIIFrame *frame);
-
-      void handleAndDispatchFrame(EthernetIIFrame *frame, int inputport);
-      void broadcastFrame(EthernetIIFrame *frame, int inputport);
+      //TODO ANSAINET4.0
+//      void handleIncomingFrame(EthernetIIFrame *frame);
+      //TODO ANSAINET4.0
+//      void handleAndDispatchFrame(EthernetIIFrame *frame, int inputport);
+//      void broadcastFrame(EthernetIIFrame *frame, int inputport);
 
       void sinkMsg(cMessage *msg);
       void sinkDupMsg(cMessage *msg);
@@ -169,9 +175,11 @@ class TRILL : public cSimpleModule
       void deliverBPDU(tFrameDescriptor& frame);
 
      // void tagMsg(int _vlan);
-      AnsaEtherFrame * tagMsg(EthernetIIFrame * _frame, int _vlan);
+      //TODO ANSAINET4.0
+//      AnsaEtherFrame * tagMsg(EthernetIIFrame * _frame, int _vlan);
       //void untagMsg();
-      EthernetIIFrame * untagMsg(AnsaEtherFrame * _frame);
+      //TODO ANSAINET4.0
+//      EthernetIIFrame * untagMsg(AnsaEtherFrame * _frame);
 
       /* NEW */
       FrameCategory classify(tFrameDescriptor &frameDesc);
@@ -191,7 +199,7 @@ class TRILL : public cSimpleModule
       bool dispatchNativeMultiDestRemote(tFrameDescriptor &frameDesc);
       bool dispatchTRILLDataMultiDestRemote(tFrameDescriptor &frameDesc);
       bool dispatchTRILLDataUnicastRemote(tFrameDescriptor &frameDesc);
-      bool dispatchTRILLControl(ISISMessage* isisMsg);
+      bool dispatchTRILLControl(Packet* packet);
 
       bool egressNativeLocal(tFrameDescriptor &frameDesc);//returns false when after removing redundant ports etc there is none to send it onto.
       bool egressNativeMulticastRemote(tFrameDescriptor &frameDesc);

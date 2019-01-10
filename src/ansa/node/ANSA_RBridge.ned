@@ -24,10 +24,8 @@
 // */
 package ansa.node;
 
-//import ansa.util.deviceConfigurator.DeviceConfigurator;
-//import inet.ansa.linklayer.switch.stp.Stp;
-//import inet.nodes.inet.BurstHost;
-//import inet.base.NotificationBoard;
+import inet.node.ethernet.EtherSwitch;
+
 import inet.linklayer.ethernet.EtherMac;
 //import inet.ansa.linklayer.ethernet.AnsaEtherMAC;
 //import inet.linklayer.IWiredInterface;
@@ -48,7 +46,7 @@ import inet.linklayer.ethernet.EthernetInterface;
 //import inet.ansa.linklayer.switch.PortTable;
 //import inet.ansa.acl.acl;
 //import inet.nodes.inet.NetworkLayer;
-import inet.networklayer.contract.INetworkLayer; 
+import inet.networklayer.contract.INetworkLayer;
 //import inet.ansa.TrafficGenerator.TrafGen;
 //import inet.ansa.rip.RipRouting;
 //import inet.transport.udp.Udp;
@@ -58,46 +56,49 @@ import inet.networklayer.common.InterfaceTable;
 //import inet.ansa.routingTable.AnsaInterfaceTable;
 import inet.networklayer.contract.IRoutingTable;
 
-import ansa.networklayer.clns.CLNSTable;
+//import ansa.networklayer.clns.CLNSTable;
 import ansa.networklayer.isis.ISIS;
 
 import ansa.linklayer.rbridge.TRILL;
-module ANSA_RBridge
+
+module ANSA_RBridge extends EtherSwitch
 {
     parameters:
-        
-        @display("i=abstract/switch;bgb=589,469,white");
+
+        @display("i=abstract/switch;bgb=1426,685,white");
         @networkNode();
         @labels(node,ethernet-node);
-        
+
         string hostname = default("");
-        
+
         string deviceId = default("");
         string deviceType = "RBridge";
         xml configData = default(xmldoc("config.xml"));
         xml configFile = default(xmldoc("config.xml"));
-        
+
         bool hasISIS = true;
         bool hasTRILL = true;
-        
+
         bool enableCLNS = default(true);
-        
+
         bool forwarding = default(true);
         bool multicastForwarding = default(false);
-        
-                
-        string routingTableType = default("ANSA_MultiRoutingTable");
-        
+
+
+        string routingTableType = default("CLNSRoutingTable");
+
         *.enableCLNS = enableCLNS;
-        
+
         routingTable.forwarding = forwarding;
         routingTable.multicastForwarding = multicastForwarding;
 
-		*.configData = configData;
-		*.deviceId = deviceId;
-		*.deviceType = deviceType;
-		*.configFile = configFile;
-		        
+        *.configData = configData;
+        *.deviceId = deviceId;
+        *.deviceType = deviceType;
+        *.configFile = configFile;
+
+        hasStp = false;
+
 //        isis.configData = configData;
 //        isis.deviceId = deviceId;
 //        isis.deviceType = deviceType;
@@ -107,126 +108,125 @@ module ANSA_RBridge
 //        trill.deviceId = deviceId;
 //        trill.deviceType = deviceType;
 //        trill.configFile = configFile;
-        
-        
+
+
         *.interfaceTableModule = default(absPath(".interfaceTable"));
-        
+
         *.routingTableModule = default(routingTableType != "" ? absPath(".routingTable") : "");
-        
+
+        relayUnit.typename = "TRILL";
+        macTable.typename = "RBMACTable";
+
     gates:
-        inout ethg[];
+//        inout ethg[];
         //inout pppg[];
 
     submodules:
-//        deviceConfigurator: DeviceConfigurator {
-//            parameters:
-//                deviceId = deviceId;
-//                deviceType = deviceType;
-//                configFile = configFile;
-//                @display("p=403,118");
-//        }
-        interfaceTable: InterfaceTable {
-            parameters:
-                @display("p=527,44");
-        }
-        trill: TRILL {
-            parameters:
-                @display("p=243,173;is=l");
-            gates:
-                lowerLayerIn[sizeof(ethg)];
-                lowerLayerOut[sizeof(ethg)];
-
-        }
-        //        mac[sizeof(ethg)]: AnsaEtherMAC {
+        //        deviceConfigurator: DeviceConfigurator {
         //            parameters:
-        //                @display("p=154,416,row,110;q=l2queue;is=l");
-        //                promiscuous = true;
+        //                deviceId = deviceId;
+        //                deviceType = deviceType;
+        //                configFile = configFile;
+        //                @display("p=403,118");
         //        }
-//        eth[sizeof(ethg)]: <default("EthernetInterface")> like IWiredInterface {
+        //        interfaceTable: InterfaceTable {
+        //            parameters:
+        //                @display("p=527,44");
+        //        }
+//        trill: TRILL {
+//            parameters:
+//                @display("p=243,173;is=l");
+////            gates:
+////                ifIn[sizeof(ethg)];
+////                ifOut[sizeof(ethg)];
+//
+//        }
 
-        eth[sizeof(ethg)]: EthernetInterface {
-            parameters:
-                @display("p=154,417,row,110;q=l2queue");
-                encapType="EtherEncapDummy";
-                mac.promiscuous=true;
-        }
-        
-        rBMACTable: RBMACTable {
-            @display("p=53,44;is=l");
-        }
+
+
+//TOOD ANSAINET4.0 Delete bewlo code; encap and promiscuous defined in EtherSwitch 
+//        eth[sizeof(ethg)]: EthernetInterface {
+//            parameters:
+//                @display("p=154,417,row,110;q=l2queue");
+//                encap.typename = "EtherEncapDummy";
+//                mac.promiscuous=true;
+//        }
+
+//        rBMACTable: RBMACTable {
+//            @display("p=53,44;is=l");
+//        }
         rBVLANTable: RBVLANTable {
             parameters:
                 configFile = configFile;
                 rBridgeId = deviceId;
                 portCount = sizeof(ethg);
-                @display("p=165,44;is=l");
+                @display("p=165,44;is=s");
         }
 //        rBPortTable: RBPortTable {
 //            parameters:
 //                @display("p=527,118");
 //        }
 
-//        clnsTable: CLNSTable {
-//            parameters:
-//                @display("p=277,44;is=l");
-//
-//        }
         routingTable: <routingTableType> like IRoutingTable if routingTableType != "" {
             parameters:
-                                @display("p=277,44;is=l");
+                @display("p=277,44;is=s");
         }
         isis: ISIS {
             parameters:
 
-                @display("p=53,173;is=l");
+                @display("p=652,92;is=m");
             gates:
-//                lowerLayerIn[sizeof(pppg)+sizeof(ethg)];
-//                lowerLayerOut[sizeof(pppg)+sizeof(ethg)];
+                //                lowerLayerIn[sizeof(pppg)+sizeof(ethg)];
+                //                lowerLayerOut[sizeof(pppg)+sizeof(ethg)];
                 trillIn;
                 trillOut;
         }
-        rbridgeSplitter: RBridgeSplitter {
-            parameters:
-                @display("p=154,295;is=l");
-            gates:
-                ifIn[sizeof(ethg)];
-                ifOut[sizeof(ethg)];
-                isisIn[sizeof(ethg)];
-                isisOut[sizeof(ethg)];
-                trillIn[sizeof(ethg)];
-                trillOut[sizeof(ethg)];
-
-        }
+    //        rbridgeSplitter: RBridgeSplitter {
+    //            parameters:
+    //                @display("p=154,295;is=l");
+    //            gates:
+    //                ifIn[sizeof(ethg)];
+    //                ifOut[sizeof(ethg)];
+    //                isisIn[sizeof(ethg)];
+    //                isisOut[sizeof(ethg)];
+    //                trillIn[sizeof(ethg)];
+    //                trillOut[sizeof(ethg)];
+    //
+    //        }
     connections allowunconnected:
 
-        for i=0..sizeof(ethg)-1 {
+//        for i=0..sizeof(ethg)-1 {
             //            ethg[i] <--> mac[i].phys;
-            ethg[i] <--> eth[i].phys;
+//            ethg[i] <--> eth[i].phys;
             //            mac[i].upperLayerOut --> rbridgeSplitter.lowerLayerIn[i];
             //            mac[i].upperLayerIn <-- rbridgeSplitter.lowerLayerOut[i];
-            
-            
+
+
 //            eth[i].upperLayerOut --> rbridgeSplitter.lowerLayerIn[i];
 //            eth[i].upperLayerIn <-- rbridgeSplitter.lowerLayerOut[i];
-            
-            eth[i].upperLayerOut --> rbridgeSplitter.ifIn[i];
-            eth[i].upperLayerIn <-- rbridgeSplitter.ifOut[i];
-            
-            
+
+//            eth[i].upperLayerOut --> rbridgeSplitter.ifIn[i];
+//            eth[i].upperLayerIn <-- rbridgeSplitter.ifOut[i];
+
+
 //            rbridgeSplitter.isisOut[i] --> isis.lowerLayerIn[i];
 //            rbridgeSplitter.isisIn[i] <-- isis.lowerLayerOut[i];
 
-			
-            rbridgeSplitter.trillOut[i] --> trill.lowerLayerIn[i];
-            rbridgeSplitter.trillIn[i] <-- trill.lowerLayerOut[i];
 
-            
+//            rbridgeSplitter.trillOut[i] --> trill.lowerLayerIn[i];
+//            rbridgeSplitter.trillIn[i] <-- trill.lowerLayerOut[i];
 
 
-        }
-        isis.lowerLayerOut --> trill.isisIn;
-            isis.lowerLayerIn <-- trill.isisOut;
 
 
-//        trill.toSink --> sink.ifIn;
+//        }
+
+// Replaced with the connection below. Will it work?
+//        isis.lowerLayerOut --> trill.isisIn;
+//        isis.lowerLayerIn <-- trill.isisOut;
+
+        isis.lowerLayerOut --> up.in++;
+        isis.lowerLayerIn <-- up.out++;
+
+
 }

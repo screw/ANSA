@@ -106,9 +106,8 @@ void ISISDeviceConfigurator::loadISISConfig(ISISMain *isisModule, ISISMain::ISIS
 
 
 
-      cModule * tmp_trill = isisModule->getParentModule()->getParentModule()->getSubmodule("trill");
-      //TODO ANSAINET4.0 Uncomment with TRILL
-//              isisModule->setTrill(check_and_cast<TRILL *>(tmp_trill));
+      cModule * tmp_trill = isisModule->getParentModule()->getParentModule()->getSubmodule("relayUnit");
+              isisModule->setTrill(check_and_cast<TRILL *>(tmp_trill));
 
 
         //RBridgeSplitter
@@ -621,10 +620,10 @@ void ISISDeviceConfigurator::loadISISInterfaceDefaultConfig(ISISMain *isisModule
         /* By this time the trillData should be initialized.
          * So set the intial appointedForwaders to itself for configured VLAN(s).
          * TODO B5 add RFC reference and do some magic with vlanId, desiredVlanId, enabledVlans, ... */
-        //TODO ANSAINET4.0 Uncomment with TRILL
-//        if(isisModule->getMode() == ISISMain::L2_ISIS_MODE){
-//            ie->trillData()->addAppointedForwarder( ie->trillData()->getVlanId(), isisModule->getNickname());
-//        }
+
+        if(isisModule->getMode() == ISISMain::L2_ISIS_MODE){
+            ie->getProtocolData<TrillInterfaceData>()->addAppointedForwarder( ie->getProtocolData<TrillInterfaceData>()->getVlanId(), isisModule->getNickname());
+        }
         newIftEntry.passive = false;
         d->setPassive(false);
         newIftEntry.entry = ie;

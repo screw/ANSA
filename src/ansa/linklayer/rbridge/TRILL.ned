@@ -15,7 +15,9 @@
 
 package ansa.linklayer.rbridge;
 
-simple TRILL
+import inet.linklayer.contract.IMacRelayUnit;
+
+simple TRILL like IMacRelayUnit
 {
     parameters:
         @display("i=block/switch;is=vl");
@@ -26,8 +28,12 @@ simple TRILL
         string interfaceTableModule; 
         
     gates:
-        input lowerLayerIn[]; //for rBridgeSplitter module
-        output lowerLayerOut[];
+        input ifIn;
+        output ifOut;
+        input upperLayerIn;
+        output upperLayerOut;
+//        input lowerLayerIn[]; //for rBridgeSplitter module
+//        output lowerLayerOut[];
         input isisIn; // for ISIS module
         output isisOut;
         output toSink;

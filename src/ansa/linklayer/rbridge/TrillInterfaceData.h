@@ -26,13 +26,13 @@
 #ifndef TRILLINTERFACEDATA_H_
 #define TRILLINTERFACEDATA_H_
 
-
+#include "ansa/common/ANSADefs.h"
 #include "inet/networklayer/common/InterfaceEntry.h"
 #include "ansa/linklayer/rbridge/TRILLCommon.h"
 
 namespace inet {
 
-class TrillInterfaceData : public InterfaceProtocolData
+class ANSA_API TrillInterfaceData : public InterfaceProtocolData
 {
     public:
         //        typedef enum{

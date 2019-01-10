@@ -25,9 +25,15 @@
 
 #include "ansa/networklayer/isis/ISISMain.h"
 #include "ansa/linklayer/rbridge/TRILL.h"
-#include "inet/networklayer/contract/clns/CLNSControlInfo.h"
+#include "inet/linklayer/common/InterfaceTag_m.h"
+#include "inet/linklayer/ethernet/EtherEncap.h"
+#include "inet/common/ProtocolTools.h"
+//TODO ANSAINET4.0 Delete
+//#include "inet/networklayer/contract/clns/CLNSControlInfo.h"
 
 #include "inet/common/ModuleAccess.h"
+
+#include "inet/linklayer/ethernet/EtherFrame_m.h"
 
 namespace inet {
 Define_Module(TRILL);
@@ -51,7 +57,7 @@ MacAddress TRILL::getBridgeAddress() {
 void TRILL::initialize(int stage) {
 
     if (stage == INITSTAGE_LOCAL) {
-        portCount = gateSize("lowerLayerOut");
+//        portCount = gateSize("lowerLayerOut");
 
         /* because ASSERT in handleIncomingFrame() */
         int i = 0;
@@ -59,7 +65,7 @@ void TRILL::initialize(int stage) {
         sprintf(msgname, "switchMsg %d", i);
         currentMsg = new cMessage(msgname, i);
 
-        cModule * tmp_rBMACTable = getParentModule()->getSubmodule("rBMACTable");
+        cModule * tmp_rBMACTable = getParentModule()->getSubmodule("macTable");
         rbMACTable = check_and_cast<RBMACTable *>(tmp_rBMACTable);
 
         cModule * tmp_rBVLANTable = getParentModule()->getSubmodule("rBVLANTable");
@@ -76,21 +82,35 @@ void TRILL::initialize(int stage) {
         isis = check_and_cast<ISISMain *>(tmp_isis);
 
 //        clnsTable = CLNSTableAccess().get();
-        clnsTable = check_and_cast<CLNSRoutingTable*>(getModuleByPath(par("routingTableModule"))->getSubmodule("clns"));
+//        clnsTable = check_and_cast<CLNSRoutingTable*>(getModuleByPath(par("routingTableModule"))->getSubmodule("clns"));
+        clnsTable = check_and_cast<CLNSRoutingTable*>(getModuleByPath(par("routingTableModule")));
 
-        bridgeGroupAddress = MacAddress("01-80-C2-00-00-00");
+        bridgeGroupAddress = MacAddress(BRIDGE_GROUP_ADDRESS);
         //TODO two modes, MAC per rBridge vs. MAC per interface
         bridgeAddress = MacAddress::generateAutoAddress();
 
+        registerService(Protocol::trill, gate("upperLayerIn"), gate("ifIn"));
+        registerProtocol(Protocol::trill, gate("ifOut"), gate("upperLayerOut"));
+
+
+
+        registerService(Protocol::l2isis, nullptr, gate("ifIn"));
+        registerProtocol(Protocol::l2isis, gate("ifOut"), nullptr);
+
+        //TODO ANSAINET4.0 Probably only ethernetMac registration is necessary
+        registerService(Protocol::ethernetMac, gate("upperLayerIn"), gate("ifIn"));
+        registerProtocol(Protocol::ethernetMac, gate("ifOut"), gate("upperLayerOut"));
         WATCH(bridgeAddress);
     }
-    else if(stage == INITSTAGE_LINK_LAYER_2){
+    else if(stage == INITSTAGE_LINK_LAYER){
+
+        portCount = ift->getNumInterfaces();
         /* Only default init for now */
         for(int i = 0; i < ift->getNumInterfaces(); i++){
             InterfaceEntry *ie = ift->getInterface(i);
-            TrillInterfaceData *d = new TrillInterfaceData();
+            TrillInterfaceData *d = ie->addProtocolData<TrillInterfaceData>();;
             d->setDefaults();
-            ie->setTRILLInterfaceData(d);
+//            ie->setTRILLInterfaceData(d);
 
         }
     }
@@ -105,29 +125,36 @@ void TRILL::handleMessage(cMessage *msg) {
     if (!msg->isSelfMessage()) {
         tFrameDescriptor frameDesc;
         const char * inGate = msg->getArrivalGate()->getName();
-
+//TODO ANSAINET4.0 All messages comes through upperLayerIn (no stpIn)
         if (strcmp(msg->getArrivalGate()->getName(), "stpIn") == 0) {
             /* Messages from Stp process */
             dispatchBPDU(msg, msg->getArrivalGate()->getIndex());
             return;
-        }else if (strcmp(msg->getArrivalGate()->getName(), "isisIn") == 0){
+        }else if (strcmp(msg->getArrivalGate()->getName(), "upperLayerIn") == 0){
             /* Messages from ISIS module */
 //            reception(frameDesc, (ISISMessage*) msg);//TODO C1 handle returned value
-            dispatchTRILLControl((ISISMessage*) msg);
-//            delete msg;
-//            return;
+            Packet *packet = (Packet *)(msg);
+            const auto& macHeader = packet->peekAtFront<EthernetMacHeader>();
+            if(macHeader->getDest() == MacAddress(ALL_IS_IS_RBRIDGES)){
+                dispatchTRILLControl((Packet*) msg);
 
-        } else if (strcmp(msg->getArrivalGate()->getName(), "lowerLayerIn") == 0) {
+            }else{
+                throw cRuntimeError("TRILL::handleMessage; unsupported message received on upperLayerIn");
+            }
+
+        } else if (strcmp(msg->getArrivalGate()->getName(), "ifIn") == 0) {
             /* Messages from network */
             bool processResult;
-            if(reception(frameDesc, msg)){
+            Packet* packet = (Packet*)(msg);
+            if(reception(frameDesc, packet)){
 
 
                 //frame received on port's allowed VLAN and successfully parsed
                 //now determine the proper type
                 //getTRILL_Type
-                Ieee802Ctrl *ctrl;
-                cPacket *tmpPacket;
+//TODO ANSAINET4.0 Delete below
+//                Ieee802Ctrl *ctrl;
+//                cPacket *tmpPacket;
                 TRILL::FrameCategory cat;
                 switch(cat = classify(frameDesc)){
                     case TRILL::TRILL_L2_CONTROL:
@@ -151,23 +178,10 @@ void TRILL::handleMessage(cMessage *msg) {
 
                     case TRILL::TRILL_CONTROL:
                     {
-                        //TODO B1
-//                        EV <<"Error: L2_ISIS frame shoudn't get send to TRILL (for NOW)" <<endl;
-//                        send(msg->)
-//                        ctrl = (Ieee802Ctrl*)msg->getControlInfo();
-//                        ctrl->dup();
-//                        frameDesc.payload->setControlInfo(frameDesc.ctrl->dup());
-                        tmpPacket = frameDesc.payload->dup();
-                        Ieee802Ctrl* ctrl = dynamic_cast<Ieee802Ctrl*>(frameDesc.ctrl->dup());
-//                        int index = tmpPacket->getArrivalGate()->getIndex();
-//                        index = msg->getArrivalGate()->getIndex();
-//                        InterfaceEntry* ie = ift->getInterfaceByNetworkLayerGateIndex(index);
-//                        ctrl->setInterfaceId(ie->getInterfaceId());
-                        tmpPacket->setControlInfo(ctrl);
-                        //TODO A! add CLNS control info CLNS info -- really?
-                        send(tmpPacket, "isisOut");
-
-//                        processResult = true;
+//TODO ANSAINET4.0 Delete below if it works;  don't send dup, try to send the payload; what happens -> delete frameDesc.payload
+//                        tmpPacket = frameDesc.payload->dup();
+//                        send(tmpPacket, "isisOut");
+                        send(frameDesc.payload->dup(), "upperLayerOut");
                         break;
                     }
                     case TRILL::TRILL_OTHER:
@@ -178,70 +192,55 @@ void TRILL::handleMessage(cMessage *msg) {
                         break;
                 }
 
-//                if(processResult){
-//
-//
-//                }else{
-//                    delete msg;
-//                    return;
-//                }
-
-                delete frameDesc.payload;
+//                delete frameDesc.payload;
 
             }
 
-//            if (reception(frame, msg) == true) {
-//                //EV << frame;
-//                //error("BLE BLE");
-//                relay(frameDesc);
-//            }
-//            delete frame.payload;
         }
     } else {
         // Self message signal used to indicate a frame has finished processing
         processFrame(msg);
     }
+//TODO ANSAINET4.0 If there are undisposed messages, this might be the reason
     delete msg;
 }
 
-//bool TRILL::reception(TRILL::tFrameDescriptor& frame, ISISMessage *isisMsg){
-//    int rPort = isisMsg->getArrivalGate()->getIndex();
-//
-//    return true;
-//}
+//TODO ANSAINET4.0 Is it used anywhere?
 /**
  * Fills frame's descriptor with information in @param msg
  * @param frame is frame's descriptor structure
  * @param msg incomming message to be parsed
  */
-bool TRILL::reception(TRILL::tFrameDescriptor& frame, cMessage *msg) {
+bool TRILL::reception(TRILL::tFrameDescriptor& frame, Packet *packet) {
     /* ACTIVE TOPOLOGY ENFORCEMENT AFTER CLASSIFICATION AND INGRESS
      * because of learning state operation, MAC record can be learned
      * after classification and ingress, if learning is enabled on
      * that port.
      */
   //CLASSIFICATION & INGRESS CALL
-    int rPort = msg->getArrivalGate()->getIndex();
+    int rPort = packet->getTag<InterfaceInd>()->getInterfaceId();
+    rPort = ift->getInterfaceById(rPort)->getIndex();
 
-    cMessage * tmp = msg;
-    ASSERT(tmp);
-
-    // Classify frame, and unpack to frame descriptor
-    if (dynamic_cast<AnsaEtherFrame *>(tmp)){
-        AnsaEtherFrame * taggedFrame = (AnsaEtherFrame *) tmp;
-        if (ingress(frame, taggedFrame, rPort) == false) {
-            return false;
-        }
-    } else if (dynamic_cast<EthernetIIFrame *>(tmp)) {
-        EthernetIIFrame * untaggedFrame = (EthernetIIFrame *) tmp;
-        ingress(frame, untaggedFrame, rPort); // discarding forbidden PortVID is in relay
-    }else{
-        return false;
-        EV << "Warning: dropping unsupported frame in TRILL::reception";
-    }
-
-    return true;
+    return ingress(frame, packet, rPort);
+//TODO ANSAINET4.0 Delete below; unified version is above
+//
+//    // Classify frame, and unpack to frame descriptor
+//    if (dynamic_cast<AnsaEtherFrame *>(tmp)){
+//        AnsaEtherFrame * taggedFrame = (AnsaEtherFrame *) tmp;
+//        if (ingress(frame, taggedFrame, rPort) == false) {
+//            return false;
+//        }
+//    } else if (dynamic_cast<EthernetIIFrame *>(tmp)) {
+//        EthernetIIFrame * untaggedFrame = (EthernetIIFrame *) tmp;
+//        ingress(frame, untaggedFrame, rPort); // discarding forbidden PortVID is in relay
+//    }else{
+//        return false;
+//        EV << "Warning: dropping unsupported frame in TRILL::reception";
+//    }
+//
+//    return true;
 }
+
 //
 //void TRILL::relay(TRILL::tFrameDescriptor& frame) {
 //
@@ -294,65 +293,85 @@ bool TRILL::reception(TRILL::tFrameDescriptor& frame, cMessage *msg) {
 ////    }
 //}
 
-bool TRILL::ingress(TRILL::tFrameDescriptor& tmp, EthernetIIFrame *frame, int rPort) {
+
+
+
+bool TRILL::ingress(TRILL::tFrameDescriptor& tmp, Packet* packet, int rPort) {
     // Info from recepted frame
-    tmp.ctrl = (Ieee802Ctrl *) frame->getControlInfo();
-    if (tmp.ctrl == NULL)
-    {
-        tmp.ctrl = new Ieee802Ctrl();
-        tmp.ctrl->setSrc(frame->getSrc());
-        tmp.ctrl->setDest(frame->getDest());
-        tmp.ctrl->setEtherType(frame->getEtherType());
 
-    }
-    tmp.ctrl->setInterfaceId(ift->getInterfaceByNetworkLayerGateIndex(rPort)->getInterfaceId());
-    tmp.payload = frame->decapsulate();
-    tmp.name.insert(0, frame->getName());
+//    auto macHeader = EtherEncap::decapsulateMacHeader(packet);
+//    const auto& macHeader = packet->peekAtFront<EthernetMacHeader>();
+    tmp.macHeader = packet->peekAtFront<EthernetMacHeader>();
+    tmp.etherType = tmp.macHeader->getTypeOrLength();
+    tmp.payload = packet;
+    tmp.offset = packet->getFrontOffset();
+    tmp.name.insert(0, packet->getName());
     tmp.rPort = rPort;
-    tmp.src = frame->getSrc();
-    tmp.dest = frame->getDest();
-    tmp.etherType = frame->getEtherType();
-
-    // VLAN Assign
-    tmp.VID = vlanTable->getVID(rPort);
-    tmp.d = this->ift->getInterfaceByNetworkLayerGateIndex(rPort)->trillData();
-
-    if (tmp.VID == 0) {
-        return false;
+    if(tmp.macHeader->getCTag()!= nullptr){
+        tmp.VID = tmp.macHeader->getCTag()->getVid();
+    }else{
+        tmp.VID = vlanTable->getVID(rPort);
     }
+    tmp.src = tmp.macHeader->getSrc();
+    tmp.dest = tmp.macHeader->getDest();
+    //TODO ANSAINET4.0 handle Ethernet and 802.3?
+//    tmp.etherType = macHeader->getTypeOrLength();
 
 
-    return true;
-}
 
-bool TRILL::ingress(TRILL::tFrameDescriptor& tmp, AnsaEtherFrame *frame, int rPort) {
-    // Info from recepted frame
-    tmp.ctrl = (Ieee802Ctrl *)frame->getControlInfo();
-    if (tmp.ctrl == NULL)
-    {
-        tmp.ctrl = new Ieee802Ctrl();
-        tmp.ctrl->setSrc(frame->getSrc());
-        tmp.ctrl->setDest(frame->getDest());
-        tmp.ctrl->setEtherType(frame->getEtherType());
 
-    }
-    tmp.ctrl->setInterfaceId(ift->getInterfaceByNetworkLayerGateIndex(rPort)->getInterfaceId());
-    tmp.payload = frame->decapsulate();
-    tmp.name.insert(0, frame->getName());
-    tmp.rPort = rPort;
-    tmp.VID = frame->getVlan();
-    tmp.src = frame->getSrc();
-    tmp.dest = frame->getDest();
-    tmp.etherType = frame->getEtherType();
-    tmp.d = this->ift->getInterfaceByNetworkLayerGateIndex(rPort)->trillData();
+    tmp.d = ift->getInterface(rPort)->getProtocolData<TrillInterfaceData>();
+    //TODO ANSAINET4.0 What? Leftover after EthernetII (without VLAN tag)
+    // How to find out if frame has tag or not?
+//    // VLAN Assign
+//    tmp.VID = vlanTable->getVID(rPort);
+//    if (tmp.VID == 0) {
+//        return false;
+//    }
+
+
 
     // VLAN Allowed
-    if (vlanTable->isAllowed(frame->getVlan(), rPort) == false) {
-        return false;
-    }
 
-    return true;
+        return vlanTable->isAllowed(tmp.VID, rPort);
+
+
+//    if (vlanTable->isAllowed(frame->getVlan(), rPort) == false) {
+//        return false;
+//    }
+//
+//    return true;
+
 }
+//TODO ANSAINET4.0 Delete below; unified version is above
+//bool TRILL::ingress(TRILL::tFrameDescriptor& tmp, AnsaEtherFrame *frame, int rPort) {
+//    // Info from recepted frame
+//    tmp.ctrl = (Ieee802Ctrl *)frame->getControlInfo();
+//    if (tmp.ctrl == NULL)
+//    {
+//        tmp.ctrl = new Ieee802Ctrl();
+//        tmp.ctrl->setSrc(frame->getSrc());
+//        tmp.ctrl->setDest(frame->getDest());
+//        tmp.ctrl->setEtherType(frame->getEtherType());
+//
+//    }
+//    tmp.ctrl->setInterfaceId(ift->getInterfaceByNetworkLayerGateIndex(rPort)->getInterfaceId());
+//    tmp.payload = frame->decapsulate();
+//    tmp.name.insert(0, frame->getName());
+//    tmp.rPort = rPort;
+//    tmp.VID = frame->getVlan();
+//    tmp.src = frame->getSrc();
+//    tmp.dest = frame->getDest();
+//    tmp.etherType = frame->getEtherType();
+//    tmp.d = this->ift->getInterfaceByNetworkLayerGateIndex(rPort)->trillData();
+//
+//    // VLAN Allowed
+//    if (vlanTable->isAllowed(frame->getVlan(), rPort) == false) {
+//        return false;
+//    }
+//
+//    return true;
+//}
 
 void TRILL::egress(TRILL::tFrameDescriptor& frame) {
   // MINIMIZE OUT PORTS
@@ -391,7 +410,7 @@ bool TRILL::egressNativeLocal(TRILL::tFrameDescriptor& frameDesc){
     frameDesc.portList.clear();
 
     for (unsigned int i = 0; i < tmp.size(); i++) {
-        TrillInterfaceData *d = this->ift->getInterfaceByNetworkLayerGateIndex(tmp.at(i).port)->trillData();
+        TrillInterfaceData *d = this->ift->getInterface(tmp.at(i).port)->getProtocolData<TrillInterfaceData>();
         if (d->isEnabled(frameDesc.VID) && tmp.at(i).port != frameDesc.rPort && d->isAppointedForwarder(frameDesc.VID, this->isis->getNickname())) {
             frameDesc.portList.push_back(tmp.at(i));
         }
@@ -421,7 +440,7 @@ bool TRILL::egressNativeMulticastRemote(TRILL::tFrameDescriptor &frameDesc){
             EV << "TRILL: Error in egressNativeMulticastRemote: can't find adjacency for systemId"<< (*it) <<std::endl;
             continue;
         }
-        portAction.port = adj->gateIndex;
+        portAction.port = ift->getInterfaceById(adj->interfaceId)->getIndex();
 //        portAction.action = this->vlanTable->getTag()//vlanId will be determined in dispatch (designated Vlan)
         frameDesc.portList.push_back(portAction);
     }
@@ -431,7 +450,9 @@ bool TRILL::egressNativeMulticastRemote(TRILL::tFrameDescriptor &frameDesc){
 
 bool TRILL::egressTRILLDataMultiDestRemote(TRILL::tFrameDescriptor &frameDesc){
 
-    TRILLFrame *trillFrame = static_cast<TRILLFrame *>(frameDesc.payload);
+    //TODO ANSAINET4.0
+//    TRILLFrame *trillFrame = static_cast<TRILLFrame *>(frameDesc.payload);
+    Ptr<const TRILLFrame> trillFrame = frameDesc.trillFrame;
 
     std::vector<SystemID> *systemIDs = this->isis->getSystemIDsFromTreeOnlySource(trillFrame->getEgressRBNickname(), this->isis->getSystemId());
 
@@ -445,10 +466,10 @@ bool TRILL::egressTRILLDataMultiDestRemote(TRILL::tFrameDescriptor &frameDesc){
         }
 
         //don't send it on received interface
-        if(frameDesc.rPort == adj->gateIndex){
+        if(frameDesc.rPort == ift->getInterfaceById(adj->interfaceId)->getIndex()){
             continue;
         }
-        portAction.port = adj->gateIndex;
+        portAction.port = ift->getInterfaceById(adj->interfaceId)->getIndex();
 //        portAction.action = this->vlanTable->getTag()//vlanId will be determined in dispatch (designated Vlan)
         frameDesc.portList.push_back(portAction);
     }
@@ -461,7 +482,7 @@ bool TRILL::egressTRILLDataMultiDestNative(TRILL::tFrameDescriptor &innerFrameDe
     innerFrameDesc.portList = vlanTable->getPorts(innerFrameDesc.VID);
 
     for(RBVLANTable::tVIDPortList::iterator it = innerFrameDesc.portList.begin(); it != innerFrameDesc.portList.end();){
-        TrillInterfaceData *d = ift->getInterfaceByNetworkLayerGateIndex((*it).port)->trillData();
+        TrillInterfaceData *d = ift->getInterface(it->port)->getProtocolData<TrillInterfaceData>();
         if(!d->isAppointedForwarder(innerFrameDesc.VID, this->isis->getNickname())){
             it = innerFrameDesc.portList.erase(it);
         }else{
@@ -472,215 +493,247 @@ bool TRILL::egressTRILLDataMultiDestNative(TRILL::tFrameDescriptor &innerFrameDe
 }
 
 void TRILL::dispatch(TRILL::tFrameDescriptor& frame) {
-
-    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frame.name.c_str());
-    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frame.name.c_str());
-
-    taggedFrame->setKind(frame.payload->getKind());
-    taggedFrame->setSrc(frame.src);
-    taggedFrame->setDest(frame.dest);
-    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    taggedFrame->setVlan(frame.VID);
-    taggedFrame->setEtherType(frame.etherType);
-#include "inet/networklayer/contract/IInterfaceTable.h"
-    taggedFrame->encapsulate(frame.payload->dup());
-    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
-        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
-
-    untaggedFrame->setKind(frame.payload->getKind());
-    untaggedFrame->setSrc(frame.src);
-    untaggedFrame->setDest(frame.dest);
-    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    untaggedFrame->setEtherType(frame.etherType);
-
-    untaggedFrame->encapsulate(frame.payload->dup());
-    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
-        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
-    RBVLANTable::tVIDPortList::iterator it;
-    for (it = frame.portList.begin(); it != frame.portList.end(); it++) {
-        if (it->port >= portCount) {
-            continue;
-        }
-//        if (spanningTree->forwarding(it->port, frame.VID) == false) {
+    //TODO ANSAINET4.0
+//    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frame.name.c_str());
+//    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frame.name.c_str());
+//
+//    taggedFrame->setKind(frame.payload->getKind());
+//    taggedFrame->setSrc(frame.src);
+//    taggedFrame->setDest(frame.dest);
+//    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    taggedFrame->setVlan(frame.VID);
+//    taggedFrame->setEtherType(frame.etherType);
+//
+//    taggedFrame->encapsulate(frame.payload->dup());
+//    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
+//        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
+//
+//    untaggedFrame->setKind(frame.payload->getKind());
+//    untaggedFrame->setSrc(frame.src);
+//    untaggedFrame->setDest(frame.dest);
+//    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    untaggedFrame->setEtherType(frame.etherType);
+//
+//    untaggedFrame->encapsulate(frame.payload->dup());
+//    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
+//        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
+//    RBVLANTable::tVIDPortList::iterator it;
+//    for (it = frame.portList.begin(); it != frame.portList.end(); it++) {
+//        if (it->port >= portCount) {
 //            continue;
 //        }
-        if (it->action == RBVLANTable::INCLUDE) {
-            send(taggedFrame->dup(), "lowerLayerOut", it->port);
-        } else {
-            send(untaggedFrame->dup(), "lowerLayerOut", it->port);
-        }
-    }
-
-    delete taggedFrame;
-    delete untaggedFrame;
+////        if (spanningTree->forwarding(it->port, frame.VID) == false) {
+////            continue;
+////        }
+//        if (it->action == RBVLANTable::INCLUDE) {
+//            send(taggedFrame->dup(), "ifOut", it->port);
+//        } else {
+//            send(untaggedFrame->dup(), "ifOut", it->port);
+//        }
+//    }
+//
+//    delete taggedFrame;
+//    delete untaggedFrame;
     return;
 }
 
 /*
  * This method is for passing messages from IS-IS module to lowerLayer module
  * with encapsulating it in Ethernet frame.
+ * EDIT: It should already be Ethernet Encapsulated. Just pass it down.
  * @param isisMsg is received message from ISIS module. It may be Hello, LSP, CSNP, ..
  */
-bool TRILL::dispatchTRILLControl(ISISMessage* isisMsg){
-    EthernetIIFrame* untaggedFrame = new EthernetIIFrame(isisMsg->getName());
-    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(isisMsg->getName());
+bool TRILL::dispatchTRILLControl(Packet* packet){
+//    EthernetIIFrame* untaggedFrame = new EthernetIIFrame(isisMsg->getName());
+//    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(isisMsg->getName());
+//
+//    taggedFrame->setKind(isisMsg->getKind());
+////     taggedFrame->setSrc(frame.src); will be set by underlying module
+////     taggedFrame->setDest(frame.dest);
+//    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    taggedFrame->setVlan(TRILL_DEFAULT_VLAN); //TODO A! VLAN_ID should get dynamically. Also more than one Hello could be send on interface.
+//    taggedFrame->setEtherType(ETHERTYPE_L2_ISIS);
+//
+//    taggedFrame->encapsulate(isisMsg->dup());
+//    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
+//    {
+//        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
+//
+//    untaggedFrame->setKind(isisMsg->getKind());
+////     untaggedFrame->setSrc(frame.src);
+////     untaggedFrame->setDest(frame.dest);
+//    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    untaggedFrame->setEtherType(ETHERTYPE_L2_ISIS);
+//
+//    untaggedFrame->encapsulate(isisMsg->dup());
+//    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
+//    {
+//        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
+//
+//    MacAddress ma;
+//    switch (isisMsg->getType())
+//        {
+//
+//        case TRILL_HELLO:
+//        case L1_LSP:
+//        case L1_CSNP:
+//        case L1_PSNP:
+//        case MTU_PROBE_PDU:
+//        case MTU_ACK_PDU:
+//            ma.setAddress(ALL_IS_IS_RBRIDGES);
+//
+//        }
+//    taggedFrame->setDest(ma);
+//    untaggedFrame->setDest(ma);
+//
+//    Ieee802Ctrl *ctrl = new Ieee802Ctrl();
+//    ctrl->setEtherType(ETHERTYPE_L2_ISIS);
+//    ctrl->setDsap(SAP_CLNS);
+//    ctrl->setSsap(SAP_CLNS);
+//    ctrl->setDest(MacAddress(ALL_IS_IS_RBRIDGES)); //ALL-IS-IS-RBridges
+//
+//
+//    taggedFrame->setControlInfo(ctrl->dup());
+//    untaggedFrame->setControlInfo(ctrl->dup());
+//
+//    //TODO A1 This below is a mess. Get VLAN ID and port/gate index properly.
+//
+//    //TODO A! delete this comment if it works :)
+////    int port = isisMsg->getArrivalGate()->getIndex();
+//    CLNSControlInfo* info = static_cast<CLNSControlInfo*>(isisMsg->removeControlInfo());
+//    int port = ift->getInterfaceById( info->getInterfaceId())->getNetworkLayerGateIndex();
+//
+//    RBVLANTable::tTagAction action = this->vlanTable->getTag(TRILL_DEFAULT_VLAN, port);
+//
+//    if (action == RBVLANTable::INCLUDE)
+//    {
+//        send(taggedFrame->dup(), "ifOut", port);
+//    }
+//    else
+//    {
+//        send(untaggedFrame->dup(), "ifOut", port);
+//    }
+//
+//
+//    delete taggedFrame;
+//    delete untaggedFrame;
+//    delete ctrl;
 
-    taggedFrame->setKind(isisMsg->getKind());
-//     taggedFrame->setSrc(frame.src); will be set by underlying module
-//     taggedFrame->setDest(frame.dest);
-    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    taggedFrame->setVlan(TRILL_DEFAULT_VLAN); //TODO A! VLAN_ID should get dynamically. Also more than one Hello could be send on interface.
-    taggedFrame->setEtherType(ETHERTYPE_L2_ISIS);
-
-    taggedFrame->encapsulate(isisMsg->dup());
-    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-    {
-        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
-
-    untaggedFrame->setKind(isisMsg->getKind());
-//     untaggedFrame->setSrc(frame.src);
-//     untaggedFrame->setDest(frame.dest);
-    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    untaggedFrame->setEtherType(ETHERTYPE_L2_ISIS);
-
-    untaggedFrame->encapsulate(isisMsg->dup());
-    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-    {
-        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
-
-    MacAddress ma;
-    switch (isisMsg->getType())
-        {
-
-        case TRILL_HELLO:
-        case L1_LSP:
-        case L1_CSNP:
-        case L1_PSNP:
-        case MTU_PROBE_PDU:
-        case MTU_ACK_PDU:
-            ma.setAddress(ALL_IS_IS_RBRIDGES);
-
-        }
-    taggedFrame->setDest(ma);
-    untaggedFrame->setDest(ma);
-
-    Ieee802Ctrl *ctrl = new Ieee802Ctrl();
-    ctrl->setEtherType(ETHERTYPE_L2_ISIS);
-    ctrl->setDsap(SAP_CLNS);
-    ctrl->setSsap(SAP_CLNS);
-    ctrl->setDest(MacAddress(ALL_IS_IS_RBRIDGES)); //ALL-IS-IS-RBridges
-
-
-    taggedFrame->setControlInfo(ctrl->dup());
-    untaggedFrame->setControlInfo(ctrl->dup());
-
-    //TODO A1 This below is a mess. Get VLAN ID and port/gate index properly.
-
-    //TODO A! delete this comment if it works :)
-//    int port = isisMsg->getArrivalGate()->getIndex();
-    CLNSControlInfo* info = static_cast<CLNSControlInfo*>(isisMsg->removeControlInfo());
-    int port = ift->getInterfaceById( info->getInterfaceId())->getNetworkLayerGateIndex();
-
-    RBVLANTable::tTagAction action = this->vlanTable->getTag(TRILL_DEFAULT_VLAN, port);
-
-    if (action == RBVLANTable::INCLUDE)
-    {
-        send(taggedFrame->dup(), "lowerLayerOut", port);
-    }
-    else
-    {
-        send(untaggedFrame->dup(), "lowerLayerOut", port);
-    }
-
-
-    delete taggedFrame;
-    delete untaggedFrame;
-    delete ctrl;
+    send(packet->dup(), "ifOut");
     return true;
 
 
 }
 
 /* NEW */
-bool TRILL::dispatchNativeLocalPort(TRILL::tFrameDescriptor& frame) {
+bool TRILL::dispatchNativeLocalPort(TRILL::tFrameDescriptor& frameDesc) {
 
-    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frame.name.c_str());
-    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frame.name.c_str());
 
-    taggedFrame->setKind(frame.payload->getKind());
-    taggedFrame->setSrc(frame.src);
-    taggedFrame->setDest(frame.dest);
-    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    taggedFrame->setVlan(frame.VID);
-    taggedFrame->setEtherType(frame.etherType);
+//    EtherEncap::addPaddingAndFcs(frame.payload, FCS_COMPUTED);
 
-    taggedFrame->encapsulate(frame.payload->dup());
-    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
-        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
-
-    untaggedFrame->setKind(frame.payload->getKind());
-    untaggedFrame->setSrc(frame.src);
-    untaggedFrame->setDest(frame.dest);
-    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    untaggedFrame->setEtherType(frame.etherType);
-
-    untaggedFrame->encapsulate(frame.payload->dup());
-    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
-        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
+//    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frame.name.c_str());
+//    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frame.name.c_str());
+//
+//    taggedFrame->setKind(frame.payload->getKind());
+//    taggedFrame->setSrc(frame.src);
+//    taggedFrame->setDest(frame.dest);
+//    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    taggedFrame->setVlan(frame.VID);
+//    taggedFrame->setEtherType(frame.etherType);
+//
+//    taggedFrame->encapsulate(frame.payload->dup());
+//    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
+//        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
+//
+//    untaggedFrame->setKind(frame.payload->getKind());
+//    untaggedFrame->setSrc(frame.src);
+//    untaggedFrame->setDest(frame.dest);
+//    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    untaggedFrame->setEtherType(frame.etherType);
+//
+//    untaggedFrame->encapsulate(frame.payload->dup());
+//    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
+//        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
     RBVLANTable::tVIDPortList::iterator it;
-    for (it = frame.portList.begin(); it != frame.portList.end(); it++) {
+    for (it = frameDesc.portList.begin(); it != frameDesc.portList.end(); it++) {
         if (it->port >= portCount) {//TODO A! this needs to go to egress// do not send on received port
             continue;
         }
 //        if (spanningTree->forwarding(it->port, frame.VID) == false) {
 //            continue;
 //        }
+        Packet* packet = frameDesc.payload->dup();
+        packet->trim();
+        packet->addTagIfAbsent<InterfaceReq>()->setInterfaceId(ift->getInterface(it->port)->getInterfaceId());
+
         if (it->action == RBVLANTable::INCLUDE) {
-            send(taggedFrame->dup(), "lowerLayerOut", it->port);
-        } else {
-            send(untaggedFrame->dup(), "lowerLayerOut", it->port);
+            //TODO ANSAINET4.0 get the header
+//            auto macHeader = EtherEncap::decapsulateMacHeader(packet);
+            //get the VLAN tag (ctag)
+            //update it? XX leave it if ctag exist, add if not (but which VLAN ID?) ??
+            //add header back
+            //add Fcs
+//            EtherEncap::addPaddingAndFcs(frameDesc.payload, FCS_COMPUTED);
+            send(packet, "ifOut");
+        } else if (it->action == RBVLANTable::REMOVE) {
+            //TODO ANSAINET4.0 get the header
+//            auto macHeader = EtherEncap::decapsulateMacHeader(packet);
+            //get the VLAN tag (ctag)
+            // remove the ctag (set it to nullptr)
+            //add header back
+            //add Fcs
+//            EtherEncap::addPaddingAndFcs(frameDesc.payload, FCS_COMPUTED);
+            send(packet, "ifOut");
+        } else if (it->action == RBVLANTable::NONE) {
+
+            send(frameDesc.payload, "ifOut");
         }
     }
 
-    delete taggedFrame;
-    delete untaggedFrame;
+//    delete taggedFrame;
+//    delete untaggedFrame;
     return true;
 }
 
 bool TRILL::dispatchNativeRemote(tFrameDescriptor &frameDesc){
 
-    AnsaEtherFrame * innerFrame = new AnsaEtherFrame(frameDesc.name.c_str());
+//    AnsaEtherFrame * innerFrame = new AnsaEtherFrame(frameDesc.name.c_str());
 
-    innerFrame->setKind(frameDesc.payload->getKind());
-    innerFrame->setSrc(frameDesc.src);
-    innerFrame->setDest(frameDesc.dest);
-    innerFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    innerFrame->setVlan(frameDesc.VID);
-    innerFrame->setEtherType(frameDesc.etherType);
-    //TODO A! comment the section below or not?
-    innerFrame->encapsulate(frameDesc.payload->dup());
-    if (innerFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
-        innerFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
+//    innerFrame->setKind(frameDesc.payload->getKind());
+//    innerFrame->setSrc(frameDesc.src);
+//    innerFrame->setDest(frameDesc.dest);
+//    innerFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    innerFrame->setVlan(frameDesc.VID);
+//    innerFrame->setEtherType(frameDesc.etherType);
+//    //TODO A! comment the section below or not?
+//    innerFrame->encapsulate(frameDesc.payload->dup());
+//    if (innerFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
+//        innerFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
 
 
-    TRILLFrame *trillFrame = new TRILLFrame(frameDesc.name.c_str());
+    auto trillFrame = makeShared<TRILLFrame>(); //new TRILLFrame(frameDesc.name.c_str());
     trillFrame->setEthertype(ETHERTYPE_TRILL);
     trillFrame->setVersion(0);
     trillFrame->setReserved(0);
     trillFrame->setMultiDest(false);
     trillFrame->setOpLength(0);
-    trillFrame->setHopCount(3);// TODO A1 fix
+    trillFrame->setHopCount(3);// TODO !A1 fix
     trillFrame->setEgressRBNickname(frameDesc.record.ingressNickname); //yes ingressNickname is correct
     trillFrame->setIngressRBNickname(this->isis->getNickname());
     //TODO A1 set options
-    trillFrame->encapsulate(innerFrame->dup());
+    frameDesc.payload->insertAtFront(trillFrame);
+
+    Packet *packet = frameDesc.payload->dup();
+    packet->trim();
+
+//    trillFrame->encapsulate(innerFrame->dup());
 
 
     /* TODO A0
@@ -689,10 +742,6 @@ bool TRILL::dispatchNativeRemote(tFrameDescriptor &frameDesc){
      */
 
     //TODO A! Find out what is the Nickname for (in this context) and update CLNS version accordingly
-//    unsigned char *tmpSysId = new unsigned char[ISIS_SYSTEM_ID];
-//    memcpy(tmpSysId, this->isis->systemId, ISIS_SYSTEM_ID);
-//    tmpSysId[ISIS_SYSTEM_ID - 2] = frameDesc.record.ingressNickname.getNickname() >> 8;
-//    tmpSysId[ISIS_SYSTEM_ID - 1] = frameDesc.record.ingressNickname.getNickname() & 0xFF;
 
     ClnsAddress clnsAddress;
     SystemID tmpSystemID;
@@ -711,102 +760,98 @@ bool TRILL::dispatchNativeRemote(tFrameDescriptor &frameDesc){
         return false;
     }
 
-    egressPort.port = clnsRoute->getInterface()->getNetworkLayerGateIndex();
+    egressPort.port = clnsRoute->getInterface()->getIndex();
+    int interfaceId = clnsRoute->getInterface()->getInterfaceId();
     frameDesc.portList.push_back(egressPort);
-    ISISadj *adj = this->isis->getAdjBySystemID(SystemID(clnsRoute->getGateway().getSystemId()), L1_TYPE, egressPort.port);
+    ISISadj *adj = this->isis->getAdjBySystemID(SystemID(clnsRoute->getGateway().getSystemId()), L1_TYPE, interfaceId);
     if(egressPort.port < 0 || adj == NULL){
         EV <<"dispatchNativeRemote: NOOOOOOOOOOOOOOOOOOOOOOOOOOO!";
         return false;
     }
 
     /*
-     * End of horribly wrong solution
+     * End of horribly wrong solution; Why? What? Oh, I see, the routing!
      */
 
-    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frameDesc.name.c_str());
-    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frameDesc.name.c_str());
+    auto macHeader = makeShared<EthernetMacHeader>();
+//    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frameDesc.name.c_str());
+//    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frameDesc.name.c_str());
 
-    taggedFrame->setKind(frameDesc.payload->getKind());
+//    taggedFrame->setKind(frameDesc.payload->getKind());
 //    taggedFrame->setSrc(frameDesc.src); ////will be set by underlying MAC module
 
-    taggedFrame->setDest(adj->mac);//TODO A! this should be MAC of the nextHop
-    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    taggedFrame->setDest(adj->mac);//TODO A! this should be MAC of the nextHop
+    //TODO ANSAINET4.0 Does the comment above (about MAC of nextHop) still applies?
+    macHeader->setDest(adj->mac);
+
+//    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
 //    taggedFrame->setVlan(frameDesc.VID);//vlanId is set below during send
-    taggedFrame->setEtherType(ETHERTYPE_TRILL);
+//    taggedFrame->setEtherType(ETHERTYPE_TRILL);
+    macHeader->setTypeOrLength(ETHERTYPE_TRILL);
 
-    taggedFrame->encapsulate(trillFrame->dup());
-    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-    {
-        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
 
-    untaggedFrame->setKind(frameDesc.payload->getKind());
-//    untaggedFrame->setSrc(frameDesc.src);//will be set by underlying MAC module
+//    taggedFrame->encapsulate(trillFrame->dup());
+//    frameDesc.payload->insertAtFront(macHeader);
 
-    untaggedFrame->setDest(adj->mac);
-    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    untaggedFrame->setEtherType(ETHERTYPE_TRILL);
-
-    untaggedFrame->encapsulate(trillFrame->dup());
-    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-    {
-        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
+//    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
+//    {
+//        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
 
 
     RBVLANTable::tVIDPortList::iterator it;
     for (it = frameDesc.portList.begin(); it != frameDesc.portList.end(); it++) {
-        if (it->port >= portCount) {
-            continue;
-        }
+        //ANSAINET4.0 This check no longer works with port = interfaceId
+//        if (it->port >= portCount) {
+//            continue;
+//        }
+
 //        if (spanningTree->forwarding(it->port, frameDesc.VID) == false) {
 //            continue;
 //        }
 
 
-        TrillInterfaceData *d = this->ift->getInterfaceByNetworkLayerGateIndex(it->port)->trillData();
+        Packet *packet = frameDesc.payload->dup();
+        auto interfaceTag = packet->addTag<InterfaceReq>();
+        interfaceTag->setInterfaceId(ift->getInterface(it->port)->getInterfaceId());
+
+        TrillInterfaceData *d = this->ift->getInterface(it->port)->getProtocolData<TrillInterfaceData>();
         it->action = vlanTable->getTag(d->getDesigVlan(), it->port);
         if (it->action == RBVLANTable::INCLUDE) {
 
-            taggedFrame->setVlan(d->getDesigVlan());
-            send(taggedFrame->dup(), "lowerLayerOut", it->port);
+//            taggedFrame->setVlan(d->getDesigVlan());
+
+            Ieee8021QTag * ctag = new Ieee8021QTag();
+            ctag->setVid(d->getDesigVlan());
+            macHeader->setCTag(ctag);
+            packet->insertAtFront(macHeader);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+
+//            send(taggedFrame->dup(), "ifOut", it->port);
         } else {
-            send(untaggedFrame->dup(), "lowerLayerOut", it->port);
+            packet->insertAtFront(macHeader);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+//            send(untaggedFrame->dup(), "ifOut", it->port);
         }
+        send(packet, "ifOut");
     }
 
-    delete innerFrame;
-    delete trillFrame;
-    delete untaggedFrame;
-    delete taggedFrame;
+//    delete innerFrame;
+//    delete trillFrame;
+//    delete untaggedFrame;
+//    delete taggedFrame;
     return true;
 }
 
 bool TRILL::dispatchTRILLDataUnicastRemote(tFrameDescriptor &frameDesc){
-
-    TRILLFrame *trillFrame = static_cast<TRILLFrame *>(frameDesc.payload);
-
+//TODO ANSAINET4.0 Expects TRILLFrame ([TrillHeader[InnerMacHeader[Payload]]])
+//    TRILLFrame *trillFrame = static_cast<TRILLFrame *>(frameDesc.payload);
+    Ptr<const TRILLFrame> trillFrame = frameDesc.trillFrame;
 
     /* TODO A0
      * because we don't have nickname ->systemID mapping, we have to go the hard way
      * ALSO move it to egressNativeRemote
      */
-    //TODO A1 if it works, delete commented section
-//    unsigned char *tmpSysId = new unsigned char[ISIS_SYSTEM_ID];
-//    memcpy(tmpSysId, this->isis->sysId, ISIS_SYSTEM_ID);
-//    tmpSysId[ISIS_SYSTEM_ID - 2] = trillFrame->getEgressRBNickname() >> 8;
-//    tmpSysId[ISIS_SYSTEM_ID - 1] = trillFrame->getEgressRBNickname() & 0xFF;
-//
-//    RBVLANTable::tVIDPort egressPort;
-//    unsigned char *nextHopSysId;
-//    nextHopSysId = this->clnsTable->getNextHopSystemIDBySystemID(tmpSysId);
-//    egressPort.port = clnsTable->getGateIndexBySystemID(tmpSysId);
-//    frameDesc.portList.push_back(egressPort);
-//    ISISadj *adj = this->isis->getAdjBySystemID(nextHopSysId, L1_TYPE, egressPort.port);
-//    if(egressPort.port < 0 || adj == NULL){
-//        EV <<"Error: dispatchTRILLDataUnicastRemote: NOOOOOOOOOOOOOOOOOOOOOOOOOOO!";
-//        return false;
-//    }
 
     ClnsAddress clnsAddress;
 //    SystemID tmpSystemID;
@@ -823,9 +868,11 @@ bool TRILL::dispatchTRILLDataUnicastRemote(tFrameDescriptor &frameDesc){
       return false;
     }
 
-    egressPort.port = clnsRoute->getInterface()->getNetworkLayerGateIndex();
+    egressPort.port = clnsRoute->getInterface()->getIndex();
+    int interfaceId = clnsRoute->getInterface()->getInterfaceId();
     frameDesc.portList.push_back(egressPort);
-    ISISadj *adj = this->isis->getAdjBySystemID(SystemID(clnsRoute->getGateway().getSystemId()), L1_TYPE, egressPort.port);
+    //TODO ANSAINET4.0 shouldn't it be clnsRoute->getNextHop().getSystemId()? we want to find ajd for the neighbor not for the final destination
+    ISISadj *adj = this->isis->getAdjBySystemID(SystemID(clnsRoute->getGateway().getSystemId()), L1_TYPE, interfaceId);
     if(egressPort.port < 0 || adj == NULL){
       EV <<"dispatchNativeRemote: NOOOOOOOOOOOOOOOOOOOOOOOOOOO!";
       return false;
@@ -834,62 +881,83 @@ bool TRILL::dispatchTRILLDataUnicastRemote(tFrameDescriptor &frameDesc){
      * End of horribly wrong solution
      */
 
-    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frameDesc.name.c_str());
-    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frameDesc.name.c_str());
+    auto macHeader = makeShared<EthernetMacHeader>();
 
-    taggedFrame->setKind(frameDesc.payload->getKind());
-//    taggedFrame->setSrc(frameDesc.src); ////will be set by underlying MAC module
+//    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frameDesc.name.c_str());
+//    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frameDesc.name.c_str());
+//
+//    taggedFrame->setKind(frameDesc.payload->getKind());
+////    taggedFrame->setSrc(frameDesc.src); ////will be set by underlying MAC module
 
-    taggedFrame->setDest(adj->mac);//TODO A! this should be MAC of the nextHop
-    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-//    taggedFrame->setVlan(frameDesc.VID);//vlanId is set below during send
-    taggedFrame->setEtherType(ETHERTYPE_TRILL);
+//    taggedFrame->setDest(adj->mac);//TODO A! this should be MAC of the nextHop
+    //TODO ANSAINET4.0 Does the comment above (about MAC of nextHop) still applies?
+    macHeader->setDest(adj->mac);
 
-    taggedFrame->encapsulate(trillFrame->dup());
-    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-    {
-        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
+//    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+////    taggedFrame->setVlan(frameDesc.VID);//vlanId is set below during send
+//    taggedFrame->setEtherType(ETHERTYPE_TRILL);
 
-    untaggedFrame->setKind(frameDesc.payload->getKind());
-//    untaggedFrame->setSrc(frameDesc.src);//will be set by underlying MAC module
+    macHeader->setTypeOrLength(ETHERTYPE_TRILL);
 
-    untaggedFrame->setDest(MacAddress(adj->mac));
-    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    untaggedFrame->setEtherType(ETHERTYPE_TRILL);
+//    taggedFrame->encapsulate(trillFrame->dup());
+//    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
+//    {
+//        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
 
-    untaggedFrame->encapsulate(trillFrame->dup());
-    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-    {
-        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
+//    untaggedFrame->setKind(frameDesc.payload->getKind());
+////    untaggedFrame->setSrc(frameDesc.src);//will be set by underlying MAC module
+//
+//    untaggedFrame->setDest(MacAddress(adj->mac));
+//    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    untaggedFrame->setEtherType(ETHERTYPE_TRILL);
+//
+//    untaggedFrame->encapsulate(trillFrame->dup());
+//    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
+//    {
+//        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
 
 
     RBVLANTable::tVIDPortList::iterator it;
     for (it = frameDesc.portList.begin(); it != frameDesc.portList.end(); it++) {
-        if (it->port >= portCount) {
-            continue;
-        }
+        //ANSAINET4.0 This check no longer works with port = interfaceId
+//        if (it->port >= portCount) {
+//            continue;
+//        }
 //        if (spanningTree->forwarding(it->port, frameDesc.VID) == false) {
 //            continue;
 //        }
 
 
-        TrillInterfaceData *d = this->ift->getInterfaceByNetworkLayerGateIndex(it->port)->trillData();
+        Packet *packet = frameDesc.payload->dup();
+        packet->trim();
+        auto interfaceTag = packet->addTag<InterfaceReq>();
+        interfaceTag->setInterfaceId(ift->getInterface(it->port)->getInterfaceId());
+
+        TrillInterfaceData *d = this->ift->getInterface(it->port)->getProtocolData<TrillInterfaceData>();
         it->action = vlanTable->getTag(d->getDesigVlan(), it->port);
         if (it->action == RBVLANTable::INCLUDE) {
 
-            taggedFrame->setVlan(d->getDesigVlan());
-            send(taggedFrame->dup(), "lowerLayerOut", it->port);
+//            taggedFrame->setVlan(d->getDesigVlan());
+            Ieee8021QTag * ctag = new Ieee8021QTag();
+            ctag->setVid(d->getDesigVlan());
+            macHeader->setCTag(ctag);
+            packet->insertAtFront(macHeader);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+//            send(taggedFrame->dup(), "ifOut", it->port);
         } else {
-            send(untaggedFrame->dup(), "lowerLayerOut", it->port);
+            packet->insertAtFront(macHeader);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+//            send(untaggedFrame->dup(), "ifOut", it->port);
         }
+        send(packet, "ifOut");
     }
 
 
 //    delete trillFrame;
-    delete untaggedFrame;
-    delete taggedFrame;
+//    delete untaggedFrame;
+//    delete taggedFrame;
     return true;
 }
 
@@ -897,23 +965,23 @@ bool TRILL::dispatchTRILLDataUnicastRemote(tFrameDescriptor &frameDesc){
 
 bool TRILL::dispatchNativeMultiDestRemote(tFrameDescriptor &frameDesc){
 
-//    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frameDesc.name.c_str());
-    AnsaEtherFrame * innerFrame = new AnsaEtherFrame(frameDesc.name.c_str());
 
-    innerFrame->setKind(frameDesc.payload->getKind());
-    innerFrame->setSrc(frameDesc.src);
-    innerFrame->setDest(frameDesc.dest);
-    innerFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    innerFrame->setVlan(frameDesc.VID);
-    innerFrame->setEtherType(frameDesc.etherType);
-    //TODO A! comment the section below or not?
-    innerFrame->encapsulate(frameDesc.payload->dup());
-    if (innerFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
-        innerFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
+//    AnsaEtherFrame * innerFrame = new AnsaEtherFrame(frameDesc.name.c_str());
+//
+//    innerFrame->setKind(frameDesc.payload->getKind());
+//    innerFrame->setSrc(frameDesc.src);
+//    innerFrame->setDest(frameDesc.dest);
+//    innerFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    innerFrame->setVlan(frameDesc.VID);
+//    innerFrame->setEtherType(frameDesc.etherType);
+//    //TODO A! comment the section below or not?
+//    innerFrame->encapsulate(frameDesc.payload->dup());
+//    if (innerFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
+//        innerFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
 
 
-    TRILLFrame *trillFrame = new TRILLFrame(frameDesc.name.c_str());
+    auto trillFrame = makeShared<TRILLFrame>(); //new TRILLFrame(frameDesc.name.c_str());
     trillFrame->setEthertype(frameDesc.etherType);
     trillFrame->setVersion(0);
     trillFrame->setReserved(0);
@@ -923,36 +991,46 @@ bool TRILL::dispatchNativeMultiDestRemote(tFrameDescriptor &frameDesc){
     trillFrame->setEgressRBNickname(this->isis->getNickname()); //TODO A1 check/change
     trillFrame->setIngressRBNickname(this->isis->getNickname());
     //TODO A1 set options
-    trillFrame->encapsulate(innerFrame->dup());
+
+    frameDesc.payload->insertAtFront(trillFrame);
+//    trillFrame->encapsulate(innerFrame->dup());
 
 
-    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frameDesc.name.c_str());
-    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frameDesc.name.c_str());
+    auto macHeader = makeShared<EthernetMacHeader>();
+    //TODO ANSAINET4.0 Will the dummyEncap set the src MacAddress?
 
-    taggedFrame->setKind(frameDesc.payload->getKind());
+//    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frameDesc.name.c_str());
+//    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frameDesc.name.c_str());
+
+//    taggedFrame->setKind(frameDesc.payload->getKind());
 //    taggedFrame->setSrc(frameDesc.src); ////will be set by underlying MAC module
-    taggedFrame->setDest(MacAddress(ALL_RBRIDGES));
-    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    taggedFrame->setDest(MacAddress(ALL_RBRIDGES));
+
+    macHeader->setDest(MacAddress(ALL_RBRIDGES));
+
+//    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
 //    taggedFrame->setVlan(frameDesc.VID);//vlanId is set below during send
-    taggedFrame->setEtherType(ETHERTYPE_TRILL);
 
-    taggedFrame->encapsulate(trillFrame->dup());
-    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-    {
-        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
+//    taggedFrame->setEtherType(ETHERTYPE_TRILL);
+    macHeader->setTypeOrLength(ETHERTYPE_TRILL);
 
-    untaggedFrame->setKind(frameDesc.payload->getKind());
+//    taggedFrame->encapsulate(trillFrame->dup());
+//    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
+//    {
+//        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
+
+//    untaggedFrame->setKind(frameDesc.payload->getKind());
 //    untaggedFrame->setSrc(frameDesc.src);//will be set by underlying MAC module
-    untaggedFrame->setDest(MacAddress(ALL_RBRIDGES));
-    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    untaggedFrame->setEtherType(ETHERTYPE_TRILL);
+//    untaggedFrame->setDest(MacAddress(ALL_RBRIDGES));
+//    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    untaggedFrame->setEtherType(ETHERTYPE_TRILL);
 
-    untaggedFrame->encapsulate(trillFrame->dup());
-    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-    {
-        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
+//    untaggedFrame->encapsulate(trillFrame->dup());
+//    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
+//    {
+//        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
 
 
     RBVLANTable::tVIDPortList::iterator it;
@@ -964,84 +1042,113 @@ bool TRILL::dispatchNativeMultiDestRemote(tFrameDescriptor &frameDesc){
 //            continue;
 //        }
 
+        Packet *packet = frameDesc.payload->dup();
+        auto interfaceTag = packet->addTag<InterfaceReq>();
+        interfaceTag->setInterfaceId(ift->getInterface(it->port)->getInterfaceId());
 
-        TrillInterfaceData *d = this->ift->getInterfaceByNetworkLayerGateIndex(it->port)->trillData();
+        TrillInterfaceData *d = this->ift->getInterface(it->port)->getProtocolData<TrillInterfaceData>();
         it->action = vlanTable->getTag(d->getDesigVlan(), it->port);
+        //TODO ANSAINET4.0 Implement all three cases: INCLUDE, REMOVE, NONE
         if (it->action == RBVLANTable::INCLUDE) {
 
-            taggedFrame->setVlan(d->getDesigVlan());
-            send(taggedFrame->dup(), "lowerLayerOut", it->port);
+//            taggedFrame->setVlan(d->getDesigVlan());
+            Ieee8021QTag * ctag = new Ieee8021QTag();
+            ctag->setVid(d->getDesigVlan());
+            macHeader->setCTag(ctag);
+            packet->insertAtFront(macHeader);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+
+//            send(taggedFrame->dup(), "ifOut", it->port);
         } else {
-            send(untaggedFrame->dup(), "lowerLayerOut", it->port);
+            packet->insertAtFront(macHeader);
+                        EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+//            send(untaggedFrame->dup(), "ifOut", it->port);
         }
+        send(packet, "ifOut");
     }
 
-    delete innerFrame;
-    delete trillFrame;
-    delete untaggedFrame;
-    delete taggedFrame;
+//    delete innerFrame;
+//    delete trillFrame;
+//    delete untaggedFrame;
+//    delete taggedFrame;
     return true;
 }
 
 bool TRILL::dispatchTRILLDataMultiDestRemote(tFrameDescriptor &frameDesc){
+//TODO ANSAINET4.0
+//    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frameDesc.name.c_str());
+//    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frameDesc.name.c_str());
+//
+//    taggedFrame->setKind(frameDesc.payload->getKind());
+//    //    taggedFrame->setSrc(frameDesc.src); ////will be set by underlying MAC module
+//    taggedFrame->setDest(frameDesc.dest);
+//    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    //    taggedFrame->setVlan(frameDesc.VID);//vlanId is set below during send
+//    taggedFrame->setEtherType(frameDesc.etherType);
+//
+//    taggedFrame->encapsulate(frameDesc.payload->dup());
+//    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
+//    {
+//        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
+//
+//    untaggedFrame->setKind(frameDesc.payload->getKind());
+//    //    untaggedFrame->setSrc(frameDesc.src);//will be set by underlying MAC module
+//    untaggedFrame->setDest(frameDesc.dest);
+//    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    untaggedFrame->setEtherType(frameDesc.etherType);
+//
+//    untaggedFrame->encapsulate(frameDesc.payload->dup());
+//    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
+//    {
+//        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
 
-    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frameDesc.name.c_str());
-    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frameDesc.name.c_str());
 
-    taggedFrame->setKind(frameDesc.payload->getKind());
-    //    taggedFrame->setSrc(frameDesc.src); ////will be set by underlying MAC module
-    taggedFrame->setDest(frameDesc.dest);
-    taggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    //    taggedFrame->setVlan(frameDesc.VID);//vlanId is set below during send
-    taggedFrame->setEtherType(frameDesc.etherType);
+    auto macHeader = makeShared<EthernetMacHeader>();
+    macHeader->setDest(frameDesc.dest);
+    macHeader->setTypeOrLength(ETHERTYPE_TRILL);
 
-    taggedFrame->encapsulate(frameDesc.payload->dup());
-    if (taggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-    {
-        taggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
-
-    untaggedFrame->setKind(frameDesc.payload->getKind());
-    //    untaggedFrame->setSrc(frameDesc.src);//will be set by underlying MAC module
-    untaggedFrame->setDest(frameDesc.dest);
-    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    untaggedFrame->setEtherType(frameDesc.etherType);
-
-    untaggedFrame->encapsulate(frameDesc.payload->dup());
-    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES)
-    {
-        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
 
     RBVLANTable::tVIDPortList::iterator it;
     for (it = frameDesc.portList.begin(); it != frameDesc.portList.end(); it++)
     {
-        if (it->port >= portCount)
-        {
-            continue;
-        }
+//        if (it->port >= portCount)
+//        {
+//            continue;
+//        }
         //        if (spanningTree->forwarding(it->port, frameDesc.VID) == false) {
         //            continue;
         //        }
 
-        TrillInterfaceData *d = this->ift->getInterfaceByNetworkLayerGateIndex(it->port)->trillData();
-        it->action = vlanTable->getTag(d->getDesigVlan(), it->port);
-        if (it->action == RBVLANTable::INCLUDE)
-        {
+        Packet *packet = frameDesc.payload->dup();
+        packet->trim();
+        auto interfaceTag = packet->addTag<InterfaceReq>();
+        interfaceTag->setInterfaceId(ift->getInterface(it->port)->getInterfaceId());
 
-            taggedFrame->setVlan(d->getDesigVlan());
-            send(taggedFrame->dup(), "lowerLayerOut", it->port);
+        TrillInterfaceData *d = this->ift->getInterface(it->port)->getProtocolData<TrillInterfaceData>();
+        it->action = vlanTable->getTag(d->getDesigVlan(), it->port);
+        if (it->action == RBVLANTable::INCLUDE) {
+
+//            taggedFrame->setVlan(d->getDesigVlan());
+            Ieee8021QTag * ctag = new Ieee8021QTag();
+            ctag->setVid(d->getDesigVlan());
+            macHeader->setCTag(ctag);
+            packet->insertAtFront(macHeader);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+//            send(taggedFrame->dup(), "ifOut", it->port);
+        } else {
+            packet->insertAtFront(macHeader);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+//            send(untaggedFrame->dup(), "ifOut", it->port);
         }
-        else
-        {
-            send(untaggedFrame->dup(), "lowerLayerOut", it->port);
-        }
+        send(packet, "ifOut");
     }
 
 //        delete innerFrame;
 //        delete trillFrame;
-        delete untaggedFrame;
-        delete taggedFrame;
+//        delete untaggedFrame;
+//        delete taggedFrame;
         return true;
 }
 
@@ -1057,25 +1164,38 @@ bool TRILL::isAllowedByGate(int vlanID, int gateIndex){
     return vlanTable->isAllowed(vlanID, gateIndex);
 
 }
+//TODO ANSAINET4.0 Unused? Delete?
+//void TRILL::learn(AnsaEtherFrame *frame){
+//    //TODO ANSAINET4.0 Uncomment below
+////    rbMACTable->updateNative(frame->getSrc(), frame->getVlan(), frame->getArrivalGate()->getIndex());
+//
+//}
 
-void TRILL::learn(AnsaEtherFrame *frame){
-    //remember the last parameter is not interfaceIndex, but gateId WRONG
-    rbMACTable->updateNative(frame->getSrc(), frame->getVlan(), frame->getArrivalGate()->getIndex());
+//TODO ANSAINET4.0 Unused? Delete?
+//void TRILL::learn(const Ptr<const EthernetMacHeader> macHeader, Packet *packet){
+//    //remember the last parameter is not interfaceIndex, but gateId WRONG!!
+//    /*TODO instead of frame->getVlan() do something like:
+//     * find out if tagAction ::REMOVE is set to this port
+//     *  if yes -> use some default vlanId
+//     *  if not -> drop frame?
+//     */
+//    int interfaceId = packet->findTag<InterfaceInd>()->getInterfaceId();
+//
+//    //TODO ANSAINET4.0 Make unified version for non and tagged frames (VLANs)
+//
+//    if(macHeader->getCTag() == nullptr)
+//    {
+//        //TODO Use default VLAN ID for this port?
+////        rbMACTable->updateNative(macHeader->getSrc(), 1, interfaceId);
+//
+//    }else{
+////        rbMACTable->updateNative(macHeader->getSrc(), macHeader->getCTag()->getVid(), interfaceId);
+//    }
+//
+//
+//}
 
-}
-
-void TRILL::learn(EthernetIIFrame *frame){
-    //remember the last parameter is not interfaceIndex, but gateId WRONG!!
-    /*TODO instead of frame->getVlan() do something like:
-     * find out if tagAction ::REMOVE is set to this port
-     *  if yes -> use some default vlanId
-     *  if not -> drop frame?
-     */
-    rbMACTable->updateNative(frame->getSrc(), 1, frame->getArrivalGate()->getIndex());
-
-}
-
-void TRILL::(TRILL::tFrameDescriptor& frame) {
+void TRILL::learn(TRILL::tFrameDescriptor& frame) {
     if (!frame.src.isBroadcast() && !frame.src.isMulticast()) {
       rbMACTable->updateNative(frame.src, frame.VID, frame.rPort);
     }
@@ -1089,71 +1209,75 @@ void TRILL::learnTRILLData(TRILL::tFrameDescriptor &innerFrameDesc, TRILLNicknam
 
 
 // TODO A3: Unused? Delete?
-void TRILL::handleIncomingFrame(EthernetIIFrame *frame) {
-    // If buffer not full, insert payload frame into buffer and process the frame in parallel.
-    cMessage *msg = this->currentMsg;
-    ASSERT(msg->getContextPointer()==NULL);
-    msg->setContextPointer(frame);
-    scheduleAt(simTime(), msg);
-    return;
-}
+//TODO ANSAINET4.0
+//void TRILL::handleIncomingFrame(EthernetIIFrame *frame) {
+//    // If buffer not full, insert payload frame into buffer and process the frame in parallel.
+//    cMessage *msg = this->currentMsg;
+//    ASSERT(msg->getContextPointer()==NULL);
+//    msg->setContextPointer(frame);
+//    scheduleAt(simTime(), msg);
+//    return;
+//}
 
 void TRILL::processFrame(cMessage *msg) {
-    EthernetIIFrame *frame = (EthernetIIFrame *) msg->getContextPointer();
-    ASSERT(frame);
-    msg->setContextPointer(NULL);
-    int inputport = frame->getArrivalGate()->getIndex();
-
-    handleAndDispatchFrame(frame, inputport);
+    //TODO ANSAINET4.0
+//    EthernetIIFrame *frame = (EthernetIIFrame *) msg->getContextPointer();
+//    ASSERT(frame);
+//    msg->setContextPointer(NULL);
+//    int inputport = frame->getArrivalGate()->getIndex();
+//
+//    handleAndDispatchFrame(frame, inputport);
     return;
 }
 
-void TRILL::handleAndDispatchFrame(EthernetIIFrame *frame, int inputport) {
-    this->rbMACTable->update(frame->getSrc(), inputport);
+//TODO ANSAINET4.0
+//void TRILL::handleAndDispatchFrame(EthernetIIFrame *frame, int inputport) {
+//    this->rbMACTable->update(frame->getSrc(), inputport);
+//
+///*
+//     AnsaEtherFrame * tmp;
+//     tmp = this->tagMsg(frame, 1);
+//     newframe = this->untagMsg(tmp);
+//*/
+//
+//    // handle broadcast frames first
+//    if (frame->getDest().isBroadcast()) {
+//        EV<< "Broadcasting broadcast frame " << frame << endl;
+//        broadcastFrame(frame, inputport);
+//        return;
+//    }
+//
+//    // Finds output port of destination address and sends to output port
+//    // if not found then broadcasts to all other ports instead
+//    MACTable::tPortList portList = rbMACTable->getPorts(frame->getDest());
+//
+//    if (portList.size() == 0) {
+//        EV << "Dest address " << frame->getDest() << " unknown, broadcasting frame " << frame << endl;
+//        broadcastFrame(frame, inputport);
+//    } else {
+//        for (unsigned int i = 0; i < portList.size(); i++) {
+//            if (inputport != portList.at(i)) {
+//                EV << "Sending frame " << frame << " with dest address " << frame->getDest() << " to port " << portList.at(i) << endl;
+//                send(frame->dup(), "ifOut", portList.at(i));
+//            }
+//        }
+//        delete frame;
+//    }
+//
+//    return;
+//}
 
-/*
-     AnsaEtherFrame * tmp;
-     tmp = this->tagMsg(frame, 1);
-     newframe = this->untagMsg(tmp);
-*/
-
-    // handle broadcast frames first
-    if (frame->getDest().isBroadcast()) {
-        EV<< "Broadcasting broadcast frame " << frame << endl;
-        broadcastFrame(frame, inputport);
-        return;
-    }
-
-    // Finds output port of destination address and sends to output port
-    // if not found then broadcasts to all other ports instead
-    MACTable::tPortList portList = rbMACTable->getPorts(frame->getDest());
-
-    if (portList.size() == 0) {
-        EV << "Dest address " << frame->getDest() << " unknown, broadcasting frame " << frame << endl;
-        broadcastFrame(frame, inputport);
-    } else {
-        for (unsigned int i = 0; i < portList.size(); i++) {
-            if (inputport != portList.at(i)) {
-                EV << "Sending frame " << frame << " with dest address " << frame->getDest() << " to port " << portList.at(i) << endl;
-                send(frame->dup(), "lowerLayerOut", portList.at(i));
-            }
-        }
-        delete frame;
-    }
-
-    return;
-}
-
-void TRILL::broadcastFrame(EthernetIIFrame *frame, int inputport) {
-    for (int i = 0; i < this->portCount; ++i) {
-        if (i != inputport) {
-            send((EthernetIIFrame*) frame->dup(), "lowerLayerOut", i);
-        }
-    }
-    delete frame;
-
-    return;
-}
+//TODO ANSAINET4.0
+//void TRILL::broadcastFrame(EthernetIIFrame *frame, int inputport) {
+//    for (int i = 0; i < this->portCount; ++i) {
+//        if (i != inputport) {
+//            send((EthernetIIFrame*) frame->dup(), "ifOut", i);
+//        }
+//    }
+//    delete frame;
+//
+//    return;
+//}
 
 void TRILL::sinkMsg(cMessage *msg) {
     send(msg, "toSink");
@@ -1170,22 +1294,22 @@ void TRILL::dispatchBPDU(cMessage *msg, int port) {
     if (port >= this->portCount || port < 0) {
         return;
     }
-
-    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(msg->getName());
-
-    untaggedFrame->setKind(msg->getKind());
-    untaggedFrame->setSrc(bridgeAddress);
-    untaggedFrame->setDest(bridgeGroupAddress);
-    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    untaggedFrame->setEtherType(-1);
-
-    untaggedFrame->encapsulate((cPacket *)msg);
-    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
-        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
-
-
-    send((EthernetIIFrame*) untaggedFrame, "lowerLayerOut", port);
+    //TODO ANSAINET4.0
+//    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(msg->getName());
+//
+//    untaggedFrame->setKind(msg->getKind());
+//    untaggedFrame->setSrc(bridgeAddress);
+//    untaggedFrame->setDest(bridgeGroupAddress);
+//    untaggedFrame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    untaggedFrame->setEtherType(-1);
+//
+//    untaggedFrame->encapsulate((cPacket *)msg);
+//    if (untaggedFrame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
+//        untaggedFrame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
+//
+//
+//    send((EthernetIIFrame*) untaggedFrame, "ifOut", port);
 }
 
 void TRILL::deliverBPDU(TRILL::tFrameDescriptor& frame) {
@@ -1217,46 +1341,47 @@ void TRILL::finish() {
  return;
  }*/
 
+//TODO ANSAINET4.0
+//AnsaEtherFrame * TRILL::tagMsg(EthernetIIFrame * _frame, int _vlan) {
+//
+//    EthernetIIFrame * tmp = _frame;
+//
+//    cPacket * payload = tmp->decapsulate();
+//    AnsaEtherFrame * frame = new AnsaEtherFrame(payload->getName());
+//
+//    frame->setSrc(tmp->getSrc());
+//    frame->setDest(tmp->getDest());
+//    frame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    frame->setVlan(_vlan);
+//    frame->setEtherType(tmp->getEtherType());
+//
+//    frame->encapsulate(payload);
+//    if (frame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
+//        frame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
+//
+//    return frame;
+//}
 
-AnsaEtherFrame * TRILL::tagMsg(EthernetIIFrame * _frame, int _vlan) {
-
-    EthernetIIFrame * tmp = _frame;
-
-    cPacket * payload = tmp->decapsulate();
-    AnsaEtherFrame * frame = new AnsaEtherFrame(payload->getName());
-
-    frame->setSrc(tmp->getSrc());
-    frame->setDest(tmp->getDest());
-    frame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    frame->setVlan(_vlan);
-    frame->setEtherType(tmp->getEtherType());
-
-    frame->encapsulate(payload);
-    if (frame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
-        frame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
-
-    return frame;
-}
-
-EthernetIIFrame * TRILL::untagMsg(AnsaEtherFrame * _frame) {
-
-    AnsaEtherFrame * tmp = _frame;
-
-    cPacket * payload = tmp->decapsulate();
-    EthernetIIFrame * frame = new EthernetIIFrame(payload->getName());
-
-    frame->setSrc(tmp->getSrc()); // if blank, will be filled in by MAC
-    frame->setDest(tmp->getDest());
-    frame->setByteLength(ETHER_MAC_FRAME_BYTES);
-    frame->setEtherType(tmp->getEtherType());
-
-    frame->encapsulate(payload);
-    if (frame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
-        frame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
-    }
-    return frame;
-}
+//TODO ANSAINET4.0
+//EthernetIIFrame * TRILL::untagMsg(AnsaEtherFrame * _frame) {
+//
+//    AnsaEtherFrame * tmp = _frame;
+//
+//    cPacket * payload = tmp->decapsulate();
+//    EthernetIIFrame * frame = new EthernetIIFrame(payload->getName());
+//
+//    frame->setSrc(tmp->getSrc()); // if blank, will be filled in by MAC
+//    frame->setDest(tmp->getDest());
+//    frame->setByteLength(ETHER_MAC_FRAME_BYTES);
+//    frame->setEtherType(tmp->getEtherType());
+//
+//    frame->encapsulate(payload);
+//    if (frame->getByteLength() < MIN_ETHERNET_FRAME_BYTES) {
+//        frame->setByteLength(MIN_ETHERNET_FRAME_BYTES); // "padding"
+//    }
+//    return frame;
+//}
 /*
 
  void TRILL::untagMsg() {
@@ -1324,6 +1449,8 @@ bool TRILL::processNative(tFrameDescriptor &frameDesc){
             //process locally
             //i guess send it back to rBridgeSplitter?
             //TODO A2
+            //TODO ANSAINET4.0 Just send it up right?
+            send(frameDesc.payload, "upperLayerOut");
             break;
 
         case RBMACTable::EST_LOCAL_PORT:
@@ -1339,7 +1466,11 @@ bool TRILL::processNative(tFrameDescriptor &frameDesc){
 //                RBVLANTable::s_vid_port vid_port = RBVLANTable::s_vid_port();
                 RBVLANTable::tVIDPort vid_port;
                 //TODO always remove tag for native frames?
-                vid_port.action = RBVLANTable::REMOVE;
+                //TODO ANSAINET4.0 get tag action (remove or not) like in egress?
+                // get out port
+                // get action for that port (from tVIDPortList)
+                vid_port.action = vlanTable->getTag(frameDesc.VID, frameDesc.record.portList.at(0));
+//                vid_port.action = RBVLANTable::REMOVE;
                 vid_port.port = frameDesc.record.portList.at(0);
                 frameDesc.portList.push_back(vid_port);
 
@@ -1349,7 +1480,7 @@ bool TRILL::processNative(tFrameDescriptor &frameDesc){
             break;
 
         case RBMACTable::EST_RBRIDGE:
-            //TODO A!
+            //TODO A! I forgot what this todo is for.
             dispatchNativeRemote(frameDesc);
             return true;
             break;
@@ -1417,7 +1548,17 @@ bool TRILL::processTRILLData(tFrameDescriptor &frameDesc){
     //RFC 6325 4.6.2 4. ?? how could this frame NOT-have TRILL ethertype?
     //skipping
 
-    TRILLFrame *trillFrame = static_cast<TRILLFrame *> (frameDesc.payload);
+    //remove the ethernet padding
+    frameDesc.payload->popAtBack<EthernetFcs>(ETHER_FCS_BYTES);
+
+    b offset = frameDesc.payload->getFrontOffset();
+    frameDesc.payload->setFrontOffset(offset + frameDesc.macHeader->getChunkLength());
+
+    frameDesc.trillFrame = frameDesc.payload->peekAtFront<TRILLFrame>();
+    //TODO ANSAINET4.0 use frameDesc.trillFrame
+    Ptr<const TRILLFrame> trillFrame = frameDesc.trillFrame;
+
+//    TRILLFrame *trillFrame = static_cast<TRILLFrame *> (frameDesc.payload);
     //RFC 6325 4.6.2 5.
     if(trillFrame->getVersion() != TRILL_VERSION){
         return false;
@@ -1460,19 +1601,21 @@ bool TRILL::processTRILLDataUnicast(tFrameDescriptor &frameDesc){
 
     //check egress Nickname. if it is unknown or reserved -> discard
     tFrameDescriptor innerFrameDesc;
-    TRILLFrame *trillFrame = static_cast<TRILLFrame *>(frameDesc.payload);
-    cPacket *tmpPacket = frameDesc.payload->dup();
+    Ptr<const TRILLFrame> trillFrame = frameDesc.trillFrame;
+//    cPacket *tmpPacket = frameDesc.payload->dup();
 
-    AnsaEtherFrame *innerFrame = static_cast<AnsaEtherFrame *>(tmpPacket->decapsulate());
-    delete tmpPacket;
+    b offset = frameDesc.payload->getFrontOffset();
+    frameDesc.payload->setFrontOffset(offset + trillFrame->getChunkLength());
+//    AnsaEtherFrame *innerFrame = static_cast<AnsaEtherFrame *>(tmpPacket->decapsulate());
+//    delete tmpPacket;
 
-    this->ingress(innerFrameDesc, innerFrame, frameDesc.rPort);
+    this->ingress(innerFrameDesc, frameDesc.payload, frameDesc.rPort);
     this->learnTRILLData(innerFrameDesc, trillFrame->getIngressRBNickname());
     bool result;
     if(trillFrame->getEgressRBNickname() == this->isis->getNickname()){
         //destination RBridge
 //        AnsaEtherFrame *innerFrame = static_cast<AnsaEtherFrame *>((frameDesc.payload->dup())->decapsulate());
-        if(innerFrame->getDest().isMulticast()){
+        if(innerFrameDesc.dest.isMulticast()){
             //discard
             return false;
         }
@@ -1493,6 +1636,7 @@ bool TRILL::processTRILLDataUnicast(tFrameDescriptor &frameDesc){
                 //process localy
                 //i guess send it back to rBridgeSplitter?
                 //TODO A2
+                return true;
                 break;
 
             case RBMACTable::EST_LOCAL_PORT:
@@ -1509,8 +1653,8 @@ bool TRILL::processTRILLDataUnicast(tFrameDescriptor &frameDesc){
                     innerFrameDesc.portList.push_back(vid_port);
 
                     result = dispatchNativeLocalPort(innerFrameDesc);
-                    delete innerFrame;
-                    delete innerFrameDesc.payload;
+//                    delete innerFrame;
+//                    delete innerFrameDesc.payload;
                     return result;
                     //                return true;
 
@@ -1527,8 +1671,8 @@ bool TRILL::processTRILLDataUnicast(tFrameDescriptor &frameDesc){
                 //TODO A! change to dispatchNativeMulti (should be send on all links where this RBridge is App Fwd)
 
                 result = dispatchNativeRemote(innerFrameDesc);
-                delete innerFrame;
-                delete innerFrameDesc.payload;
+//                delete innerFrame;
+//                delete innerFrameDesc.payload;
                 return result;
                 break;
 
@@ -1545,16 +1689,16 @@ bool TRILL::processTRILLDataUnicast(tFrameDescriptor &frameDesc){
                 //minimize output ports
                 this->egressNativeLocal(innerFrameDesc);
                 result = dispatchNativeLocalPort(innerFrameDesc);
-                delete innerFrame;
-                delete innerFrameDesc.payload;
+//                delete innerFrame;
+//                delete innerFrameDesc.payload;
                 return result;
 
 
             break;
                 default:
                 EV << "TRILL: ERROR: ProcessNative unrecognized type" <<endl;
-                delete innerFrame;
-                delete innerFrameDesc.payload;
+//                delete innerFrame;
+//                delete innerFrameDesc.payload;
 
                 return false;
             }
@@ -1563,11 +1707,21 @@ bool TRILL::processTRILLDataUnicast(tFrameDescriptor &frameDesc){
         else
         {
             //transit RBridge
-            trillFrame->decHopCount();
+            frameDesc.payload->setFrontOffset(offset);
+            //TODO ANSAINET4.0 Verify there is hopCount < 1 check
+            //decrement hopcount
+            const auto& trillHeader = removeProtocolHeader<TRILLFrame>(frameDesc.payload);
+            trillHeader->setHopCount(trillHeader->getHopCount() - 1);
+            frameDesc.payload->insertAtFront(trillHeader);
+            //update frameDesc trillFrame reference
+            frameDesc.trillFrame = frameDesc.payload->peekAtFront<TRILLFrame>();
+
+//            trillFrame->decHopCount();
+
             //egressTRILLDataUnicastRemote
             result = this->dispatchTRILLDataUnicastRemote(frameDesc);
-            delete innerFrame;
-            delete innerFrameDesc.payload;
+//            delete innerFrame;
+//            delete innerFrameDesc.payload;
 
                             return result;
         }
@@ -1579,13 +1733,15 @@ bool TRILL::processTRILLDataUnicast(tFrameDescriptor &frameDesc){
 
 bool TRILL::processTRILLDataMultiDest(tFrameDescriptor &frameDesc){
 
-    TRILLFrame *trillFrame = static_cast<TRILLFrame *> (frameDesc.payload);
+//    TRILLFrame *trillFrame = static_cast<TRILLFrame *> (frameDesc.payload);
+    Ptr<const TRILLFrame> trillFrame = frameDesc.trillFrame;
 
     //RFC 6325 4.6.2.5.
-    //examine ingress/egress nicknames, if iether is unknown or reserved -> discard frame
+    //examine ingress/egress nicknames, if either is unknown or reserved -> discard frame
 
     //get adjacencies/paths for Outer.MacSA and if it doesn't belong to specified tree -> discard
-    ISISadj *adj = this->isis->getAdjByMAC(frameDesc.src, L1_TYPE, frameDesc.rPort);
+
+    ISISadj *adj = this->isis->getAdjByMAC(frameDesc.src, L1_TYPE, ift->getInterface(frameDesc.rPort)->getInterfaceId());
     if(adj == NULL){
         //discard -> received from somebody with whom we don't have adjacency
         return false;
@@ -1604,7 +1760,6 @@ bool TRILL::processTRILLDataMultiDest(tFrameDescriptor &frameDesc){
             found = true;
             systemIDs->erase(it);
             break;
-
         }
     }
 
@@ -1612,23 +1767,23 @@ bool TRILL::processTRILLDataMultiDest(tFrameDescriptor &frameDesc){
         return false;
     }
 
-
-
     //Reverse path Forwarding check on both nicknames
 
     //skipping additional check more info in RFC 6325 section 4.5.2.
     tFrameDescriptor innerFrameDesc;
-    cPacket *tmpPacket = frameDesc.payload->dup();
+//    cPacket *tmpPacket = frameDesc.payload->dup();
 
-    AnsaEtherFrame *innerFrame = static_cast<AnsaEtherFrame *>(tmpPacket->decapsulate());
-    delete tmpPacket;
+    b offset = frameDesc.payload->getFrontOffset();
+    frameDesc.payload->setFrontOffset(offset + trillFrame->getChunkLength());
+//    AnsaEtherFrame *innerFrame = static_cast<AnsaEtherFrame *>(tmpPacket->decapsulate());
+//    delete tmpPacket;
 
-    this->ingress(innerFrameDesc, innerFrame, frameDesc.rPort);
+    this->ingress(innerFrameDesc, frameDesc.payload, frameDesc.rPort);
 
     if(innerFrameDesc.VID == 0x0 || innerFrameDesc.VID == 0xFFF){
         //discard
-        delete innerFrame;
-        delete innerFrameDesc.payload;
+//        delete innerFrame;
+//        delete innerFrameDesc.payload;
         return false;
     }
 
@@ -1637,14 +1792,12 @@ bool TRILL::processTRILLDataMultiDest(tFrameDescriptor &frameDesc){
 
 
     for(int i = 0; i < ift->getNumInterfaces(); i++){
-        TrillInterfaceData *d = ift->getInterface(i)->trillData();
+        TrillInterfaceData *d = ift->getInterface(i)->getProtocolData<TrillInterfaceData>();
         if(d->isAppointedForwarder(innerFrameDesc.VID, this->isis->getNickname())){
             //learn
 
                 this->learnTRILLData(innerFrameDesc, trillFrame->getIngressRBNickname());
 
-
-//            innerFrameDesc.portList.push_back(ift->getInterface(i)->getNetworkLayerGateIndex());
             break;
         }
     }
@@ -1653,12 +1806,22 @@ bool TRILL::processTRILLDataMultiDest(tFrameDescriptor &frameDesc){
 
     this->dispatchNativeLocalPort(innerFrameDesc);
     //delete copy of innerFrame
-    delete innerFrame; //the original innerFrame is still in frameDesc.payload (TRILL encapsulated)
-    delete innerFrameDesc.payload;
+//    delete innerFrame;
+//    delete innerFrameDesc.payload;
 
 
     //hop count decreased
-    trillFrame->decHopCount();
+
+    frameDesc.payload->setFrontOffset(offset);
+    //TODO ANSAINET4.0 Verify there is hopCount < 1 check
+    //decrement hopcount
+    const auto& trillHeader = removeProtocolHeader<TRILLFrame>(frameDesc.payload);
+    trillHeader->setHopCount(trillHeader->getHopCount() - 1);
+    frameDesc.payload->insertAtFront(trillHeader);
+    //update frameDesc trillFrame reference
+    frameDesc.trillFrame = frameDesc.payload->peekAtFront<TRILLFrame>();
+
+//    trillFrame->decHopCount();
 
     //from set of adjacencies/paths delete the source one and send it all others
 
@@ -1684,7 +1847,7 @@ bool TRILL::processTRILLDataMultiDest(tFrameDescriptor &frameDesc){
 
 bool TRILL::isNativeAllowed(tFrameDescriptor &frameDesc){
 
-    TrillInterfaceData *d = (ift->getInterfaceByNetworkLayerGateIndex(frameDesc.rPort))->trillData();
+    TrillInterfaceData *d = (ift->getInterfaceById(frameDesc.rPort))->getProtocolData<TrillInterfaceData>();
     //RFC 6325 4.6.1
     if(d->isDisabled() || d->isTrunk() || d->isP2p()){
         //frame should be discarded

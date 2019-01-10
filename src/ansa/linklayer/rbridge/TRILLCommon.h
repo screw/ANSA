@@ -35,7 +35,7 @@ namespace inet {
 
 static const int TRILL_NICKNAME_STRING_SIZE = 4; //4 chars
 
-class TRILLNickname {
+class ANSA_API TRILLNickname {
     protected:
     uint16 nickname;
 

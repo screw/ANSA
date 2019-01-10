@@ -17,6 +17,7 @@
 #ifndef __MACTABLE_H__
 #define __MACTABLE_H__
 
+#include "ansa/common/ANSADefs.h"
 
 //#include "inet/linklayer/ethernet/Ethernet.h"
 #include "inet/linklayer/ethernet/EtherFrame_m.h"
@@ -28,7 +29,7 @@
 
 namespace inet {
 
-class MACTable : public cSimpleModule
+class ANSA_API MACTable : public cSimpleModule
 {
 public:
   MACTable();

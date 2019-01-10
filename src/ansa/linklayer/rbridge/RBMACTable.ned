@@ -15,7 +15,9 @@
 
 package ansa.linklayer.rbridge;
 
-simple RBMACTable
+import inet.linklayer.contract.IMacAddressTable;
+
+simple RBMACTable like IMacAddressTable
 {
     parameters:
         @display("i=block/table2,lightblue");
@@ -23,5 +25,8 @@ simple RBMACTable
         xml configFile = default(xmldoc("config.xml"));
         string deviceId = default("");
         string deviceType = "RBridge";
+        //TODO ANSAINET4.0 Utilize these value (at least load them in .cc)
+        double agingTime @unit(s) = default(120s);
+        string addressTableFile = default("");
         
 }

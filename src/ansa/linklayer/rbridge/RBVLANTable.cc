@@ -78,7 +78,7 @@ int RBVLANTable::getVID(int Port) {
 //        simulation.endRun();
     }
     if (Port > portCount) {
-        error("Portnumber is exceeds port count in getVID");
+        error("Port number exceeds port count in getVID");
 //        simulation.endRun();
     }
     return portVIDTable.at(Port).VID;
@@ -103,6 +103,7 @@ bool RBVLANTable::isAllowed(int VID, int _port) {
     return false;
 }
 
+//Why is port action per VLAN?
 RBVLANTable::tTagAction RBVLANTable::getTag(int VID, int _port) {
     tVIDRecord tmp = vidTable.at(VID);
     if (tmp.VID != VID) { // VLAN is not active

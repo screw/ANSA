@@ -1,4 +1,6 @@
 
+
+import ansa.common.ANSADefs;
 import inet.common.packet.chunk.Chunk;
 //import inet.linklayer.ethernet.Ethernet;
 import inet.linklayer.common.MacAddress;
