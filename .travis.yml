@@ -11,7 +11,7 @@ services:
   - docker
 
 before_install:
-  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-${TARGET_PLATFORM}-${MODE}
+  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.1.0-${TARGET_PLATFORM}-${MODE}
 #  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-linux-debug
 #  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-windows-release
 #  - docker pull xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-windows-debug
@@ -26,7 +26,7 @@ cache:
 docker_command: &DOCKER_COMMAND travis_wait 30 sleep infinity &
                   docker run -ti --env TARGET_PLATFORM --env MODE --env TRAVIS_REPO_SLUG
                   -v /home/travis/build/$TRAVIS_REPO_SLUG:/$TRAVIS_REPO_SLUG
-                  -v $HOME/docker_ccache:/root/.ccache xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.0.0-${TARGET_PLATFORM}-${MODE}
+                  -v $HOME/docker_ccache:/root/.ccache xmarek02/omnetpp-travis-ansainet-base:5.4.1-v4.1.0-${TARGET_PLATFORM}-${MODE}
                   /bin/bash /$TRAVIS_REPO_SLUG/scripts/travis/travis-stage-$STAGE.sh $INNER_ARGS
                    # the last two (STAGE and INNER_ARGS) come from export statements, not env: lines
 
