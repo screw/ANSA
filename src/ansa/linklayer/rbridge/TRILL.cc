@@ -633,7 +633,7 @@ bool TRILL::dispatchTRILLControl(Packet* packet){
 bool TRILL::dispatchNativeLocalPort(TRILL::tFrameDescriptor& frameDesc) {
 
 
-//    EtherEncap::addPaddingAndFcs(frame.payload, FCS_COMPUTED);
+//    EtherEncap::addPaddingAndFcs(frame.payload, FCS_DECLARED_CORRECT);
 
 //    EthernetIIFrame * untaggedFrame = new EthernetIIFrame(frame.name.c_str());
 //    AnsaEtherFrame * taggedFrame = new AnsaEtherFrame(frame.name.c_str());
@@ -670,6 +670,7 @@ bool TRILL::dispatchNativeLocalPort(TRILL::tFrameDescriptor& frameDesc) {
 //        }
         Packet* packet = frameDesc.payload->dup();
         packet->trim();
+        packet->clearTags();
         packet->addTagIfAbsent<InterfaceReq>()->setInterfaceId(ift->getInterface(it->port)->getInterfaceId());
 
         if (it->action == RBVLANTable::INCLUDE) {
@@ -679,7 +680,7 @@ bool TRILL::dispatchNativeLocalPort(TRILL::tFrameDescriptor& frameDesc) {
             //update it? XX leave it if ctag exist, add if not (but which VLAN ID?) ??
             //add header back
             //add Fcs
-//            EtherEncap::addPaddingAndFcs(frameDesc.payload, FCS_COMPUTED);
+//            EtherEncap::addPaddingAndFcs(frameDesc.payload, FCS_DECLARED_CORRECT);
             send(packet, "ifOut");
         } else if (it->action == RBVLANTable::REMOVE) {
             //TODO ANSAINET4.0 get the header
@@ -688,7 +689,7 @@ bool TRILL::dispatchNativeLocalPort(TRILL::tFrameDescriptor& frameDesc) {
             // remove the ctag (set it to nullptr)
             //add header back
             //add Fcs
-//            EtherEncap::addPaddingAndFcs(frameDesc.payload, FCS_COMPUTED);
+//            EtherEncap::addPaddingAndFcs(frameDesc.payload, FCS_DECLARED_CORRECT);
             send(packet, "ifOut");
         } else if (it->action == RBVLANTable::NONE) {
 
@@ -728,10 +729,12 @@ bool TRILL::dispatchNativeRemote(tFrameDescriptor &frameDesc){
     trillFrame->setEgressRBNickname(frameDesc.record.ingressNickname); //yes ingressNickname is correct
     trillFrame->setIngressRBNickname(this->isis->getNickname());
     //TODO A1 set options
-    frameDesc.payload->insertAtFront(trillFrame);
+//    frameDesc.payload->insertAtFront(trillFrame);
 
-    Packet *packet = frameDesc.payload->dup();
-    packet->trim();
+    Packet *trillPacket = frameDesc.payload->dup();
+    trillPacket->trim();
+    trillPacket->clearTags();
+    trillPacket->insertAtFront(trillFrame);
 
 //    trillFrame->encapsulate(innerFrame->dup());
 
@@ -811,7 +814,7 @@ bool TRILL::dispatchNativeRemote(tFrameDescriptor &frameDesc){
 //        }
 
 
-        Packet *packet = frameDesc.payload->dup();
+        Packet *packet = trillPacket->dup();
         auto interfaceTag = packet->addTag<InterfaceReq>();
         interfaceTag->setInterfaceId(ift->getInterface(it->port)->getInterfaceId());
 
@@ -821,16 +824,16 @@ bool TRILL::dispatchNativeRemote(tFrameDescriptor &frameDesc){
 
 //            taggedFrame->setVlan(d->getDesigVlan());
 
-            Ieee8021QTag * ctag = new Ieee8021QTag();
+            Ieee8021qHeader * ctag = new Ieee8021qHeader();
             ctag->setVid(d->getDesigVlan());
             macHeader->setCTag(ctag);
             packet->insertAtFront(macHeader);
-            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_DECLARED_CORRECT);
 
 //            send(taggedFrame->dup(), "ifOut", it->port);
         } else {
             packet->insertAtFront(macHeader);
-            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_DECLARED_CORRECT);
 //            send(untaggedFrame->dup(), "ifOut", it->port);
         }
         send(packet, "ifOut");
@@ -840,6 +843,7 @@ bool TRILL::dispatchNativeRemote(tFrameDescriptor &frameDesc){
 //    delete trillFrame;
 //    delete untaggedFrame;
 //    delete taggedFrame;
+    delete trillPacket;
     return true;
 }
 
@@ -932,6 +936,7 @@ bool TRILL::dispatchTRILLDataUnicastRemote(tFrameDescriptor &frameDesc){
 
         Packet *packet = frameDesc.payload->dup();
         packet->trim();
+        packet->clearTags();
         auto interfaceTag = packet->addTag<InterfaceReq>();
         interfaceTag->setInterfaceId(ift->getInterface(it->port)->getInterfaceId());
 
@@ -940,15 +945,15 @@ bool TRILL::dispatchTRILLDataUnicastRemote(tFrameDescriptor &frameDesc){
         if (it->action == RBVLANTable::INCLUDE) {
 
 //            taggedFrame->setVlan(d->getDesigVlan());
-            Ieee8021QTag * ctag = new Ieee8021QTag();
+            Ieee8021qHeader * ctag = new Ieee8021qHeader();
             ctag->setVid(d->getDesigVlan());
             macHeader->setCTag(ctag);
             packet->insertAtFront(macHeader);
-            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_DECLARED_CORRECT);
 //            send(taggedFrame->dup(), "ifOut", it->port);
         } else {
             packet->insertAtFront(macHeader);
-            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_DECLARED_CORRECT);
 //            send(untaggedFrame->dup(), "ifOut", it->port);
         }
         send(packet, "ifOut");
@@ -992,7 +997,7 @@ bool TRILL::dispatchNativeMultiDestRemote(tFrameDescriptor &frameDesc){
     trillFrame->setIngressRBNickname(this->isis->getNickname());
     //TODO A1 set options
 
-    frameDesc.payload->insertAtFront(trillFrame);
+//    frameDesc.payload->insertAtFront(trillFrame);
 //    trillFrame->encapsulate(innerFrame->dup());
 
 
@@ -1043,6 +1048,9 @@ bool TRILL::dispatchNativeMultiDestRemote(tFrameDescriptor &frameDesc){
 //        }
 
         Packet *packet = frameDesc.payload->dup();
+        packet->trim();
+        packet->clearTags();
+        packet->insertAtFront(trillFrame);
         auto interfaceTag = packet->addTag<InterfaceReq>();
         interfaceTag->setInterfaceId(ift->getInterface(it->port)->getInterfaceId());
 
@@ -1052,16 +1060,16 @@ bool TRILL::dispatchNativeMultiDestRemote(tFrameDescriptor &frameDesc){
         if (it->action == RBVLANTable::INCLUDE) {
 
 //            taggedFrame->setVlan(d->getDesigVlan());
-            Ieee8021QTag * ctag = new Ieee8021QTag();
+            Ieee8021qHeader * ctag = new Ieee8021qHeader();
             ctag->setVid(d->getDesigVlan());
             macHeader->setCTag(ctag);
             packet->insertAtFront(macHeader);
-            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_DECLARED_CORRECT);
 
 //            send(taggedFrame->dup(), "ifOut", it->port);
         } else {
             packet->insertAtFront(macHeader);
-                        EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+                        EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_DECLARED_CORRECT);
 //            send(untaggedFrame->dup(), "ifOut", it->port);
         }
         send(packet, "ifOut");
@@ -1123,6 +1131,7 @@ bool TRILL::dispatchTRILLDataMultiDestRemote(tFrameDescriptor &frameDesc){
 
         Packet *packet = frameDesc.payload->dup();
         packet->trim();
+        packet->clearTags();
         auto interfaceTag = packet->addTag<InterfaceReq>();
         interfaceTag->setInterfaceId(ift->getInterface(it->port)->getInterfaceId());
 
@@ -1131,15 +1140,15 @@ bool TRILL::dispatchTRILLDataMultiDestRemote(tFrameDescriptor &frameDesc){
         if (it->action == RBVLANTable::INCLUDE) {
 
 //            taggedFrame->setVlan(d->getDesigVlan());
-            Ieee8021QTag * ctag = new Ieee8021QTag();
+            Ieee8021qHeader * ctag = new Ieee8021qHeader();
             ctag->setVid(d->getDesigVlan());
             macHeader->setCTag(ctag);
             packet->insertAtFront(macHeader);
-            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_DECLARED_CORRECT);
 //            send(taggedFrame->dup(), "ifOut", it->port);
         } else {
             packet->insertAtFront(macHeader);
-            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_COMPUTED);
+            EtherEncap::addPaddingAndFcs(packet, FcsMode::FCS_DECLARED_CORRECT);
 //            send(untaggedFrame->dup(), "ifOut", it->port);
         }
         send(packet, "ifOut");
@@ -1847,7 +1856,7 @@ bool TRILL::processTRILLDataMultiDest(tFrameDescriptor &frameDesc){
 
 bool TRILL::isNativeAllowed(tFrameDescriptor &frameDesc){
 
-    TrillInterfaceData *d = (ift->getInterfaceById(frameDesc.rPort))->getProtocolData<TrillInterfaceData>();
+    TrillInterfaceData *d = (ift->getInterface(frameDesc.rPort))->getProtocolData<TrillInterfaceData>();
     //RFC 6325 4.6.1
     if(d->isDisabled() || d->isTrunk() || d->isP2p()){
         //frame should be discarded

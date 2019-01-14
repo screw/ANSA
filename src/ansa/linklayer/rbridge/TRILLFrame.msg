@@ -32,6 +32,7 @@ class TRILLNickname
 
 class TRILLFrame extends FieldsChunk{
     @customize(true);  // see the generated C++ header for more info
+    chunkLength = B(8);
 //    abstract int anotherField;
     uint16_t Ethertype; //this field is only present if IEEE 802.3 layer is used
     unsigned short version = 0; //this field should be 2-bit unsigned int

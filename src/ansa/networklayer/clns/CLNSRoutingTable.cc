@@ -19,7 +19,7 @@
 #include "ansa/networklayer/clns/CLNSRoutingTable.h"
 
 #include "inet/common/INETUtils.h"
-#include "inet/common/lifecycle/NodeOperations.h"
+#include "inet/common/lifecycle/ModuleOperations.h"
 #include "inet/common/lifecycle/NodeStatus.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/networklayer/contract/IInterfaceTable.h"
@@ -341,7 +341,7 @@ void CLNSRoutingTable::receiveSignal(cComponent *source, simsignal_t signalID, c
     }
 }
 
-bool CLNSRoutingTable::handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback)
+bool CLNSRoutingTable::handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback)
 {
     Enter_Method_Silent();
 //    if (dynamic_cast<NodeStartOperation *>(operation)) {

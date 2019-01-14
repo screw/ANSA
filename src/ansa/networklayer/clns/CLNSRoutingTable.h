@@ -21,9 +21,9 @@
 #include "ansa/common/ANSADefs.h"
 
 #include "inet/networklayer/contract/clns/ClnsAddress.h"
-#include "ansa/networklayer/clns/CLNSRoute.h"
 #include "inet/networklayer/contract/IRoutingTable.h"
 #include "inet/common/lifecycle/ILifecycle.h"
+#include "ansa/networklayer/clns/CLNSRoute.h"
 
 using namespace omnetpp;
 
@@ -260,7 +260,7 @@ class CLNSRoutingTable : public cSimpleModule, public IRoutingTable, protected c
     /**
      * ILifecycle method
      */
-    virtual bool handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback) override;
+    virtual bool handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback) override;
 };
 
 } //namespace

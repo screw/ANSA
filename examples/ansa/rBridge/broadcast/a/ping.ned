@@ -16,6 +16,8 @@
 package ansa.examples.ansa.rBridge.broadcast.a;
 
 
+import inet.node.inet.StandardHost;
+import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import ansa.node.ANSA_Host;
 import inet.node.ethernet.Eth100M;
 
@@ -27,19 +29,25 @@ network ping extends a
 {
     @display("bgb=509,354");
     submodules:
-        ansaHost2: ANSA_Host {
+        host2: StandardHost {
             @display("p=243,214");
             gates:
                 ethg[1];
         }
-        ansaHost1: ANSA_Host {
+        host1: StandardHost {
             @display("p=87,214");
             gates:
                 ethg[1];
         }
+        
+                configurator: Ipv4NetworkConfigurator {
+            parameters:
+                @display("p=100,100;is=s");
+//                config = xml("<config><interface hosts='host*' address='192.168.1.x' netmask='255.255.255.x'/></config>");
+        }
 
     connections:
-        rBridge1.ethg++ <--> Eth100M <--> ansaHost1.ethg[0];
-        rBridge2.ethg++ <--> Eth100M <--> ansaHost2.ethg[0];
+        rBridge1.ethg++ <--> Eth100M <--> host1.ethg[0];
+        rBridge2.ethg++ <--> Eth100M <--> host2.ethg[0];
 
 }

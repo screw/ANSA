@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Devices>
 <!-- Host1 -->
-	<Host id="Host1">
+	<Host id="host1">
 		<Interfaces>
 			<Interface name="eth0">
 				<IPAddress>192.168.1.1</IPAddress>
@@ -20,7 +20,7 @@
 		</Routing>
 	</Host>
 	<!-- Host2 -->
-	<Host id="Host2">
+	<Host id="host2">
 		<Interfaces>
 			<Interface name="eth0">
 				<IPAddress>192.168.1.2</IPAddress>
