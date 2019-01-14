@@ -23,7 +23,7 @@
 
 #include "ansa/linklayer/lldp/LLDPMain.h"
 
-#include "inet/common/lifecycle/NodeOperations.h"
+#include "inet/common/lifecycle/ModuleOperations.h"
 #include "inet/common/lifecycle/NodeStatus.h"
 #include "inet/common/IProtocolRegistrationListener.h"
 #include "inet/linklayer/common/InterfaceTag_m.h"
@@ -210,28 +210,28 @@ void LLDPMain::receiveSignal(cComponent *source, simsignal_t signalID, cObject *
     }
 }
 
-bool LLDPMain::handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback)
+bool LLDPMain::handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback)
 {
    Enter_Method_Silent();
 
-    if (dynamic_cast<NodeStartOperation *>(operation)) {
-        if ((NodeStartOperation::Stage)stage == NodeStartOperation::STAGE_LAST) {
-            startLLDP();
-        }
-    }
-    else if (dynamic_cast<NodeShutdownOperation *>(operation)) {
-        if ((NodeShutdownOperation::Stage)stage == NodeShutdownOperation::STAGE_LINK_LAYER){
-            //TODO: interface already down so shutdown packet are dropped
-            // send shutdown updates to neighbors
-            stopLLDP();
-        }
-    }
-    else if (dynamic_cast<NodeCrashOperation *>(operation)) {
-        if ((NodeCrashOperation::Stage)stage == NodeCrashOperation::STAGE_CRASH)
-            stopLLDP();
-    }
-    else
-        throw cRuntimeError("Unsupported operation '%s'", operation->getClassName());
+//    if (dynamic_cast<NodeStartOperation *>(operation)) {
+//        if ((NodeStartOperation::Stage)stage == NodeStartOperation::STAGE_LAST) {
+//            startLLDP();
+//        }
+//    }
+//    else if (dynamic_cast<NodeShutdownOperation *>(operation)) {
+//        if ((NodeShutdownOperation::Stage)stage == NodeShutdownOperation::STAGE_LINK_LAYER){
+//            //TODO: interface already down so shutdown packet are dropped
+//            // send shutdown updates to neighbors
+//            stopLLDP();
+//        }
+//    }
+//    else if (dynamic_cast<NodeCrashOperation *>(operation)) {
+//        if ((NodeCrashOperation::Stage)stage == NodeCrashOperation::STAGE_CRASH)
+//            stopLLDP();
+//    }
+//    else
+//        throw cRuntimeError("Unsupported operation '%s'", operation->getClassName());
 
     return true;
 }

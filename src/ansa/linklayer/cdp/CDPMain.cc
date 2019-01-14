@@ -23,7 +23,7 @@
 #include "ansa/linklayer/cdp/CDPMain.h"
 #include "inet/common/ProtocolTag_m.h"
 #include "inet/common/Simsignals.h"
-#include "inet/common/lifecycle/NodeOperations.h"
+#include "inet/common/lifecycle/ModuleOperations.h"
 #include "inet/common/lifecycle/NodeStatus.h"
 #include "inet/common/lifecycle/ILifecycle.h"
 #include "inet/common/packet/Packet.h"
@@ -204,30 +204,30 @@ void CDPMain::receiveSignal(cComponent *source, simsignal_t signalID, cObject *o
     }
 }
 
-bool CDPMain::handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback)
+bool CDPMain::handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback)
 {
     Enter_Method_Silent();
 
-    if (dynamic_cast<NodeStartOperation *>(operation)) {
-        if ((NodeStartOperation::Stage)stage == NodeStartOperation::STAGE_LAST) {
-            startCDP();
-        }
-    }
-    else if (dynamic_cast<NodeShutdownOperation *>(operation)) {
-        if ((NodeShutdownOperation::Stage)stage == NodeShutdownOperation::STAGE_LOCAL){
-            //TODO: interface already down, packet dropped
-            // send updates to neighbors
-            for (auto it = cit->getInterfaces().begin(); it != cit->getInterfaces().end(); ++it)
-                sendUpdate((*it)->getInterfaceId(), true);
-            stopCDP();
-        }
-    }
-    else if (dynamic_cast<NodeCrashOperation *>(operation)) {
-        if ((NodeCrashOperation::Stage)stage == NodeCrashOperation::STAGE_CRASH)
-            stopCDP();
-    }
-    else
-        throw cRuntimeError("Unsupported operation '%s'", operation->getClassName());
+//    if (dynamic_cast<NodeStartOperation *>(operation)) {
+//        if ((NodeStartOperation::Stage)stage == NodeStartOperation::STAGE_LAST) {
+//            startCDP();
+//        }
+//    }
+//    else if (dynamic_cast<NodeShutdownOperation *>(operation)) {
+//        if ((NodeShutdownOperation::Stage)stage == NodeShutdownOperation::STAGE_LOCAL){
+//            //TODO: interface already down, packet dropped
+//            // send updates to neighbors
+//            for (auto it = cit->getInterfaces().begin(); it != cit->getInterfaces().end(); ++it)
+//                sendUpdate((*it)->getInterfaceId(), true);
+//            stopCDP();
+//        }
+//    }
+//    else if (dynamic_cast<NodeCrashOperation *>(operation)) {
+//        if ((NodeCrashOperation::Stage)stage == NodeCrashOperation::STAGE_CRASH)
+//            stopCDP();
+//    }
+//    else
+//        throw cRuntimeError("Unsupported operation '%s'", operation->getClassName());
 
     return true;
 }
