@@ -61,7 +61,15 @@ jobs:
     # in one of them contain the letter 'v', and the ones in the other don't. So what.
 
     # release mode fingerprints, split into three arbitrary parts using filters, to avoid freaking timeouts
-#    - stage: fingerprints
+    - stage: fingerprints
+      script:
+        - export STAGE=fingerprints
+        - *DOCKER_COMMAND
+      env: TARGET_PLATFORM=linux MODE=release
+      - script:
+        - export STAGE=fingerprints
+        - *DOCKER_COMMAND
+      env: TARGET_PLATFORM=linux MODE=debug
 #      script:
 #        - export STAGE=fingerprints INNER_ARGS="-m tutorials -m showcases" # not env, so it doesn't affect the cache key
 #        - *DOCKER_COMMAND

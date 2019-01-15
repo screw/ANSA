@@ -1,0 +1,25 @@
+#! /bin/sh
+# This script is taken from INET project (https://github.com/inet-framework/inet) and
+# slightly modified to work with ANSA.
+
+case "$-" in
+*i*) ;;
+*)  if [ "$1" != "-f" ]; then # allow use from scripts, as ". setenv -f"
+        echo "Error: not a login shell -- run this script as 'source setenv' or '. setenv'"
+        exit 1
+    fi
+esac
+
+if [ ! -f bin/ansa ]; then
+    echo "Error: current working directory does not look like an ANSA root directory"
+    # no exit -- it would close the shell
+else
+    export ANSA_ROOT=`pwd`
+    echo $ANSA_ROOT
+    export PATH=$ANSA_ROOT/bin:$PATH
+    export ANSA_NED_PATH="$INET_NED_PATH:$ANSA_ROOT/src:$ANSA_ROOT/examples"
+    export ANSA_OMNETPP_OPTIONS="-n $ANSA_NED_PATH --image-path=$INET_ROOT/images"
+    export ANSA_GDB_OPTIONS="-quiet -ex run --args"
+    export ANSA_VALGRIND_OPTIONS="-v --tool=memcheck --leak-check=yes --show-reachable=no --leak-resolution=high --num-callers=40 --freelist-vol=4000000"
+fi
+

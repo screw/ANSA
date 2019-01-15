@@ -12,20 +12,22 @@
 
 set -e # make the script exit with error if any executed command exits with error
 
-echo -e "\nccache summary:\n"
-ccache -s
-echo -e ""
+#echo -e "\nccache summary:\n"
+#ccache -s
+#echo -e ""
 
-export PATH="/root/omnetpp-5.4.1-linux/bin:/usr/lib/ccache:$PATH"
+export PATH="/root/omnetpp-5.4.1-$TARGET_PLATFORM/bin:/usr/lib/ccache:$PATH"
 
-# this is where the cloned INET repo is mounted into the container (as prescribed in /.travis.yml)
-cd $INET_BASE-$TARGET_PLATFORM-$MODE
+# this is where the cloned ANSA repo is mounted into the container (as prescribed in /.travis.yml)
+cd /$TRAVIS_REPO_SLUG
 
 . setenv -f
 
-cp -r /root/nsc-0.5.3 3rdparty
 
-opp_featuretool enable VoIPStream VoIPStream_examples TCP_NSC TCP_lwIP
+
+#cp -r /root/nsc-0.5.3 3rdparty
+
+#opp_featuretool enable VoIPStream VoIPStream_examples TCP_NSC TCP_lwIP
 
 # We have to explicitly enable diagnostics coloring to make ccache work,
 # since we redirect stderr here, but not in the build stage.
@@ -36,16 +38,16 @@ echo -e "\nBuilding (silently)...\n"
 make makefiles > /dev/null 2>&1
 make MODE=$MODE USE_PRECOMPILED_HEADER=no -j $(nproc) > /dev/null 2>&1
 
-echo -e "\nccache summary:\n"
-ccache -s
+#echo -e "\nccache summary:\n"
+#ccache -s
 
 echo -e "\nBuild finished, starting fingerprint tests..."
 echo -e "Additional arguments passed to fingerprint test script: " $@ "\n"
 
 cd tests/fingerprint
 if [ "$MODE" = "debug" ]; then
-    ./fingerprinttest -d "$@"
+    ./fingerprints -d "$@"
 else
-    ./fingerprinttest "$@"
+    ./fingerprints "$@"
 fi
 #
