@@ -45,8 +45,8 @@ jobs:
     - stage: build
       env: TARGET_PLATFORM=linux MODE=release
     - env: TARGET_PLATFORM=linux MODE=debug
-    - env: TARGET_PLATFORM=windows MODE=release
-    - env: TARGET_PLATFORM=windows MODE=debug
+#    - env: TARGET_PLATFORM=windows MODE=release
+#    - env: TARGET_PLATFORM=windows MODE=debug
     - env: TARGET_PLATFORM=macosx MODE=release
     - env: TARGET_PLATFORM=macosx MODE=debug
 
