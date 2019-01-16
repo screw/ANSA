@@ -689,6 +689,9 @@ if __name__ == "__main__":
     if exitCode == 0:
         print("Test results equals to expected results")
     else:
+        FILE = open(logFile, "r")
+        print (FILE.read())
+        FILE.close()
         print("Test results differ from expected results")
     exit(exitCode)
 
