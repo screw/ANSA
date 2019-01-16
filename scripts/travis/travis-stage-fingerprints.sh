@@ -46,8 +46,8 @@ echo -e "Additional arguments passed to fingerprint test script: " $@ "\n"
 
 cd tests/fingerprint
 if [ "$MODE" = "debug" ]; then
-    ./fingerprints ansa.csv -d "$@"
+    ./fingerprints ansa.csv -e ansa -d "$@"
 else
-    ./fingerprints ansa.csv "$@"
+    ./fingerprints ansa.csv -e ansa "$@"
 fi
 #
