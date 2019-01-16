@@ -23,12 +23,13 @@ export PATH="/root/omnetpp-5.4.1-$TARGET_PLATFORM/bin:/usr/lib/ccache:$PATH"
 # so we need to invoked it again
 cd $INET_BASE
 . setenv -f
+env
 
 # this is where the cloned ANSA repo is mounted into the container (as prescribed in /.travis.yml)
 cd /$TRAVIS_REPO_SLUG
 
 . setenv -f
-
+env
 
 
 #cp -r /root/nsc-0.5.3 3rdparty
@@ -51,6 +52,7 @@ echo -e "\nBuild finished, starting fingerprint tests..."
 echo -e "Additional arguments passed to fingerprint test script: " $@ "\n"
 
 cd tests/fingerprint
+env
 if [ "$MODE" = "debug" ]; then
     ./fingerprints ansa.csv -e ansa -d "$@"
 else
