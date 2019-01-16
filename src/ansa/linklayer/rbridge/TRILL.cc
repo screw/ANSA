@@ -489,6 +489,7 @@ bool TRILL::egressTRILLDataMultiDestNative(TRILL::tFrameDescriptor &innerFrameDe
             ++it;
         }
     }
+    return true;
 
 }
 
@@ -1736,7 +1737,7 @@ bool TRILL::processTRILLDataUnicast(tFrameDescriptor &frameDesc){
         }
 
 
-
+return false;
 }
 
 

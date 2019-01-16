@@ -3062,7 +3062,7 @@ SystemID ISISMain::getSysID(const ISISMessage *msg) {
                   << msg->getType() << endl;
     }
 
-//    return systemID;
+    throw cRuntimeError("ISIS: ERROR: getSysID for this message type is not implemented (yet?):");
 
 }
 
