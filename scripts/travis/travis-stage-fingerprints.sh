@@ -18,6 +18,12 @@ set -e # make the script exit with error if any executed command exits with erro
 
 export PATH="/root/omnetpp-5.4.1-$TARGET_PLATFORM/bin:/usr/lib/ccache:$PATH"
 
+# INET_BASE is defined in docker
+# setenv is invoked during docker build, but the environment variables exist only during the "RUN" statement,
+# so we need to invoked it again
+cd $INET_BASE
+. setenv -f
+
 # this is where the cloned ANSA repo is mounted into the container (as prescribed in /.travis.yml)
 cd /$TRAVIS_REPO_SLUG
 
